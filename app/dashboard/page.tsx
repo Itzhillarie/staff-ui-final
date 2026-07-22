@@ -6,43 +6,31 @@ import IdeaPipeline from "@/app/components/dashboard/IdeaPipeline";
 import RecentIdeas from "@/app/components/dashboard/RecentIdeas";
 import Leaderboard from "@/app/components/dashboard/Leaderboard";
 
-async function getDashboard() {
-  return {
-    ideas: [],
-    projects: {},
-    leaderboard: [],
-    pipeline: [],
-    recentIdeas: [],
-  };
-}
-
-export default async function Dashboard() {
-  const dashboard = await getDashboard() as {
-    ideas: any;
-    projects: any;
-    leaderboard: any;
-    pipeline?: any[];
-    recentIdeas?: any[];
-  };
-
+export default function Dashboard() {
   return (
-    <div className="space-y-8">
+    <main className="space-y-8">
+
+      {/* Dashboard Header */}
       <DashboardHeader />
 
-      <DashboardStats stats={dashboard.projects} />
+      {/* Dashboard Statistics */}
+      <DashboardStats />
 
+      {/* Quick Actions */}
       <QuickActions />
 
-      <div className="grid gap-8 xl:grid-cols-2">
-        {/* recentActivity may not be provided by getDashboard; default to empty array */}
-        <RecentActivity activities={[] } />
+      {/* Activity & Pipeline */}
+      <section className="grid gap-8 xl:grid-cols-2">
+        <RecentActivity />
+        <IdeaPipeline />
+      </section>
 
-        <IdeaPipeline pipeline={dashboard.pipeline ?? []} />
-      </div>
+      {/* Recent Ideas */}
+      <RecentIdeas />
 
-      <RecentIdeas ideas={dashboard.recentIdeas ?? []} />
+      {/* Leaderboard */}
+      <Leaderboard />
 
-      <Leaderboard users={dashboard.leaderboard} />
-    </div>
+    </main>
   );
 }

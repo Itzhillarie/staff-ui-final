@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+
 import {
   Lightbulb,
   ClipboardList,
@@ -10,28 +12,26 @@ import {
   Bell,
 } from "lucide-react";
 
-interface QuickActionsProps {
-  stats?: {
-    submittedIdeas: number;
-    peerReview: number;
-    projects: number;
-    notifications?: number;
-  };
+interface DashboardStats {
+  submittedIdeas: number;
+  peerReview: number;
+  projects: number;
+  notifications: number;
 }
 
 const actions = [
   {
     title: "Submit Idea",
     description: "Share a new innovation",
-    href: "/submit-idea",
+    href: "/dashboard/submit-idea",
     icon: Lightbulb,
     color: "bg-blue-500",
     badge: null,
   },
   {
     title: "Idea Board",
-    description: "Browse all ideas",
-    href: "/idea-board",
+    description: "Browse all submitted ideas",
+    href: "/dashboard/idea-board",
     icon: ClipboardList,
     color: "bg-purple-500",
     badge: "submittedIdeas",
@@ -39,7 +39,7 @@ const actions = [
   {
     title: "Peer Reviews",
     description: "Review colleague ideas",
-    href: "/peer-review",
+    href: "/dashboard/peer-review",
     icon: Users,
     color: "bg-green-500",
     badge: "peerReview",
@@ -47,45 +47,93 @@ const actions = [
   {
     title: "Projects",
     description: "Implementation projects",
-    href: "/implementation",
+    href: "/dashboard/implementation",
     icon: Rocket,
     color: "bg-cyan-600",
     badge: "projects",
   },
   {
     title: "Leaderboard",
-    description: "Innovation rankings",
-    href: "/leaderboard",
+    description: "Organization rankings",
+    href: "/dashboard/leaderboard",
     icon: Trophy,
     color: "bg-yellow-500",
     badge: null,
   },
   {
     title: "Notifications",
-    description: "Recent updates",
-    href: "/notifications",
+    description: "Recent activity",
+    href: "/dashboard/notifications",
     icon: Bell,
     color: "bg-red-500",
     badge: "notifications",
   },
 ];
 
-export default function QuickActions({
-  stats,
-}: QuickActionsProps) {
+export default function QuickActions() {
+  const [stats, setStats] = useState<DashboardStats>({
+    submittedIdeas: 0,
+    peerReview: 0,
+    projects: 0,
+    notifications: 0,
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchQuickActions() {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/dashboard/`,
+          {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store",
+            headers: {
+              "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "1",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Unable to load quick actions.");
+        }
+
+        const data = await response.json();
+
+        setStats({
+          submittedIdeas: data.submittedIdeas ?? 0,
+          peerReview: data.peerReview ?? 0,
+          projects: data.projects ?? 0,
+          notifications: data.notifications ?? 0,
+        });
+      } catch (error) {
+        console.error("Quick Actions Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchQuickActions();
+  }, []);
+
   return (
     <section>
+
       <h2 className="mb-5 text-2xl font-bold text-slate-800">
         Quick Actions
       </h2>
 
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+
         {actions.map((action) => {
+
           const Icon = action.icon;
 
           const badge =
-            action.badge && stats
-              ? stats[action.badge as keyof typeof stats]
+            action.badge !== null
+              ? stats[action.badge as keyof DashboardStats]
               : null;
 
           return (
@@ -94,9 +142,10 @@ export default function QuickActions({
               href={action.href}
               className="group relative rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              {badge !== null &&
-                badge !== undefined &&
-                Number(badge) > 0 && (
+
+              {!loading &&
+                badge !== null &&
+                badge > 0 && (
                   <span className="absolute right-4 top-4 rounded-full bg-red-600 px-2 py-1 text-xs font-bold text-white">
                     {badge}
                   </span>
@@ -115,10 +164,13 @@ export default function QuickActions({
               <p className="mt-2 text-sm text-slate-500">
                 {action.description}
               </p>
+
             </Link>
           );
         })}
+
       </div>
+
     </section>
   );
 }

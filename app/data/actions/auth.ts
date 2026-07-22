@@ -5,6 +5,9 @@ import { cookies } from "next/headers";
 export interface LoginState {
   success: boolean;
   message: string;
+  token?: string;
+  username?: string;
+  role?: string;
 }
 
 export async function loginUserAction(
@@ -28,7 +31,6 @@ export async function loginUserAction(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "1",
         },
         body: JSON.stringify({
           username,
@@ -44,25 +46,29 @@ export async function loginUserAction(
       return {
         success: false,
         message:
-          data.message ||
           data.error ||
-          data.detail ||
+          data.message ||
           "Invalid username or password.",
+      };
+    }
+
+    if (!data.token) {
+      return {
+        success: false,
+        message: "Login succeeded but no token was returned.",
       };
     }
 
     const cookieStore = await cookies();
 
-    // IMPORTANT: Django expects this cookie name
     cookieStore.set("jwt", data.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60, // 1 hour (matches your Django backend)
+      maxAge: 60 * 60,
     });
 
-    // Optional user information
     cookieStore.set("username", data.username ?? "", {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
@@ -81,7 +87,10 @@ export async function loginUserAction(
 
     return {
       success: true,
-      message: "Login successful. Welcome back!",
+      message: "Login successful.",
+      token: data.token,
+      username: data.username,
+      role: data.role,
     };
   } catch (error) {
     console.error("Login Error:", error);

@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import {
   FileEdit,
   Send,
@@ -14,10 +16,6 @@ import {
 interface PipelineStage {
   stage: string;
   count: number;
-}
-
-interface IdeaPipelineProps {
-  pipeline: PipelineStage[];
 }
 
 const stageConfig = {
@@ -55,16 +53,50 @@ const stageConfig = {
   },
 } as const;
 
-export default function IdeaPipeline({
-  pipeline,
-}: IdeaPipelineProps) {
+export default function IdeaPipeline() {
+  const [pipeline, setPipeline] = useState<PipelineStage[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadPipeline() {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/dashboard/`,
+          {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store",
+            headers: {
+              "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "1",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to load pipeline");
+        }
+
+        const data = await response.json();
+
+        setPipeline(data.pipeline ?? []);
+      } catch (error) {
+        console.error("Pipeline Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadPipeline();
+  }, []);
+
   const maxCount = Math.max(
-    ...pipeline.map((stage) => stage.count),
+    ...pipeline.map((item) => item.count),
     1
   );
 
   const totalIdeas = pipeline.reduce(
-    (sum, stage) => sum + stage.count,
+    (sum, item) => sum + item.count,
     0
   );
 
@@ -72,7 +104,9 @@ export default function IdeaPipeline({
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
 
       <div className="mb-8 flex items-center justify-between">
+
         <div>
+
           <h2 className="text-2xl font-bold text-slate-800">
             Idea Pipeline
           </h2>
@@ -80,66 +114,97 @@ export default function IdeaPipeline({
           <p className="mt-1 text-sm text-slate-500">
             Track ideas through the innovation lifecycle.
           </p>
+
         </div>
 
         <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
-          {totalIdeas} Total Ideas
+
+          {loading ? "Loading..." : `${totalIdeas} Total Ideas`}
+
         </span>
+
       </div>
 
-      <div className="space-y-6">
-        {pipeline.map((stage) => {
-          const config =
-            stageConfig[
-              stage.stage as keyof typeof stageConfig
-            ];
+      {loading ? (
 
-          if (!config) return null;
+        <div className="py-12 text-center text-slate-500">
 
-          const Icon = config.icon;
+          Loading pipeline...
 
-          const percentage =
-            (stage.count / maxCount) * 100;
+        </div>
 
-          return (
-            <div key={stage.stage}>
-              <div className="mb-2 flex items-center justify-between">
+      ) : pipeline.length === 0 ? (
 
-                <div className="flex items-center gap-3">
+        <div className="py-12 text-center text-slate-500">
 
-                  <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-lg ${config.color} text-white`}
-                  >
-                    <Icon size={18} />
+          No pipeline data available.
+
+        </div>
+
+      ) : (
+
+        <div className="space-y-6">
+
+          {pipeline.map((stage) => {
+
+            const config =
+              stageConfig[
+                stage.stage as keyof typeof stageConfig
+              ];
+
+            if (!config) return null;
+
+            const Icon = config.icon;
+
+            const percentage =
+              (stage.count / maxCount) * 100;
+
+            return (
+
+              <div key={stage.stage}>
+
+                <div className="mb-2 flex items-center justify-between">
+
+                  <div className="flex items-center gap-3">
+
+                    <div
+                      className={`flex h-10 w-10 items-center justify-center rounded-lg ${config.color} text-white`}
+                    >
+                      <Icon size={18} />
+                    </div>
+
+                    <span className="font-medium text-slate-700">
+                      {stage.stage}
+                    </span>
+
                   </div>
 
-                  <span className="font-medium text-slate-700">
-                    {stage.stage}
+                  <span className="font-bold text-slate-800">
+                    {stage.count}
                   </span>
 
                 </div>
 
-                <span className="font-bold text-slate-800">
-                  {stage.count}
-                </span>
+                <div className="h-3 overflow-hidden rounded-full bg-slate-200">
+
+                  <div
+                    className={`h-full rounded-full ${config.color} transition-all duration-700`}
+                    style={{
+                      width: `${percentage}%`,
+                    }}
+                  />
+
+                </div>
 
               </div>
 
-              <div className="h-3 overflow-hidden rounded-full bg-slate-200">
+            );
+          })}
 
-                <div
-                  className={`h-full rounded-full ${config.color} transition-all duration-700`}
-                  style={{
-                    width: `${percentage}%`,
-                  }}
-                />
+        </div>
 
-              </div>
+      )}
 
-            </div>
-          );
-        })}
-      </div>
     </section>
   );
 }

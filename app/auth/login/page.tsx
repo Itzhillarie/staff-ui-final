@@ -1,5 +1,5 @@
 
-import { SigninForm } from "@/app/components/forms/SigninForm";
+import { SigninForm } from "@/app/components/forms/LoginForm";
 
 export default function Signin() {
   return (

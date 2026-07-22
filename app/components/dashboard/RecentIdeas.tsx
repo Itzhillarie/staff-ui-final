@@ -1,11 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+
 import {
   Eye,
   MessageCircle,
   ThumbsUp,
   Clock3,
+  Loader2,
 } from "lucide-react";
 
 interface Idea {
@@ -15,10 +18,6 @@ interface Idea {
   likes: number;
   comments: number;
   submitted: string;
-}
-
-interface RecentIdeasProps {
-  ideas: Idea[];
 }
 
 const statusColors: Record<string, string> = {
@@ -33,15 +32,61 @@ const statusColors: Record<string, string> = {
   Archived: "bg-slate-100 text-slate-700",
 };
 
-export default function RecentIdeas({
-  ideas,
-}: RecentIdeasProps) {
+export default function RecentIdeas() {
+  const [ideas, setIdeas] = useState<Idea[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchIdeas() {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/dashboard/ideas`,
+          {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store",
+            headers: {
+              "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "1",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch ideas");
+        }
+
+        const data = await response.json();
+
+        const formattedIdeas = data.map((idea: any) => ({
+          id: String(idea.id),
+          title: idea.title,
+          status: idea.status,
+          likes: idea.likes ?? 0,
+          comments: idea.comments ?? 0,
+          submitted: new Date(
+            idea.created_at ?? idea.submitted
+          ).toLocaleDateString(),
+        }));
+
+        setIdeas(formattedIdeas);
+      } catch (error) {
+        console.error("Recent Ideas Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchIdeas();
+  }, []);
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
 
       <div className="flex items-center justify-between border-b p-6">
 
         <div>
+
           <h2 className="text-2xl font-bold text-slate-800">
             My Recent Ideas
           </h2>
@@ -49,11 +94,12 @@ export default function RecentIdeas({
           <p className="mt-1 text-sm text-slate-500">
             Track your latest submissions and their progress.
           </p>
+
         </div>
 
         <Link
-          href="/idea-board"
-          className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          href="/dashboard/idea-board"
+          className="rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
         >
           View All
         </Link>
@@ -62,116 +108,162 @@ export default function RecentIdeas({
 
       <div className="overflow-x-auto">
 
-        <table className="w-full">
+        {loading ? (
 
-          <thead className="bg-slate-50">
+          <div className="flex justify-center py-12">
 
-            <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold">
-                Idea
-              </th>
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
 
-              <th className="px-6 py-4 text-left text-sm font-semibold">
-                Status
-              </th>
+          </div>
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
-                Likes
-              </th>
+        ) : (
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
-                Comments
-              </th>
+          <table className="w-full">
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
-                Submitted
-              </th>
+            <thead className="bg-slate-50">
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
-                Action
-              </th>
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            {ideas.length === 0 ? (
               <tr>
-                <td
-                  colSpan={6}
-                  className="py-10 text-center text-slate-500"
-                >
-                  No ideas found.
-                </td>
+
+                <th className="px-6 py-4 text-left text-sm font-semibold">
+                  Idea
+                </th>
+
+                <th className="px-6 py-4 text-left text-sm font-semibold">
+                  Status
+                </th>
+
+                <th className="px-6 py-4 text-center text-sm font-semibold">
+                  Likes
+                </th>
+
+                <th className="px-6 py-4 text-center text-sm font-semibold">
+                  Comments
+                </th>
+
+                <th className="px-6 py-4 text-center text-sm font-semibold">
+                  Submitted
+                </th>
+
+                <th className="px-6 py-4 text-center text-sm font-semibold">
+                  Action
+                </th>
+
               </tr>
-            ) : (
-              ideas.map((idea) => (
-                <tr
-                  key={idea.id}
-                  className="border-t hover:bg-slate-50"
-                >
-                  <td className="px-6 py-5 font-medium">
-                    {idea.title}
+
+            </thead>
+
+            <tbody>
+
+              {ideas.length === 0 ? (
+
+                <tr>
+
+                  <td
+                    colSpan={6}
+                    className="py-12 text-center text-slate-500"
+                  >
+                    No ideas found.
                   </td>
 
-                  <td className="px-6 py-5">
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        statusColors[idea.status] ??
-                        "bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {idea.status}
-                    </span>
-                  </td>
-
-                  <td className="px-6 py-5 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <ThumbsUp
-                        size={16}
-                        className="text-blue-600"
-                      />
-                      {idea.likes}
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-5 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <MessageCircle
-                        size={16}
-                        className="text-green-600"
-                      />
-                      {idea.comments}
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-5 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <Clock3
-                        size={16}
-                        className="text-orange-500"
-                      />
-                      {idea.submitted}
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-5 text-center">
-                    <Link
-                      href={`/idea-board/${idea.id}`}
-                      className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm hover:bg-blue-600 hover:text-white"
-                    >
-                      <Eye size={16} />
-                      View
-                    </Link>
-                  </td>
                 </tr>
-              ))
-            )}
 
-          </tbody>
+              ) : (
 
-        </table>
+                ideas.map((idea) => (
+
+                  <tr
+                    key={idea.id}
+                    className="border-t transition hover:bg-slate-50"
+                  >
+
+                    <td className="px-6 py-5 font-medium">
+                      {idea.title}
+                    </td>
+
+                    <td className="px-6 py-5">
+
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                          statusColors[idea.status] ??
+                          "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {idea.status}
+                      </span>
+
+                    </td>
+
+                    <td className="px-6 py-5 text-center">
+
+                      <div className="flex items-center justify-center gap-2">
+
+                        <ThumbsUp
+                          size={16}
+                          className="text-blue-600"
+                        />
+
+                        {idea.likes}
+
+                      </div>
+
+                    </td>
+
+                    <td className="px-6 py-5 text-center">
+
+                      <div className="flex items-center justify-center gap-2">
+
+                        <MessageCircle
+                          size={16}
+                          className="text-green-600"
+                        />
+
+                        {idea.comments}
+
+                      </div>
+
+                    </td>
+
+                    <td className="px-6 py-5 text-center">
+
+                      <div className="flex items-center justify-center gap-2">
+
+                        <Clock3
+                          size={16}
+                          className="text-orange-500"
+                        />
+
+                        {idea.submitted}
+
+                      </div>
+
+                    </td>
+
+                    <td className="px-6 py-5 text-center">
+
+                      <Link
+                        href={`/dashboard/idea-board/${idea.id}`}
+                        className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm transition hover:bg-blue-600 hover:text-white"
+                      >
+
+                        <Eye size={16} />
+
+                        View
+
+                      </Link>
+
+                    </td>
+
+                  </tr>
+
+                ))
+
+              )}
+
+            </tbody>
+
+          </table>
+
+        )}
 
       </div>
 

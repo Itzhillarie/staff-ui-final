@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 
 import { Toaster } from "sonner";
+import AuthProvider from "@/app/providers/Authprovider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -85,26 +86,30 @@ export default function RootLayout({
       <body
         className={`${inter.variable} bg-slate-100 font-sans antialiased`}
       >
-        {/* Main Application */}
-        <main className="min-h-screen">
-          {children}
-        </main>
+        <AuthProvider>
 
-        {/* Toast Notifications */}
-        <Toaster
-          position="top-right"
-          richColors
-          closeButton
-          expand
-          duration={3500}
-          visibleToasts={5}
-          toastOptions={{
-            style: {
-              borderRadius: "14px",
-              fontSize: "14px",
-            },
-          }}
-        />
+          {/* Main Application */}
+          <main className="min-h-screen">
+            {children}
+          </main>
+
+          {/* Toast Notifications */}
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            expand
+            duration={3500}
+            visibleToasts={5}
+            toastOptions={{
+              style: {
+                borderRadius: "14px",
+                fontSize: "14px",
+              },
+            }}
+          />
+
+        </AuthProvider>
       </body>
     </html>
   );

@@ -40,14 +40,16 @@ export function SignupForm() {
       <form action={actions.auth.registerUserAction}>
         <Card>
           <CardHeader className={styles.header}>
-            <CardTitle className={styles.title}>LOGIN</CardTitle>
+            <CardTitle className={styles.title}>RESET PASSWORD</CardTitle>
             <CardDescription>
-              Enter your details to create a new account
+              Enter your details to reset password.
             </CardDescription>
           </CardHeader>
           <CardContent className={styles.content}>
             <div className={styles.fieldGroup}>
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username" className="text-red-500">
+                Username
+              </Label>
               <Input
                 id="username"
                 name="username"
@@ -56,7 +58,9 @@ export function SignupForm() {
               />
             </div>
             <div className={styles.fieldGroup}>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-red-500">
+                Email
+              </Label>
               <Input
                 id="email"
                 name="email"
@@ -75,13 +79,13 @@ export function SignupForm() {
             </div>
           </CardContent>
           <CardFooter className={styles.footer}>
-            <Button className={styles.button}>Sign Up</Button>
+            <Button className={styles.button}>login</Button>
           </CardFooter>
         </Card>
         <div className={styles.prompt}>
           Have an account?
           <Link className={styles.link} href="/auth/signin">
-            Sign In
+            login
           </Link>
         </div>
       </form>

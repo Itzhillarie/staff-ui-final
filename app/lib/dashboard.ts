@@ -9,7 +9,6 @@ export async function getDashboard() {
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
-    "ngrok-skip-browser-warning": "1",
   };
 
   if (jwt) {

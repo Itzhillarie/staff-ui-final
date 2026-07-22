@@ -1,0 +1,67 @@
+{
+    "onboarding_id": "3c7ddaac-4ec8-4098-a58c-2c4157029026",
+    "organization_id": "",
+    "legal_name": "spin-hil",
+    "trading_name": "Hil",
+    "organization_type": "microfinance",
+    "products_needed": [
+        "statement_analysis",
+        "kyc_kyb_checks"
+    ],
+    "monthly_transaction_volume": "2501_to_5000",
+    "staff_size": "21_to_50",
+    "pain_points": [
+        "manual_analysis",
+        "fraud"
+    ],
+    "country": {
+        "country_code": "KE",
+        "name": "Kenya",
+        "registration_number": "BRS-SUCCESS",
+        "tax_id": "867",
+        "address": "",
+        "business_permit_license": "BRS-SUCCESS"
+    },
+    "operating_countries": [
+        {
+            "country_code": "KE",
+            "name": "Kenya",
+            "registration_number": "BRS-SUCCESS",
+            "tax_id": "867",
+            "address": "Nairobi",
+            "business_permit_license": "BRS-SUCCESS"
+        },
+        {
+            "country_code": "TZ",
+            "name": "Tanzania",
+            "registration_number": "BRS-SUCCESS",
+            "tax_id": "32r32r32",
+            "address": "Deresalam",
+            "business_permit_license": ""
+        }
+    ],
+    "contact_email": "",
+    "contact_phone": "",
+    "website": "https://github.com/Alfonce-Muthama/staff_innovations/tree/main/projects",
+    "description": "Organization onboarding request",
+    "documents": {
+        "business_registration": "Screenshot 2026-06-27 201755.png",
+        "kra_pin": "Screenshot 2026-06-29 094009.png",
+        "tax_compliance": "Screenshot 2026-06-30 165525.png",
+        "memorandum": "Screenshot 2026-06-27 205752.png"
+    },
+    "plan_option": "statement_analysis",
+    "payment_option": "mpesa",
+    "compliance_checks": {
+        "authorized_representative": false,
+        "data_privacy": false,
+        "product_terms": false,
+        "accurate_information": false
+    },
+    "steps": {
+        "product_tour": "skipped",
+        "choose_plan": "done",
+        "payment_done": "done",
+        "operating_countries": "done"
+    }
+}

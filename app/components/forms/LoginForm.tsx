@@ -5,9 +5,8 @@ import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import {
-  loginUserAction,
-} from "@/app/data/actions/auth";
+import { loginUserAction } from "@/app/data/actions/auth";
+import { useAuthStore } from "@/app/store/authstore";
 
 import {
   Card,
@@ -21,9 +20,12 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-const initialState: { success: boolean; message: string } = {
+const initialState = {
   success: false,
   message: "",
+  token: "",
+  username: "",
+  role: "",
 };
 
 const styles = {
@@ -42,6 +44,8 @@ const styles = {
 export function SigninForm() {
   const router = useRouter();
 
+  const login = useAuthStore((state) => state.login);
+
   const [state, formAction, pending] = useActionState(
     loginUserAction,
     initialState
@@ -51,15 +55,19 @@ export function SigninForm() {
     if (!state.message) return;
 
     if (state.success) {
+      login(
+        state.token ?? "",
+        state.username ?? "",
+        state.role ?? ""
+      );
+
       toast.success(state.message);
 
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 1200);
+      router.replace("/dashboard");
     } else {
       toast.error(state.message);
     }
-  }, [state, router]);
+  }, [state, login, router]);
 
   return (
     <div className={styles.container}>
@@ -111,15 +119,14 @@ export function SigninForm() {
               disabled={pending}
               className={styles.button}
             >
-              {pending
-                ? "Logging In..."
-                : "LOGIN"}
+              {pending ? "Logging In..." : "LOGIN"}
             </button>
           </CardFooter>
         </Card>
 
         <div className={styles.prompt}>
           Forgot password?
+
           <Link
             href="/auth/forgot-password"
             className={styles.link}

@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { logout } from "@/app/lib/logout";
+
 import {
   LayoutDashboard,
   Lightbulb,
@@ -12,6 +14,7 @@ import {
   Trophy,
   Bell,
   Settings,
+  LogOut,
 } from "lucide-react";
 
 const links = [
@@ -25,7 +28,6 @@ const links = [
     href: "/dashboard/submit-idea",
     icon: Lightbulb,
   },
-
   {
     name: "Idea Board",
     href: "/dashboard/idea-board",
@@ -43,7 +45,7 @@ const links = [
   },
   {
     name: "Implementation",
-    href: "/implementation",
+    href: "/dashboard/implementation",
     icon: Rocket,
   },
   {
@@ -65,16 +67,28 @@ const links = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    await logout();
+    router.replace("/auth/signin");
+  }
 
   return (
-    <aside className="w-72 bg-white border-r h-screen sticky top-0 shadow-sm">
-      <div className="h-20 flex items-center px-8 border-b">
+    <aside className="flex h-screen w-72 flex-col border-r bg-white shadow-sm">
+
+      {/* Logo */}
+
+      <div className="flex h-20 items-center border-b px-8">
         <h1 className="text-3xl font-bold text-blue-600">
           💡 InnoBoard
         </h1>
       </div>
 
-      <nav className="mt-6 space-y-2 px-4">
+      {/* Navigation */}
+
+      <nav className="mt-6 flex-1 space-y-2 px-4">
+
         {links.map((item) => {
           const Icon = item.icon;
 
@@ -82,11 +96,10 @@ export default function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`flex items-center gap-4 rounded-xl px-5 py-4 transition-all
-              ${
+              className={`flex items-center gap-4 rounded-xl px-5 py-4 transition-all ${
                 pathname === item.href
                   ? "bg-blue-600 text-white shadow-lg"
-                  : "hover:bg-gray-100 text-gray-700"
+                  : "text-gray-700 hover:bg-gray-100"
               }`}
             >
               <Icon size={22} />
@@ -94,7 +107,23 @@ export default function Sidebar() {
             </Link>
           );
         })}
+
       </nav>
+
+      {/* Logout */}
+
+      <div className="border-t p-4">
+
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center justify-center gap-3 rounded-xl bg-red-600 px-4 py-3 font-medium text-white transition hover:bg-red-700"
+        >
+          <LogOut size={20} />
+          Logout
+        </button>
+
+      </div>
+
     </aside>
   );
 }
