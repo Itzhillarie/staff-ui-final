@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import {
   Crown,
   Trophy,
@@ -10,6 +9,8 @@ import {
   TrendingUp,
   Loader2,
 } from "lucide-react";
+
+import { getDashboardData } from "@/app/lib/dashboard";
 
 interface Leader {
   id: string;
@@ -44,26 +45,29 @@ export default function Leaderboard() {
   useEffect(() => {
     async function fetchLeaderboard() {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/dashboard/`,
-          {
-            method: "GET",
-            credentials: "include",
-            cache: "no-store",
-            headers: {
-              "Content-Type": "application/json",
-              "ngrok-skip-browser-warning": "1",
-            },
-          }
-        );
+        const dashboard = await getDashboardData();
 
-        if (!response.ok) {
-          throw new Error("Unable to load leaderboard");
-        }
+        const leaderboard =
+          dashboard.charts.leaderboard.map(
+            (user, index) => ({
+              id: String(index + 1),
+              rank: index + 1,
+              username: user.username,
+              points: user.points,
+              ideas: 0,
+              approved_ideas: 0,
+              badge:
+                index === 0
+                  ? "Champion"
+                  : index === 1
+                  ? "Runner Up"
+                  : index === 2
+                  ? "Top Innovator"
+                  : "Contributor",
+            })
+          );
 
-        const data = await response.json();
-
-        setLeaders(data);
+        setLeaders(leaderboard);
       } catch (error) {
         console.error("Leaderboard Error:", error);
       } finally {
@@ -95,7 +99,7 @@ export default function Leaderboard() {
 
           <TrendingUp size={18} />
 
-          Live Rankings
+          <span>Live Rankings</span>
 
         </div>
 
@@ -106,8 +110,11 @@ export default function Leaderboard() {
         <div className="flex items-center justify-center py-12">
 
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+
         </div>
+
       ) : leaders.length === 0 ? (
+
         <div className="p-10 text-center text-slate-500">
           No leaderboard data available.
         </div>
@@ -175,15 +182,11 @@ export default function Leaderboard() {
                   <div className="text-center">
 
                     <p className="text-xs uppercase text-slate-400">
-
                       Ideas
-
                     </p>
 
                     <p className="font-semibold">
-
                       {leader.ideas}
-
                     </p>
 
                   </div>
@@ -191,27 +194,23 @@ export default function Leaderboard() {
                   <div className="text-center">
 
                     <p className="text-xs uppercase text-slate-400">
-
                       Approved
-
                     </p>
 
                     <p className="font-semibold text-green-600">
                       {leader.approved_ideas}
                     </p>
+
                   </div>
+
                   <div className="text-center">
 
                     <p className="text-xs uppercase text-slate-400">
-
                       Points
-
                     </p>
 
                     <p className="text-lg font-bold text-blue-600">
-
                       {leader.points}
-
                     </p>
 
                   </div>
@@ -224,9 +223,7 @@ export default function Leaderboard() {
                     />
 
                     <span className="text-sm font-medium">
-
                       {leader.badge}
-
                     </span>
 
                   </div>

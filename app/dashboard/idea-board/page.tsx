@@ -1,80 +1,137 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+
 import {
   Search,
   Plus,
-  Filter,
-  Eye,
   Pencil,
-  ThumbsUp,
-  ThumbsDown,
-  MessageCircle,
+  Trash2,
   Calendar,
+  Loader2,
 } from "lucide-react";
 
-const ideas = [
-  {
-    id: 1,
-    title: "Smart Inventory Management",
-    description:
-      "Reduce inventory losses using QR code technology.",
-    department: "ICT",
-    status: "Peer Review",
-    priority: "High",
-    likes: 12,
-    dislikes: 2,
-    comments: 8,
-    date: "12 Jul 2026",
-  },
-  {
-    id: 2,
-    title: "Digital Leave Request",
-    description:
-      "Employees apply leave online with automated approvals.",
-    department: "Human Resource",
-    status: "Approved",
-    priority: "Medium",
-    likes: 25,
-    dislikes: 1,
-    comments: 17,
-    date: "10 Jul 2026",
-  },
-  {
-    id: 3,
-    title: "AI Customer Support",
-    description:
-      "Use AI chatbot for customer support services.",
-    department: "Customer Care",
-    status: "Implementation",
-    priority: "High",
-    likes: 35,
-    dislikes: 3,
-    comments: 24,
-    date: "8 Jul 2026",
-  },
-];
+import {
+  getIdeas,
+  deleteIdea,
+} from "@/app/lib/ideas";
+
+interface Idea {
+  id: string;
+  title: string;
+  description: string;
+  creator: string;
+  status: string;
+  priority: string | null;
+  likes: number;
+  dislikes: number;
+  created_at: string;
+}
 
 const statusColor = (status: string) => {
   switch (status) {
+    case "Submitted":
+      return "bg-blue-100 text-blue-700";
+
     case "Peer Review":
       return "bg-purple-100 text-purple-700";
+
+    case "Product Manager Review":
+      return "bg-orange-100 text-orange-700";
+
     case "Approved":
       return "bg-green-100 text-green-700";
+
+    case "Rejected":
+      return "bg-red-100 text-red-700";
+
     case "Implementation":
-      return "bg-blue-100 text-blue-700";
+      return "bg-cyan-100 text-cyan-700";
+
+    case "Impact Evaluation":
+      return "bg-pink-100 text-pink-700";
+
+    case "Archived":
+      return "bg-gray-100 text-gray-700";
+
     default:
       return "bg-slate-100 text-slate-700";
   }
 };
 
 export default function IdeaBoardPage() {
+  const [ideas, setIdeas] = useState<Idea[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [search, setSearch] = useState("");
+
+  const [statusFilter, setStatusFilter] =
+    useState("Submitted");
+
+  async function loadIdeas() {
+    try {
+      setLoading(true);
+
+      const data = await getIdeas();
+
+      setIdeas(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadIdeas();
+  }, []);
+
+  async function handleDelete(id: string) {
+    const confirmed = window.confirm(
+      "Delete this idea permanently?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteIdea(id);
+
+      setIdeas((prev) =>
+        prev.filter((idea) => idea.id !== id)
+      );
+    } catch (error) {
+      console.error(error);
+
+      alert("Unable to delete idea.");
+    }
+  }
+
+  const filteredIdeas = useMemo(() => {
+    return ideas.filter((idea) => {
+      const matchesSearch =
+        idea.title
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        idea.description
+          .toLowerCase()
+          .includes(search.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === "All"
+          ? true
+          : idea.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [ideas, search, statusFilter]);
+
   return (
     <div className="space-y-8">
 
       {/* Header */}
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
         <div>
 
@@ -82,19 +139,20 @@ export default function IdeaBoardPage() {
             Idea Board
           </h1>
 
-          <p className="text-slate-500 mt-2">
-            Browse and collaborate on innovation ideas.
+          <p className="mt-2 text-slate-500">
+            Browse submitted innovation ideas.
           </p>
 
         </div>
 
         <Link
           href="/dashboard/submit-idea"
-          className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
+          className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700"
         >
           <Plus size={20} />
 
           Submit Idea
+
         </Link>
 
       </div>
@@ -103,113 +161,188 @@ export default function IdeaBoardPage() {
 
       <div className="rounded-2xl border bg-white p-5 shadow-sm">
 
-        <div className="grid gap-4 lg:grid-cols-4">
+        <div className="grid gap-4 lg:grid-cols-2">
 
           <div className="relative">
 
             <Search
-              className="absolute left-3 top-3 text-slate-400"
               size={18}
+              className="absolute left-3 top-3 text-slate-400"
             />
 
             <input
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
               placeholder="Search ideas..."
               className="w-full rounded-xl border p-3 pl-10"
             />
 
           </div>
 
-          <select className="rounded-xl border p-3">
-
-            <option>All Status</option>
-            <option>Draft</option>
+          <select
+            value={statusFilter}
+            onChange={(e) =>
+              setStatusFilter(e.target.value)
+            }
+            className="rounded-xl border p-3"
+          >
             <option>Submitted</option>
             <option>Peer Review</option>
-            <option>PM Review</option>
+            <option>Product Manager Review</option>
             <option>Approved</option>
-
+            <option>Rejected</option>
+            <option>Implementation</option>
+            <option>Impact Evaluation</option>
+            <option>Archived</option>
+            <option>All</option>
           </select>
-
-          <select className="rounded-xl border p-3">
-
-            <option>All Departments</option>
-
-          </select>
-
-          <button className="flex items-center justify-center gap-2 rounded-xl border">
-
-            <Filter size={18} />
-
-            More Filters
-
-          </button>
 
         </div>
 
       </div>
+            {/* Ideas */}
 
-      {/* Cards */}
+      {loading ? (
 
-      <div className="grid gap-6">
+        <div className="flex justify-center py-20">
 
-        {ideas.map((idea) => (
+          <Loader2
+            className="h-10 w-10 animate-spin text-blue-600"
+          />
 
-          <div
-            key={idea.id}
-            className="rounded-2xl border bg-white p-6 shadow-sm transition hover:shadow-lg"
-          >
+        </div>
 
-            <div className="flex justify-between">
+      ) : filteredIdeas.length === 0 ? (
 
-              <div>
+        <div className="rounded-2xl border bg-white py-20 text-center shadow-sm">
 
-                <h2 className="text-2xl font-semibold">
+          <h3 className="text-xl font-semibold text-slate-700">
+            No ideas found
+          </h3>
 
-                  {idea.title}
+          <p className="mt-2 text-slate-500">
+            There are no ideas matching your search.
+          </p>
 
-                </h2>
+        </div>
 
-                <p className="mt-3 text-slate-600">
+      ) : (
 
-                  {idea.description}
+        <div className="grid gap-6">
 
-                </p>
+          {filteredIdeas.map((idea) => (
 
-                <div className="mt-5 flex flex-wrap gap-3">
+            <div
+              key={idea.id}
+              className="rounded-2xl border bg-white p-6 shadow-sm transition hover:shadow-lg"
+            >
 
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-sm">
+              <div className="flex flex-col gap-6 lg:flex-row lg:justify-between">
 
-                    {idea.department}
+                <div className="flex-1">
 
-                  </span>
+                  <div className="flex flex-wrap items-center gap-3">
 
-                  <span
-                    className={`rounded-full px-3 py-1 text-sm ${statusColor(
-                      idea.status
-                    )}`}
-                  >
+                    <h2 className="text-2xl font-bold">
 
-                    {idea.status}
+                      {idea.title}
 
-                  </span>
+                    </h2>
 
-                  <span className="rounded-full bg-red-100 px-3 py-1 text-sm text-red-700">
+                    <span
+                      className={`rounded-full px-3 py-1 text-sm font-medium ${statusColor(
+                        idea.status
+                      )}`}
+                    >
+                      {idea.status}
+                    </span>
 
-                    {idea.priority}
+                    {idea.priority && (
 
-                  </span>
+                      <span className="rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
+
+                        {idea.priority}
+
+                      </span>
+
+                    )}
+
+                  </div>
+
+                  <p className="mt-4 text-slate-600">
+
+                    {idea.description}
+
+                  </p>
+
+                  <div className="mt-6 flex flex-wrap gap-6 text-sm text-slate-500">
+
+                    <span>
+
+                      <strong>Creator:</strong>{" "}
+                      {idea.creator}
+
+                    </span>
+
+                    <span>
+
+                      👍 {idea.likes}
+
+                    </span>
+
+                    <span>
+
+                      👎 {idea.dislikes}
+
+                    </span>
+
+                    <span className="flex items-center gap-2">
+
+                      <Calendar size={16} />
+
+                      {new Date(
+                        idea.created_at
+                      ).toLocaleDateString()}
+
+                    </span>
+
+                  </div>
 
                 </div>
 
-              </div>
+                {/* Actions */}
 
-              <div className="text-right">
+                <div className="flex items-end">
 
-                <div className="flex items-center gap-2">
+                  <div className="flex gap-3">
 
-                  <Calendar size={16} />
+                    <Link
+                      href={`/dashboard/submit-idea?id=${idea.id}`}
+                      className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-700"
+                    >
 
-                  {idea.date}
+                      <Pencil size={18} />
+
+                      Edit
+
+                    </Link>
+
+                    <button
+                      onClick={() =>
+                        handleDelete(idea.id)
+                      }
+                      className="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-white transition hover:bg-red-700"
+                    >
+
+                      <Trash2 size={18} />
+
+                      Delete
+
+                    </button>
+
+                  </div>
 
                 </div>
 
@@ -217,64 +350,13 @@ export default function IdeaBoardPage() {
 
             </div>
 
-            <div className="mt-8 flex items-center justify-between">
+          ))}
 
-              <div className="flex gap-6">
+        </div>
 
-                <div className="flex items-center gap-2">
-
-                  <ThumbsUp size={18} />
-
-                  {idea.likes}
-
-                </div>
-
-                <div className="flex items-center gap-2">
-
-                  <ThumbsDown size={18} />
-
-                  {idea.dislikes}
-
-                </div>
-
-                <div className="flex items-center gap-2">
-
-                  <MessageCircle size={18} />
-
-                  {idea.comments}
-
-                </div>
-
-              </div>
-
-              <div className="flex gap-3">
-
-                <button className="flex items-center gap-2 rounded-xl border px-4 py-2 hover:bg-slate-100">
-
-                  <Eye size={18} />
-
-                  View
-
-                </button>
-
-                <button className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-
-                  <Pencil size={18} />
-
-                  Edit
-
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        ))}
-
-      </div>
+      )}
 
     </div>
+
   );
 }

@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiFetch } from "@/app/utils/apiFetch";
-import DashboardHeader from "@/app/components/dashboard/DashboardHeader";
+import { getDashboardData } from "@/app/lib/dashboard";
 import StatCard from "@/app/components/common/StatCard";
 import {
   Lightbulb,
@@ -12,9 +11,6 @@ import {
   Trophy,
   Award,
 } from "lucide-react";
-
-import Dashboard from "@/app/dashboard/page";
-// import Dashboard from "@/app/dashboard/page";
 
 interface DashboardStatsData {
   users: {
@@ -48,6 +44,14 @@ interface DashboardStatsData {
     completed: number;
     pending: number;
     overdue: number;
+  };
+
+  gamification: {
+    top_contributors: {
+      username: string;
+      points: number;
+    }[];
+    points_awarded: number;
   };
 }
 
@@ -84,61 +88,30 @@ const initialState: DashboardStatsData = {
     pending: 0,
     overdue: 0,
   },
+
+  gamification: {
+    top_contributors: [],
+    points_awarded: 0,
+  },
 };
 
-// interface DashboardData {
-//   totalIdeas: number;
-//   peerReview: number;
-//   pmReview: number;
-//   projects: number;
-//   innovationPoints: number;
-//   topBadge: string;
-// }
-
-// const initialStats: DashboardData = {
-//   totalIdeas: 0,
-//   peerReview: 0,
-//   pmReview: 0,
-//   projects: 0,
-//   innovationPoints: 0,
-//   topBadge: "",
-// };
-
 export default function DashboardStats() {
-  const [stats, setStats] = useState<DashboardStatsData>(initialState);
+  const [stats, setStats] = useState(initialState);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadDashboardStats() {
+    async function loadStats() {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/dashboard/`,
-          {
-            method: "GET",
-            credentials: "include",
-            cache: "no-store",
-            headers: {
-              "Content-Type": "application/json",
-              "ngrok-skip-browser-warning": "1",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch dashboard statistics");
-        }
-
-        const data = await response.json();
-
+        const data = await getDashboardData();
         setStats(data);
       } catch (error) {
-        console.error("Dashboard statistics error:", error);
+        console.error("Dashboard stats error:", error);
       } finally {
         setLoading(false);
       }
     }
 
-    loadDashboardStats();
+    loadStats();
   }, []);
 
   return (
@@ -148,47 +121,47 @@ export default function DashboardStats() {
         title="Ideas Submitted"
         value={loading ? "..." : stats.ideas.total}
         subtitle="Total ideas submitted"
-        icon={<Lightbulb size={40} />}
-        color="bg-blue-600"
+        icon={<Lightbulb size={30} />}
+        color="bg-green-600"
       />
 
       <StatCard
         title="Peer Reviews"
         value={loading ? "..." : stats.ideas.peer_review}
-        subtitle="Ideas awaiting peer review"
-        icon={<Users size={28} />}
-        color="bg-purple-600"
+        subtitle="Awaiting peer review"
+        icon={<Users size={30} />}
+        color="bg-green-600"
       />
 
       <StatCard
         title="PM Reviews"
         value={loading ? "..." : stats.ideas.pm_review}
-        subtitle="Awaiting manager approval"
-        icon={<ClipboardCheck size={28} />}
-        color="bg-orange-500"
+        subtitle="Manager review stage"
+        icon={<ClipboardCheck size={30} />}
+        color="bg-green-500"
       />
 
       <StatCard
         title="Projects"
         value={loading ? "..." : stats.projects.total}
         subtitle="Implementation projects"
-        icon={<Rocket size={28} />}
-        color="bg-cyan-600"
+        icon={<Rocket size={30} />}
+        color="bg-green-600"
       />
 
       <StatCard
-        title="Innovation Points"
-        value={loading ? "..." : stats.projects.average_progress}
-        subtitle="Current innovation score"
-        icon={<Trophy size={28} />}
-        color="bg-yellow-500"
+        title="Points Awarded"
+        value={loading ? "..." : stats.gamification.points_awarded}
+        subtitle="Innovation points issued"
+        icon={<Trophy size={30} />}
+        color="bg-green-500"
       />
 
       <StatCard
-        title="Current Badge"
-        value={loading ? "..." : String(stats.users.active_users)}
-        subtitle="Latest badge earned"
-        icon={<Award size={28} />}
+        title="Active Users"
+        value={loading ? "..." : stats.users.active_users}
+        subtitle={`${stats.users.total_users} Total Users`}
+        icon={<Award size={30} />}
         color="bg-green-600"
       />
 

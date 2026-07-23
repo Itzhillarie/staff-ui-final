@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import {
   FileEdit,
   Send,
@@ -12,6 +11,8 @@ import {
   BarChart3,
   Archive,
 } from "lucide-react";
+
+import { getDashboardData } from "@/app/lib/dashboard";
 
 interface PipelineStage {
   stage: string;
@@ -60,26 +61,42 @@ export default function IdeaPipeline() {
   useEffect(() => {
     async function loadPipeline() {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/dashboard/`,
+        const dashboard = await getDashboardData();
+
+        setPipeline([
           {
-            method: "GET",
-            credentials: "include",
-            cache: "no-store",
-            headers: {
-              "Content-Type": "application/json",
-              "ngrok-skip-browser-warning": "1",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to load pipeline");
-        }
-
-        const data = await response.json();
-
-        setPipeline(data.pipeline ?? []);
+            stage: "Draft",
+            count: dashboard.ideas.draft,
+          },
+          {
+            stage: "Submitted",
+            count: dashboard.ideas.submitted,
+          },
+          {
+            stage: "Peer Review",
+            count: dashboard.ideas.peer_review,
+          },
+          {
+            stage: "Product Manager Review",
+            count: dashboard.ideas.pm_review,
+          },
+          {
+            stage: "Approved",
+            count: dashboard.ideas.approved,
+          },
+          {
+            stage: "Implementation",
+            count: dashboard.ideas.implementation,
+          },
+          {
+            stage: "Impact Evaluation",
+            count: dashboard.ideas.impact,
+          },
+          {
+            stage: "Archived",
+            count: dashboard.ideas.archived,
+          },
+        ]);
       } catch (error) {
         console.error("Pipeline Error:", error);
       } finally {
@@ -106,7 +123,6 @@ export default function IdeaPipeline() {
       <div className="mb-8 flex items-center justify-between">
 
         <div>
-
           <h2 className="text-2xl font-bold text-slate-800">
             Idea Pipeline
           </h2>
@@ -114,13 +130,10 @@ export default function IdeaPipeline() {
           <p className="mt-1 text-sm text-slate-500">
             Track ideas through the innovation lifecycle.
           </p>
-
         </div>
 
         <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
-
           {loading ? "Loading..." : `${totalIdeas} Total Ideas`}
-
         </span>
 
       </div>
@@ -128,17 +141,7 @@ export default function IdeaPipeline() {
       {loading ? (
 
         <div className="py-12 text-center text-slate-500">
-
           Loading pipeline...
-
-        </div>
-
-      ) : pipeline.length === 0 ? (
-
-        <div className="py-12 text-center text-slate-500">
-
-          No pipeline data available.
-
         </div>
 
       ) : (
@@ -146,7 +149,6 @@ export default function IdeaPipeline() {
         <div className="space-y-6">
 
           {pipeline.map((stage) => {
-
             const config =
               stageConfig[
                 stage.stage as keyof typeof stageConfig
@@ -157,10 +159,11 @@ export default function IdeaPipeline() {
             const Icon = config.icon;
 
             const percentage =
-              (stage.count / maxCount) * 100;
+              maxCount === 0
+                ? 0
+                : (stage.count / maxCount) * 100;
 
             return (
-
               <div key={stage.stage}>
 
                 <div className="mb-2 flex items-center justify-between">
@@ -197,7 +200,6 @@ export default function IdeaPipeline() {
                 </div>
 
               </div>
-
             );
           })}
 

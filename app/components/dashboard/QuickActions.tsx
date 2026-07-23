@@ -12,6 +12,8 @@ import {
   Bell,
 } from "lucide-react";
 
+import { getDashboardData } from "@/app/lib/dashboard";
+
 interface DashboardStats {
   submittedIdeas: number;
   peerReview: number;
@@ -81,32 +83,20 @@ export default function QuickActions() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchQuickActions() {
+    async function loadDashboard() {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/dashboard/`,
-          {
-            method: "GET",
-            credentials: "include",
-            cache: "no-store",
-            headers: {
-              "Content-Type": "application/json",
-              "ngrok-skip-browser-warning": "1",
-            },
-          }
-        );
+        const dashboard = await getDashboardData();
 
-        if (!response.ok) {
-          throw new Error("Unable to load quick actions.");
-        }
-
-        const data = await response.json();
+        // Safely extract notification count — API shape may vary
+        const raw: any = dashboard;
+        const unreadNotifications =
+          raw.notifications?.unread ?? raw.unread_notifications ?? 0;
 
         setStats({
-          submittedIdeas: data.submittedIdeas ?? 0,
-          peerReview: data.peerReview ?? 0,
-          projects: data.projects ?? 0,
-          notifications: data.notifications ?? 0,
+          submittedIdeas: dashboard.ideas.total,
+          peerReview: dashboard.ideas.peer_review,
+          projects: dashboard.projects.total,
+          notifications: unreadNotifications,
         });
       } catch (error) {
         console.error("Quick Actions Error:", error);
@@ -115,20 +105,17 @@ export default function QuickActions() {
       }
     }
 
-    fetchQuickActions();
+    loadDashboard();
   }, []);
 
   return (
     <section>
-
       <h2 className="mb-5 text-2xl font-bold text-slate-800">
         Quick Actions
       </h2>
 
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-
         {actions.map((action) => {
-
           const Icon = action.icon;
 
           const badge =
@@ -142,14 +129,11 @@ export default function QuickActions() {
               href={action.href}
               className="group relative rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-
-              {!loading &&
-                badge !== null &&
-                badge > 0 && (
-                  <span className="absolute right-4 top-4 rounded-full bg-red-600 px-2 py-1 text-xs font-bold text-white">
-                    {badge}
-                  </span>
-                )}
+              {!loading && badge !== null && badge > 0 && (
+                <span className="absolute right-4 top-4 rounded-full bg-red-600 px-2 py-1 text-xs font-bold text-white">
+                  {badge}
+                </span>
+              )}
 
               <div
                 className={`mb-5 flex h-14 w-14 items-center justify-center rounded-xl ${action.color} text-white`}
@@ -164,13 +148,10 @@ export default function QuickActions() {
               <p className="mt-2 text-sm text-slate-500">
                 {action.description}
               </p>
-
             </Link>
           );
         })}
-
       </div>
-
     </section>
   );
 }

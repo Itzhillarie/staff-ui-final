@@ -75,53 +75,50 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="flex h-screen w-72 flex-col border-r bg-white shadow-sm">
+    <aside className="fixed left-0 top-0 flex h-screen w-72 flex-col border-r bg-white shadow-sm">
 
       {/* Logo */}
-
-      <div className="flex h-20 items-center border-b px-8">
+      <div className="flex h-20 shrink-0 items-center border-b px-8">
         <h1 className="text-3xl font-bold text-blue-600">
           💡 InnoBoard
         </h1>
       </div>
 
-      {/* Navigation */}
+      {/* Scrollable Navigation */}
+      <div className="flex-1 overflow-y-auto px-4 py-6">
+        <nav className="space-y-2">
 
-      <nav className="mt-6 flex-1 space-y-2 px-4">
+          {links.map((item) => {
+            const Icon = item.icon;
 
-        {links.map((item) => {
-          const Icon = item.icon;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`flex items-center gap-4 rounded-xl px-5 py-4 transition-all ${
+                  pathname === item.href
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <Icon size={22} />
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
 
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`flex items-center gap-4 rounded-xl px-5 py-4 transition-all ${
-                pathname === item.href
-                  ? "bg-blue-600 text-white shadow-lg"
-                  : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              <Icon size={22} />
-              <span>{item.name}</span>
-            </Link>
-          );
-        })}
+        </nav>
+      </div>
 
-      </nav>
-
-      {/* Logout */}
-
-      <div className="border-t p-4">
-
+      {/* Fixed Logout */}
+      <div className="shrink-0 border-t bg-white p-4">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center justify-center gap-3 rounded-xl bg-red-600 px-4 py-3 font-medium text-white transition hover:bg-red-700"
+          className="flex w-full items-center justify-center gap-3 rounded-full bg-red-600 px-8 py-4 font-semibold text-white shadow-md transition duration-200 hover:bg-red-700"
         >
           <LogOut size={20} />
           Logout
         </button>
-
       </div>
 
     </aside>

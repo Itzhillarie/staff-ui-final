@@ -122,9 +122,7 @@ export default function DashboardHeader() {
 
   return (
     <section className="mb-8">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10 rounded-3xl bg-linear-to-r from-slate-900 via-blue-700 to-indigo-700 p-10 shadow-2xl">
-      
-        <div className="flex-1">
+<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10 rounded-3xl bg-linear-to-r from-violet-900 via-purple-700 to-orange-500 p-10 shadow-2xl">        <div className="flex-1">
 
           <div className="mb-4 flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-yellow-300" />

@@ -7,15 +7,19 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex bg-gray-100">
+    <div className="min-h-screen bg-gray-100">
 
+      {/* Fixed Sidebar */}
       <Sidebar />
 
-      <div className="flex-1 flex flex-col">
+      {/* Main Content */}
+      <div className="ml-72 flex min-h-screen flex-col">
 
+        {/* Top Navigation */}
         <TopNavbar />
 
-        <main className="p-8">
+        {/* Page Content */}
+        <main className="flex-1 p-8 overflow-auto">
           {children}
         </main>
 

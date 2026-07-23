@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import {
   MessageCircle,
   ThumbsUp,
@@ -10,7 +9,8 @@ import {
   Bell,
   Loader2,
 } from "lucide-react";
-import { apiFetch } from "@/app/utils/apiFetch";
+
+import { getDashboardData } from "@/app/lib/dashboard";
 
 interface Activity {
   id: string;
@@ -47,36 +47,39 @@ export default function RecentActivity() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchActivities() {
+    async function loadActivities() {
       try {
-        const response = await apiFetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/dashboard/`,
-          {
-            method: "GET",
-            credentials: "include",
-            cache: "no-store",
-            headers: {
-              "Content-Type": "application/json",
-              "ngrok-skip-browser-warning": "1",
-            },
-          }
-        );
+        const dashboard = await getDashboardData();
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch activities");
-        }
+        const recent =
+          (dashboard as any).audit_logs?.recent ?? [];
 
-        const data = await response.json();
+        const mapped = recent
+          .slice(0, 5)
+          .map((item: any, index: number) => ({
+            id: String(index),
+            title: item.event_message,
+            type:
+              item.event_type__name
+                ?.toLowerCase()
+                .replace(/\s+/g, "") || "notification",
+            time: new Date(
+              item.created_at
+            ).toLocaleString(),
+          }));
 
-        setActivities(data);
+        setActivities(mapped);
       } catch (error) {
-        console.error("Recent Activity Error:", error);
+        console.error(
+          "Recent Activity Error:",
+          error
+        );
       } finally {
         setLoading(false);
       }
     }
 
-    fetchActivities();
+    loadActivities();
   }, []);
 
   return (
@@ -88,7 +91,7 @@ export default function RecentActivity() {
         </h2>
 
         <p className="mt-1 text-sm text-slate-500">
-          Latest activity across your innovation workspace.
+          Latest 5 changes across the innovation platform.
         </p>
       </div>
 
@@ -104,7 +107,6 @@ export default function RecentActivity() {
         <div className="space-y-5">
 
           {activities.map((activity) => {
-
             const config =
               iconMap[
                 activity.type as keyof typeof iconMap
@@ -117,7 +119,6 @@ export default function RecentActivity() {
                 key={activity.id}
                 className="flex items-start gap-4 rounded-xl p-3 transition hover:bg-slate-50"
               >
-
                 <div
                   className={`rounded-full bg-slate-100 p-3 ${config.color}`}
                 >
@@ -130,20 +131,18 @@ export default function RecentActivity() {
                     {activity.title}
                   </p>
 
-                  <span className="text-sm text-slate-400">
+                  <p className="mt-1 text-sm text-slate-500">
                     {activity.time}
-                  </span>
+                  </p>
 
                 </div>
 
               </div>
             );
-
           })}
 
         </div>
       )}
-
     </section>
   );
 }
