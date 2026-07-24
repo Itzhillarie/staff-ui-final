@@ -1,19 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-
 import {
-  Search,
   Plus,
   Pencil,
   Trash2,
-  Calendar,
   Loader2,
+  Calendar,
 } from "lucide-react";
 
 import {
   getIdeas,
+  updateIdea,
   deleteIdea,
 } from "@/app/lib/ideas";
 
@@ -24,114 +23,93 @@ interface Idea {
   creator: string;
   status: string;
   priority: string | null;
-  likes: number;
-  dislikes: number;
-  created_at: string;
+  created_at?: string;
 }
 
-const statusColor = (status: string) => {
-  switch (status) {
-    case "Submitted":
-      return "bg-blue-100 text-blue-700";
-
-    case "Peer Review":
-      return "bg-purple-100 text-purple-700";
-
-    case "Product Manager Review":
-      return "bg-orange-100 text-orange-700";
-
-    case "Approved":
-      return "bg-green-100 text-green-700";
-
-    case "Rejected":
-      return "bg-red-100 text-red-700";
-
-    case "Implementation":
-      return "bg-cyan-100 text-cyan-700";
-
-    case "Impact Evaluation":
-      return "bg-pink-100 text-pink-700";
-
-    case "Archived":
-      return "bg-gray-100 text-gray-700";
-
-    default:
-      return "bg-slate-100 text-slate-700";
-  }
+const statusColors: Record<string, string> = {
+  Draft: "bg-gray-100 text-gray-700",
+  Submitted: "bg-blue-100 text-blue-700",
+  "Peer Review": "bg-purple-100 text-purple-700",
+  "Product Manager Review": "bg-orange-100 text-orange-700",
+  Approved: "bg-green-100 text-green-700",
+  Rejected: "bg-red-100 text-red-700",
+  Implementation: "bg-cyan-100 text-cyan-700",
+  "Impact Evaluation": "bg-pink-100 text-pink-700",
+  Archived: "bg-slate-100 text-slate-700",
 };
 
 export default function IdeaBoardPage() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [search, setSearch] = useState("");
-
-  const [statusFilter, setStatusFilter] =
-    useState("Submitted");
-
-  async function loadIdeas() {
+  const loadIdeas = async () => {
     try {
       setLoading(true);
 
       const data = await getIdeas();
 
-      setIdeas(data);
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data.results)
+        ? data.results
+        : [];
+
+      setIdeas(
+        list.filter(
+          (idea: Idea) => idea.status === "Submitted"
+        )
+      );
     } catch (error) {
       console.error(error);
+      alert("Unable to load ideas.");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     loadIdeas();
   }, []);
 
   async function handleDelete(id: string) {
-    const confirmed = window.confirm(
-      "Delete this idea permanently?"
-    );
-
-    if (!confirmed) return;
+    if (!confirm("Delete this idea?")) return;
 
     try {
       await deleteIdea(id);
-
-      setIdeas((prev) =>
-        prev.filter((idea) => idea.id !== id)
-      );
-    } catch (error) {
-      console.error(error);
-
-      alert("Unable to delete idea.");
+      loadIdeas();
+    } catch (err: any) {
+      alert(err?.body?.error || "Delete failed");
     }
   }
 
-  const filteredIdeas = useMemo(() => {
-    return ideas.filter((idea) => {
-      const matchesSearch =
-        idea.title
-          .toLowerCase()
-          .includes(search.toLowerCase()) ||
-        idea.description
-          .toLowerCase()
-          .includes(search.toLowerCase());
+  async function handleEdit(idea: Idea) {
+    const title = prompt("Idea title", idea.title);
 
-      const matchesStatus =
-        statusFilter === "All"
-          ? true
-          : idea.status === statusFilter;
+    if (!title) return;
 
-      return matchesSearch && matchesStatus;
-    });
-  }, [ideas, search, statusFilter]);
+    const description = prompt(
+      "Idea description",
+      idea.description
+    );
+
+    if (!description) return;
+
+    try {
+      await updateIdea(idea.id, {
+        title,
+        description,
+      });
+
+      loadIdeas();
+    } catch (err: any) {
+      alert(err?.body?.error || "Update failed");
+    }
+  }
 
   return (
     <div className="space-y-8">
 
-      {/* Header */}
-
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex items-center justify-between">
 
         <div>
 
@@ -140,223 +118,193 @@ export default function IdeaBoardPage() {
           </h1>
 
           <p className="mt-2 text-slate-500">
-            Browse submitted innovation ideas.
+            Submitted ideas awaiting review.
           </p>
 
         </div>
 
         <Link
           href="/dashboard/submit-idea"
-          className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700"
+          className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
         >
           <Plus size={20} />
-
-          Submit Idea
-
+          Create Idea
         </Link>
 
       </div>
 
-      {/* Filters */}
+      <div className="rounded-2xl border bg-white shadow-sm">
 
-      <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <div className="flex items-center justify-between border-b p-6">
 
-        <div className="grid gap-4 lg:grid-cols-2">
+          <div>
 
-          <div className="relative">
+            <h2 className="text-2xl font-bold">
+              Submitted Ideas
+            </h2>
 
-            <Search
-              size={18}
-              className="absolute left-3 top-3 text-slate-400"
-            />
-
-            <input
-              value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
-              }
-              placeholder="Search ideas..."
-              className="w-full rounded-xl border p-3 pl-10"
-            />
+            <p className="text-sm text-slate-500">
+              Ideas ready for review.
+            </p>
 
           </div>
 
-          <select
-            value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(e.target.value)
-            }
-            className="rounded-xl border p-3"
-          >
-            <option>Submitted</option>
-            <option>Peer Review</option>
-            <option>Product Manager Review</option>
-            <option>Approved</option>
-            <option>Rejected</option>
-            <option>Implementation</option>
-            <option>Impact Evaluation</option>
-            <option>Archived</option>
-            <option>All</option>
-          </select>
+          <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
+            {ideas.length} Ideas
+          </span>
 
         </div>
 
-      </div>
-            {/* Ideas */}
+        {loading ? (
 
-      {loading ? (
+          <div className="flex justify-center py-12">
 
-        <div className="flex justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
 
-          <Loader2
-            className="h-10 w-10 animate-spin text-blue-600"
-          />
+          </div>
 
-        </div>
+        ) : ideas.length === 0 ? (
 
-      ) : filteredIdeas.length === 0 ? (
+          <div className="py-16 text-center text-slate-500">
+            No submitted ideas found.
+          </div>
 
-        <div className="rounded-2xl border bg-white py-20 text-center shadow-sm">
+        ) : (
 
-          <h3 className="text-xl font-semibold text-slate-700">
-            No ideas found
-          </h3>
+          <div className="overflow-x-auto">
 
-          <p className="mt-2 text-slate-500">
-            There are no ideas matching your search.
-          </p>
+            <table className="w-full">
 
-        </div>
+              <thead className="bg-slate-50">
 
-      ) : (
+                <tr>
 
-        <div className="grid gap-6">
+                  <th className="px-6 py-4 text-left">
+                    Title
+                  </th>
 
-          {filteredIdeas.map((idea) => (
+                  <th className="px-6 py-4 text-left">
+                    Description
+                  </th>
 
-            <div
-              key={idea.id}
-              className="rounded-2xl border bg-white p-6 shadow-sm transition hover:shadow-lg"
-            >
+                  <th className="px-6 py-4 text-center">
+                    Creator
+                  </th>
 
-              <div className="flex flex-col gap-6 lg:flex-row lg:justify-between">
+                  <th className="px-6 py-4 text-center">
+                    Status
+                  </th>
 
-                <div className="flex-1">
+                  <th className="px-6 py-4 text-center">
+                    Priority
+                  </th>
 
-                  <div className="flex flex-wrap items-center gap-3">
+                  <th className="px-6 py-4 text-center">
+                    Date
+                  </th>
 
-                    <h2 className="text-2xl font-bold">
+                  <th className="px-6 py-4 text-center">
+                    Actions
+                  </th>
 
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                {ideas.map((idea) => (
+
+                  <tr
+                    key={idea.id}
+                    className="border-t hover:bg-slate-50"
+                  >
+
+                    <td className="px-6 py-5 font-medium">
                       {idea.title}
+                    </td>
 
-                    </h2>
+                    <td className="px-6 py-5 max-w-lg">
+                      <div className="line-clamp-2">
+                        {idea.description}
+                      </div>
+                    </td>
 
-                    <span
-                      className={`rounded-full px-3 py-1 text-sm font-medium ${statusColor(
-                        idea.status
-                      )}`}
-                    >
-                      {idea.status}
-                    </span>
+                    <td className="px-6 py-5 text-center">
+                      {idea.creator}
+                    </td>
 
-                    {idea.priority && (
+                    <td className="px-6 py-5 text-center">
 
-                      <span className="rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
-
-                        {idea.priority}
-
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                          statusColors[idea.status] ??
+                          "bg-slate-100 text-slate-700"
+                        }`}
+                      >
+                        {idea.status}
                       </span>
 
-                    )}
+                    </td>
 
-                  </div>
+                    <td className="px-6 py-5 text-center">
+                      {idea.priority ?? "-"}
+                    </td>
 
-                  <p className="mt-4 text-slate-600">
+                    <td className="px-6 py-5 text-center">
 
-                    {idea.description}
+                      <div className="flex items-center justify-center gap-2">
 
-                  </p>
+                        <Calendar size={16} />
 
-                  <div className="mt-6 flex flex-wrap gap-6 text-sm text-slate-500">
+                        {idea.created_at
+                          ? new Date(
+                              idea.created_at
+                            ).toLocaleDateString()
+                          : "-"}
 
-                    <span>
+                      </div>
 
-                      <strong>Creator:</strong>{" "}
-                      {idea.creator}
+                    </td>
 
-                    </span>
+                    <td className="px-6 py-5">
 
-                    <span>
+                      <div className="flex justify-center gap-3">
 
-                      👍 {idea.likes}
+                        <button
+                          onClick={() => handleEdit(idea)}
+                          className="rounded-lg bg-yellow-500 p-2 text-white hover:bg-yellow-600"
+                        >
+                          <Pencil size={18} />
+                        </button>
 
-                    </span>
+                        <button
+                          onClick={() =>
+                            handleDelete(idea.id)
+                          }
+                          className="rounded-lg bg-red-600 p-2 text-white hover:bg-red-700"
+                        >
+                          <Trash2 size={18} />
+                        </button>
 
-                    <span>
+                      </div>
 
-                      👎 {idea.dislikes}
+                    </td>
 
-                    </span>
+                  </tr>
 
-                    <span className="flex items-center gap-2">
+                ))}
 
-                      <Calendar size={16} />
+              </tbody>
 
-                      {new Date(
-                        idea.created_at
-                      ).toLocaleDateString()}
+            </table>
 
-                    </span>
+          </div>
 
-                  </div>
+        )}
 
-                </div>
-
-                {/* Actions */}
-
-                <div className="flex items-end">
-
-                  <div className="flex gap-3">
-
-                    <Link
-                      href={`/dashboard/submit-idea?id=${idea.id}`}
-                      className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-700"
-                    >
-
-                      <Pencil size={18} />
-
-                      Edit
-
-                    </Link>
-
-                    <button
-                      onClick={() =>
-                        handleDelete(idea.id)
-                      }
-                      className="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-white transition hover:bg-red-700"
-                    >
-
-                      <Trash2 size={18} />
-
-                      Delete
-
-                    </button>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      )}
+      </div>
 
     </div>
-
   );
 }
