@@ -1,21 +1,10 @@
 import { apiFetch } from "@/app/utils/apiFetch";
 
-const API = process.env.NEXT_PUBLIC_API_URL;
+const API = process.env.NEXT_PUBLIC_API_URL!;
 
-function authHeaders() {
-  const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem("authToken")
-      : null;
-
-  return {
-    "Content-Type": "application/json",
-    ...(token
-      ? {
-          Authorization: `Bearer ${token}`,
-        }
-      : {}),
-  };
+export interface IdeaPayload {
+  title: string;
+  description: string;
 }
 
 /* ------------------------------------------
@@ -23,9 +12,8 @@ function authHeaders() {
 ------------------------------------------ */
 
 export async function getIdeas() {
-  return apiFetch(`${API}/ideas/list/`, {
+  return await apiFetch(`${API}/ideas/list/`, {
     method: "GET",
-    headers: authHeaders(),
   });
 }
 
@@ -34,9 +22,8 @@ export async function getIdeas() {
 ------------------------------------------ */
 
 export async function getIdea(id: string) {
-  return apiFetch(`${API}/ideas/detail/${id}/`, {
+  return await apiFetch(`${API}/ideas/detail/${id}/`, {
     method: "GET",
-    headers: authHeaders(),
   });
 }
 
@@ -44,13 +31,9 @@ export async function getIdea(id: string) {
    CREATE IDEA
 ------------------------------------------ */
 
-export async function createIdea(data: {
-  title: string;
-  description: string;
-}) {
-  return apiFetch(`${API}/ideas/create/`, {
+export async function createIdea(data: IdeaPayload) {
+  return await apiFetch(`${API}/ideas/create/`, {
     method: "POST",
-    headers: authHeaders(),
     body: JSON.stringify(data),
   });
 }
@@ -61,14 +44,10 @@ export async function createIdea(data: {
 
 export async function updateIdea(
   id: string,
-  data: {
-    title: string;
-    description: string;
-  }
+  data: IdeaPayload
 ) {
-  return apiFetch(`${API}/ideas/update/${id}/`, {
+  return await apiFetch(`${API}/ideas/update/${id}/`, {
     method: "PUT",
-    headers: authHeaders(),
     body: JSON.stringify(data),
   });
 }
@@ -78,9 +57,8 @@ export async function updateIdea(
 ------------------------------------------ */
 
 export async function deleteIdea(id: string) {
-  return apiFetch(`${API}/ideas/delete/${id}/`, {
+  return await apiFetch(`${API}/ideas/delete/${id}/`, {
     method: "DELETE",
-    headers: authHeaders(),
   });
 }
 
@@ -89,9 +67,8 @@ export async function deleteIdea(id: string) {
 ------------------------------------------ */
 
 export async function submitIdea(id: string) {
-  return apiFetch(`${API}/ideas/submit/${id}/`, {
+  return await apiFetch(`${API}/ideas/submit/${id}/`, {
     method: "POST",
-    headers: authHeaders(),
   });
 }
 
@@ -100,9 +77,8 @@ export async function submitIdea(id: string) {
 ------------------------------------------ */
 
 export async function likeIdea(id: string) {
-  return apiFetch(`${API}/ideas/like/${id}/`, {
+  return await apiFetch(`${API}/ideas/like/${id}/`, {
     method: "POST",
-    headers: authHeaders(),
   });
 }
 
@@ -111,9 +87,8 @@ export async function likeIdea(id: string) {
 ------------------------------------------ */
 
 export async function dislikeIdea(id: string) {
-  return apiFetch(`${API}/ideas/dislike/${id}/`, {
+  return await apiFetch(`${API}/ideas/dislike/${id}/`, {
     method: "POST",
-    headers: authHeaders(),
   });
 }
 
@@ -125,9 +100,8 @@ export async function commentIdea(
   id: string,
   comment: string
 ) {
-  return apiFetch(`${API}/ideas/comment/${id}/`, {
+  return await apiFetch(`${API}/ideas/comment/${id}/`, {
     method: "POST",
-    headers: authHeaders(),
     body: JSON.stringify({
       comment,
     }),

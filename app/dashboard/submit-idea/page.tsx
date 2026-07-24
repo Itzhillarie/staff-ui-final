@@ -3,14 +3,11 @@
 import { useEffect, useState } from "react";
 import {
   Lightbulb,
-  Send,
+  Plus,
   Pencil,
   Trash2,
-  ThumbsUp,
-  ThumbsDown,
-  MessageCircle,
+  Send,
   Loader2,
-  Plus,
   X,
 } from "lucide-react";
 
@@ -20,9 +17,6 @@ import {
   updateIdea,
   deleteIdea,
   submitIdea,
-  likeIdea,
-  dislikeIdea,
-  commentIdea,
 } from "@/app/lib/ideas";
 
 interface Idea {
@@ -43,7 +37,7 @@ export default function SubmitIdeaPage() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const [showCreateIdea, setShowCreateIdea] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -51,20 +45,30 @@ export default function SubmitIdeaPage() {
   });
 
   const loadIdeas = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const data = await getIdeas();
+    const data = await getIdeas();
 
-      setIdeas(data);
+    console.log("Ideas:", data);
 
-    } catch (err) {
-      console.error(err);
-      alert("Failed to load ideas.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  setIdeas(
+  Array.isArray(data.results)
+    ? data.results.filter((idea: Idea) => idea.status === "Draft")
+    : []
+);
+
+    console.log("edede",ideas)
+  } catch (err: any) {
+    console.error("LOAD IDEAS ERROR:", err);
+
+    alert(
+      JSON.stringify(err, null, 2)
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     loadIdeas();
@@ -78,17 +82,17 @@ export default function SubmitIdeaPage() {
       description: "",
     });
 
-    setShowCreateIdea(false);
+    setShowModal(false);
   }
 
   async function handleSave() {
     if (!form.title.trim()) {
-      alert("Idea title is required.");
+      alert("Title is required.");
       return;
     }
 
     if (!form.description.trim()) {
-      alert("Idea description is required.");
+      alert("Description is required.");
       return;
     }
 
@@ -96,200 +100,213 @@ export default function SubmitIdeaPage() {
       setSaving(true);
 
       if (editingId) {
-        await updateIdea(editingId, {
-          title: form.title,
-          description: form.description,
-        });
+        await updateIdea(editingId, form);
       } else {
-        await createIdea({
-          title: form.title,
-          description: form.description,
-        });
+        await createIdea(form);
       }
 
       resetForm();
 
       await loadIdeas();
-
     } catch (err: any) {
       console.error(err);
-      alert(err?.body?.error || "Failed to save idea.");
+
+      alert(
+        err?.body?.error ??
+          "Unable to save idea."
+      );
     } finally {
       setSaving(false);
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this idea?")) return;
+    if (!confirm("Delete this draft?")) return;
 
     try {
       await deleteIdea(id);
+
       await loadIdeas();
     } catch (err: any) {
-      alert(err?.body?.error || "Delete failed.");
+      alert(
+        err?.body?.error ??
+          "Unable to delete."
+      );
     }
   }
 
-  async function handleSubmitIdea(id: string) {
+  async function handleSubmit(id: string) {
+    if (
+      !confirm(
+        "Submit this idea for peer review?"
+      )
+    )
+      return;
+
     try {
       await submitIdea(id);
+
       await loadIdeas();
     } catch (err: any) {
-      alert(err?.body?.error || "Submit failed.");
-    }
-  }
-
-  async function handleLike(id: string) {
-    try {
-      await likeIdea(id);
-      await loadIdeas();
-    } catch (err: any) {
-      alert(err?.body?.error || "Unable to like.");
-    }
-  }
-
-  async function handleDislike(id: string) {
-    try {
-      await dislikeIdea(id);
-      await loadIdeas();
-    } catch (err: any) {
-      alert(err?.body?.error || "Unable to dislike.");
-    }
-  }
-
-  async function handleComment(id: string) {
-    const comment = prompt("Enter comment");
-
-    if (!comment) return;
-
-    try {
-      await commentIdea(id, comment);
-      await loadIdeas();
-    } catch (err: any) {
-      alert(err?.body?.error || "Comment failed.");
+      alert(
+        err?.body?.error ??
+          "Unable to submit."
+      );
     }
   }
 
   return (
-    <div className="space-y-8 p-8">
+    <div className="space-y-8">
 
-      <div className="flex items-center justify-between">
+      {/* Header */}
 
-        <div>
+      <div className="rounded-3xl bg-linear-to-r from-indigo-700 via-purple-700 to-fuchsia-700 p-10 text-white shadow-xl">
 
-          <h1 className="flex items-center gap-3 text-3xl font-bold">
-            <Lightbulb className="text-blue-600" />
-            Submit Innovation Idea
-          </h1>
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
 
-          <p className="mt-2 text-slate-500">
-            Submit, manage and track your innovation ideas.
-          </p>
+          <div>
 
-        </div>
+            <h1 className="flex items-center gap-3 text-4xl font-bold">
 
-        <button
-          onClick={() => {
-            resetForm();
-            setShowCreateIdea(true);
-          }}
-          className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-white shadow hover:bg-blue-700"
-        >
-          <Plus size={20} />
-          Create Idea
-        </button>
+              <Lightbulb className="h-10 w-10" />
 
-      </div>
+              Submit Innovation Idea
 
-      {showCreateIdea && (
+            </h1>
 
-        <div className="rounded-2xl border bg-white p-8 shadow-sm">
+            <p className="mt-4 max-w-2xl text-lg text-indigo-100">
 
-          <div className="mb-6 flex items-center justify-between">
+              Create and manage your draft ideas before
+              submitting them into the innovation pipeline.
 
-            <h2 className="text-xl font-semibold">
-              {editingId ? "Edit Idea" : "Create New Idea"}
-            </h2>
-
-            <button
-              onClick={resetForm}
-              className="rounded-lg p-2 hover:bg-slate-100"
-            >
-              <X size={22} />
-            </button>
+            </p>
 
           </div>
 
-          <div className="space-y-5">
+          <button
+            onClick={() => {
+              resetForm();
+              setShowModal(true);
+            }}
+            className="flex items-center gap-2 rounded-2xl bg-white px-6 py-4 font-semibold text-indigo-700 transition hover:scale-105"
+          >
+            <Plus size={22} />
 
-            <div>
+            Create Idea
+          </button>
 
-              <label className="mb-2 block font-medium">
-                Title
-              </label>
+        </div>
 
-              <input
-                className="w-full rounded-xl border p-3"
-                value={form.title}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    title: e.target.value,
-                  })
-                }
-              />
+      </div>
 
-            </div>
+      {/* Create/Edit Modal */}
 
-            <div>
+      {showModal && (
 
-              <label className="mb-2 block font-medium">
-                Description
-              </label>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-5">
 
-              <textarea
-                rows={6}
-                className="w-full rounded-xl border p-3"
-                value={form.description}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    description: e.target.value,
-                  })
-                }
-              />
+          <div className="w-full max-w-3xl rounded-3xl bg-white shadow-2xl">
 
-            </div>
+            <div className="flex items-center justify-between border-b p-8">
 
-            <div className="flex gap-4">
+              <h2 className="text-2xl font-bold">
+
+                {editingId
+                  ? "Edit Draft Idea"
+                  : "Create Draft Idea"}
+
+              </h2>
 
               <button
-                onClick={handleSave}
-                disabled={saving}
-                className="rounded-xl bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
-              >
-                {saving ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2
-                      size={18}
-                      className="animate-spin"
-                    />
-                    Saving...
-                  </span>
-                ) : editingId ? (
-                  "Update Idea"
-                ) : (
-                  "Create Idea"
-                )}
-              </button>
-
-              <button
-                type="button"
                 onClick={resetForm}
-                className="rounded-xl border px-6 py-3"
+                className="rounded-xl border p-2 hover:bg-slate-100"
               >
-                Clear
+                <X />
               </button>
+
+            </div>
+
+            <div className="space-y-6 p-8">
+
+              <div>
+
+                <label className="mb-2 block font-semibold">
+
+                  Idea Title
+
+                </label>
+
+                <input
+                  value={form.title}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      title: e.target.value,
+                    })
+                  }
+                  placeholder="Enter idea title..."
+                  className="w-full rounded-xl border p-4"
+                />
+
+              </div>
+
+              <div>
+
+                <label className="mb-2 block font-semibold">
+
+                  Description
+
+                </label>
+
+                <textarea
+                  rows={8}
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      description:
+                        e.target.value,
+                    })
+                  }
+                  placeholder="Describe your innovation..."
+                  className="w-full rounded-xl border p-4"
+                />
+
+              </div>
+
+              <div className="flex gap-4">
+
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="rounded-xl bg-indigo-600 px-8 py-3 font-semibold text-white hover:bg-indigo-700"
+                >
+                  {saving ? (
+                    <span className="flex items-center gap-2">
+
+                      <Loader2
+                        size={18}
+                        className="animate-spin"
+                      />
+
+                      Saving...
+
+                    </span>
+                  ) : editingId ? (
+                    "Update Draft"
+                  ) : (
+                    "Create Draft"
+                  )}
+                </button>
+
+                <button
+                  onClick={resetForm}
+                  className="rounded-xl border px-8 py-3"
+                >
+                  Cancel
+                </button>
+
+              </div>
 
             </div>
 
@@ -298,332 +315,199 @@ export default function SubmitIdeaPage() {
         </div>
 
       )}
-      {showCreateIdea && (
-  <div className="rounded-2xl border bg-white p-8 shadow-sm">
+            {/* Draft Ideas */}
 
-    <div className="mb-6 flex items-center justify-between">
+      <div className="rounded-3xl border border-slate-200 bg-white shadow-sm">
 
-      <h2 className="text-xl font-semibold">
-        {editingId ? "Edit Idea" : "Create New Idea"}
-      </h2>
+        <div className="flex items-center justify-between border-b p-6">
 
-      <button
-        onClick={resetForm}
-        className="rounded-lg border px-4 py-2 hover:bg-gray-100"
-      >
-        ✕
-      </button>
+          <div>
 
-    </div>
+            <h2 className="text-2xl font-bold text-slate-800">
+              My Draft Ideas
+            </h2>
 
-    <div className="space-y-5">
+            <p className="mt-1 text-sm text-slate-500">
+              Draft ideas can be edited, deleted or submitted for review.
+            </p>
 
-      <div>
+          </div>
 
-        <label className="mb-2 block font-medium">
-          Title
-        </label>
+          <span className="rounded-full bg-indigo-100 px-4 py-2 text-sm font-semibold text-indigo-700">
 
-        <input
-          className="w-full rounded-xl border p-3"
-          value={form.title}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              title: e.target.value,
-            })
-          }
-        />
+            {ideas.length} Draft{ideas.length !== 1 ? "s" : ""}
 
-      </div>
-
-      <div>
-
-        <label className="mb-2 block font-medium">
-          Description
-        </label>
-
-        <textarea
-          rows={6}
-          className="w-full rounded-xl border p-3"
-          value={form.description}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              description: e.target.value,
-            })
-          }
-        />
-
-      </div>
-
-      <div className="flex gap-4">
-
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="rounded-xl bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
-        >
-          {saving ? (
-            <span className="flex items-center gap-2">
-              <Loader2
-                size={18}
-                className="animate-spin"
-              />
-              Saving...
-            </span>
-          ) : editingId ? (
-            "Update Idea"
-          ) : (
-            "Create Idea"
-          )}
-        </button>
-
-        <button
-          type="button"
-          onClick={resetForm}
-          className="rounded-xl border px-6 py-3"
-        >
-          Clear
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-)}
-
-<div className="rounded-2xl border bg-white shadow-sm">
-
-  <div className="border-b p-6 flex items-center justify-between">
-
-    <div>
-
-      <h2 className="text-2xl font-bold">
-        Ideas Table
-      </h2>
-
-      <p className="text-sm text-slate-500">
-        Ideas fetched directly from Django.
-      </p>
-
-    </div>
-
-    <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
-      {ideas.length} Ideas
-    </span>
-
-  </div>
-
-  <div className="overflow-x-auto">
-
-    {loading ? (
-
-      <div className="flex items-center justify-center p-12">
-
-        <Loader2
-          className="animate-spin text-blue-600"
-          size={30}
-        />
-
-      </div>
-
-    ) : ideas.length === 0 ? (
-
-      <div className="p-12 text-center text-slate-500">
-        No ideas found.
-      </div>
-
-    ) : (
-
-      <table className="w-full">
-
-        <thead className="bg-slate-50">
-
-          <tr>
-
-            <th className="px-6 py-4 text-left">
-              Title
-            </th>
-
-            <th className="px-6 py-4 text-left">
-              Description
-            </th>
-
-            <th className="px-6 py-4 text-center">
-              Creator
-            </th>
-
-            <th className="px-6 py-4 text-center">
-              Status
-            </th>
-
-            <th className="px-6 py-4 text-center">
-              Priority
-            </th>
-
-            <th className="px-6 py-4 text-center">
-              Likes
-            </th>
-
-            <th className="px-6 py-4 text-center">
-              Dislikes
-            </th>
-
-            <th className="px-6 py-4 text-center">
-              Actions
-            </th>
-
-          </tr>
-
-        </thead>
-
-          <tbody>
-
-  {ideas.map((idea) => (
-
-    <tr
-      key={idea.id}
-      className="border-t hover:bg-slate-50"
-    >
-
-      <td className="px-6 py-5 font-medium">
-        {idea.title}
-      </td>
-
-      <td className="px-6 py-5 max-w-md">
-        <div className="line-clamp-2">
-          {idea.description}
-        </div>
-      </td>
-
-      <td className="px-6 py-5 text-center">
-        {idea.creator}
-      </td>
-
-      <td className="px-6 py-5 text-center">
-
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold
-
-          ${
-            idea.status === "Draft"
-              ? "bg-slate-100 text-slate-700"
-              : idea.status === "Submitted"
-              ? "bg-blue-100 text-blue-700"
-              : idea.status === "Peer Review"
-              ? "bg-purple-100 text-purple-700"
-              : idea.status === "Product Manager Review"
-              ? "bg-orange-100 text-orange-700"
-              : idea.status === "Approved"
-              ? "bg-green-100 text-green-700"
-              : idea.status === "Rejected"
-              ? "bg-red-100 text-red-700"
-              : idea.status === "Implementation"
-              ? "bg-cyan-100 text-cyan-700"
-              : "bg-slate-100 text-slate-700"
-          }
-
-          `}
-        >
-          {idea.status}
-        </span>
-
-      </td>
-
-      <td className="px-6 py-5 text-center">
-        {idea.priority || "-"}
-      </td>
-
-      <td className="px-6 py-5 text-center">
-        👍 {idea.likes}
-      </td>
-
-      <td className="px-6 py-5 text-center">
-        👎 {idea.dislikes}
-      </td>
-
-      <td className="px-6 py-5">
-
-        <div className="flex flex-wrap justify-center gap-2">
-
-          <button
-            onClick={() => {
-              setEditingId(idea.id);
-
-              setShowCreateIdea(true);
-
-              setForm({
-                title: idea.title,
-                description: idea.description,
-              });
-
-              window.scrollTo({
-                top: 0,
-                behavior: "smooth",
-              });
-            }}
-            className="rounded-lg bg-yellow-500 p-2 text-white hover:bg-yellow-600"
-          >
-            <Pencil size={16} />
-          </button>
-
-          <button
-            onClick={() => handleDelete(idea.id)}
-            className="rounded-lg bg-red-600 p-2 text-white hover:bg-red-700"
-          >
-            <Trash2 size={16} />
-          </button>
-
-          <button
-            onClick={() => handleSubmitIdea(idea.id)}
-            disabled={idea.status !== "Draft"}
-            className="rounded-lg bg-blue-600 p-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
-          >
-            <Send size={16} />
-          </button>
-
-          <button
-            onClick={() => handleLike(idea.id)}
-            className="rounded-lg bg-green-600 p-2 text-white hover:bg-green-700"
-          >
-            <ThumbsUp size={16} />
-          </button>
-
-          <button
-            onClick={() => handleDislike(idea.id)}
-            className="rounded-lg bg-orange-600 p-2 text-white hover:bg-orange-700"
-          >
-            <ThumbsDown size={16} />
-          </button>
-
-          <button
-            onClick={() => handleComment(idea.id)}
-            className="rounded-lg bg-purple-600 p-2 text-white hover:bg-purple-700"
-          >
-            <MessageCircle size={16} />
-          </button>
+          </span>
 
         </div>
 
-      </td>
+        {loading ? (
 
-    </tr>
+          <div className="flex justify-center py-20">
 
-  ))}
+            <Loader2
+              className="h-10 w-10 animate-spin text-indigo-600"
+            />
 
-</tbody>
+          </div>
 
-</table>
+        ) : ideas.length === 0 ? (
 
-)}
+          <div className="py-20 text-center">
 
-</div>
+            <Lightbulb
+              size={60}
+              className="mx-auto text-slate-300"
+            />
 
-</div>
+            <h3 className="mt-6 text-xl font-semibold text-slate-700">
 
-</div>
+              No Draft Ideas
 
-);
+            </h3>
+
+            <p className="mt-2 text-slate-500">
+
+              Click <strong>Create Idea</strong> to start your first
+              innovation.
+
+            </p>
+
+          </div>
+
+        ) : (
+
+          <div className="grid gap-6 p-6 lg:grid-cols-2">
+
+
+            {ideas.map((idea) => (
+
+              <div
+                key={idea.id}
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+              >
+
+                <div className="flex items-start justify-between">
+
+                  <div>
+
+                    <h3 className="text-xl font-bold text-slate-800">
+
+                      {idea.title}
+
+                    </h3>
+
+                    <span className="mt-2 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+
+                      {idea.status}
+
+                    </span>
+
+                  </div>
+
+                </div>
+
+                <p className="mt-5 line-clamp-4 text-slate-600">
+
+                  {idea.description}
+
+                </p>
+
+                <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
+
+                  <div>
+
+                    <span className="font-semibold text-slate-500">
+
+                      Priority
+
+                    </span>
+
+                    <p className="mt-1 font-medium">
+
+                      {idea.priority ?? "-"}
+
+                    </p>
+
+                  </div>
+
+                  <div>
+
+                    <span className="font-semibold text-slate-500">
+
+                      Creator
+
+                    </span>
+
+                    <p className="mt-1 font-medium">
+
+                      {idea.creator}
+
+                    </p>
+
+                  </div>
+
+                </div>
+
+                <div className="mt-8 flex flex-wrap gap-3">
+
+                  <button
+                    onClick={() => {
+
+                      setEditingId(idea.id);
+
+                      setForm({
+                        title: idea.title,
+                        description: idea.description,
+                      });
+
+                      setShowModal(true);
+
+                    }}
+                    className="flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-3 text-white transition hover:bg-amber-600"
+                  >
+
+                    <Pencil size={18} />
+
+                    Edit
+
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(idea.id)}
+                    className="flex items-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-white transition hover:bg-red-700"
+                  >
+
+                    <Trash2 size={18} />
+
+                    Delete
+
+                  </button>
+
+                  <button
+                    onClick={() => handleSubmit(idea.id)}
+                    className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-white transition hover:bg-indigo-700"
+                  >
+
+                    <Send size={18} />
+
+                    Submit
+
+                  </button>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        )}
+
+      </div>
+
+    </div>
+
+  );
 }
