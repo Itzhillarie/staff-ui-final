@@ -240,7 +240,7 @@ export default function GamificationPage() {
             </h2>
 
             <Link
-              href="/dashboard/gamifications/leaderboard"
+              href="/dashboard/gamification/leaderboard"
               className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700"
             >
               View All
@@ -284,7 +284,7 @@ export default function GamificationPage() {
       <div className="grid gap-6 md:grid-cols-3">
 
         <Link
-          href="/dashboard/gamifications/badges"
+          href="/dashboard/gamification/badges"
           className="rounded-2xl border bg-white p-8 shadow-sm transition hover:shadow-lg"
         >
           <Award className="mb-5 h-10 w-10 text-green-600" />
@@ -300,7 +300,7 @@ export default function GamificationPage() {
         </Link>
 
         <Link
-          href="/dashboard/gamifications/achivements"
+          href="/dashboard/gamification/achievements"
           className="rounded-2xl border bg-white p-8 shadow-sm transition hover:shadow-lg"
         >
           <Trophy className="mb-5 h-10 w-10 text-yellow-500" />
@@ -316,7 +316,7 @@ export default function GamificationPage() {
         </Link>
 
         <Link
-          href="/dashboard/gamifications/rewards"
+          href="/dashboard/gamification/rewards"
           className="rounded-2xl border bg-white p-8 shadow-sm transition hover:shadow-lg"
         >
           <Gift className="mb-5 h-10 w-10 text-purple-600" />

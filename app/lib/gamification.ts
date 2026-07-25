@@ -7,7 +7,7 @@ const API = process.env.NEXT_PUBLIC_API_URL;
 ========================================== */
 
 export interface LeaderboardUser {
-  id: number;
+  id: number | string;
   username: string;
   points: number;
   rank: number;
@@ -32,10 +32,11 @@ export interface Achievement {
 }
 
 export interface Reward {
-  id: number;
+  id: string;
   name: string;
   description: string;
   points_required: number;
+  redeemed?: boolean;
 }
 
 export interface PointHistory {
@@ -59,14 +60,46 @@ export interface GamificationDashboard {
   rewards: Reward[];
 }
 
+interface PaginatedResponse<T> {
+  results?: T[];
+}
+
+type LeaderboardApiUser = {
+  id?: number | string;
+  username?: string;
+  points?: number;
+  rank?: number;
+};
+
+type BadgeApiItem = Partial<Badge>;
+
 /* ==========================================
    DASHBOARD
 ========================================== */
 
 export async function getGamificationDashboard() {
-  return apiFetch(`${API}/gamification/dashboard/`, {
-    method: "GET",
-  });
+  const [leaderboard, badges] = await Promise.all([
+    getLeaderboard(),
+    getBadges().catch(() => []),
+  ]);
+
+  const currentUser = leaderboard[0];
+  const earnedBadges = badges.filter((badge) => badge.earned);
+
+  return {
+    total_points: currentUser?.points ?? 0,
+    rank: currentUser?.rank ?? 0,
+    level: Math.max(1, Math.floor((currentUser?.points ?? 0) / 100) + 1),
+    next_level_points:
+      (Math.floor((currentUser?.points ?? 0) / 100) + 1) * 100,
+    badges_count: earnedBadges.length,
+    achievements_count: 0,
+    leaderboard,
+    recent_points: [],
+    badges,
+    achievements: [],
+    rewards: [],
+  } satisfies GamificationDashboard;
 }
 
 /* ==========================================
@@ -74,9 +107,20 @@ export async function getGamificationDashboard() {
 ========================================== */
 
 export async function getLeaderboard() {
-  return apiFetch(`${API}/gamification/leaderboard/`, {
+  const data = await apiFetch<
+    LeaderboardApiUser[] | PaginatedResponse<LeaderboardApiUser>
+  >(`${API}/Gamification/leaderboard/`, {
     method: "GET",
   });
+
+  const users = Array.isArray(data) ? data : data.results ?? [];
+
+  return users.map((user, index) => ({
+    id: user.id ?? `${user.username ?? "user"}-${index}`,
+    username: user.username ?? "Unknown user",
+    points: user.points ?? 0,
+    rank: user.rank ?? index + 1,
+  }));
 }
 
 /* ==========================================
@@ -84,9 +128,7 @@ export async function getLeaderboard() {
 ========================================== */
 
 export async function getPointHistory() {
-  return apiFetch(`${API}/gamification/points-history/`, {
-    method: "GET",
-  });
+  return [];
 }
 
 /* ==========================================
@@ -94,9 +136,22 @@ export async function getPointHistory() {
 ========================================== */
 
 export async function getBadges() {
-  return apiFetch(`${API}/gamification/badges/`, {
+  const data = await apiFetch<
+    BadgeApiItem[] | PaginatedResponse<BadgeApiItem>
+  >(`${API}/Gamification/my-badges/`, {
     method: "GET",
   });
+
+  const badges = Array.isArray(data) ? data : data.results ?? [];
+
+  return badges.map((badge, index) => ({
+    id: badge.id ?? index,
+    name: badge.name ?? "Badge",
+    description: badge.description ?? "Achievement badge",
+    icon: badge.icon,
+    earned: badge.earned ?? true,
+    earned_at: badge.earned_at,
+  }));
 }
 
 /* ==========================================
@@ -104,9 +159,7 @@ export async function getBadges() {
 ========================================== */
 
 export async function getAchievements() {
-  return apiFetch(`${API}/gamification/achievements/`, {
-    method: "GET",
-  });
+  return [] as Achievement[];
 }
 
 /* ==========================================
@@ -114,9 +167,7 @@ export async function getAchievements() {
 ========================================== */
 
 export async function getRewards() {
-  return apiFetch(`${API}/gamification/rewards/`, {
-    method: "GET",
-  });
+  return [] as Reward[];
 }
 
 /* ==========================================
@@ -124,7 +175,7 @@ export async function getRewards() {
 ========================================== */
 
 export async function redeemReward(id: string) {
-  return apiFetch(`${API}/gamification/rewards/${id}/redeem/`, {
+  return apiFetch(`${API}/Gamification/rewards/${id}/redeem/`, {
     method: "POST",
   });
 }

@@ -100,8 +100,12 @@ export async function getDashboardData(): Promise<DashboardData> {
     cookieStore.get("jwt")?.value;
 
 
+  const apiUrl =
+    process.env.API_SERVER_URL ??
+    process.env.NEXT_PUBLIC_API_URL;
+
   return await apiFetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/users/dashboard/`,
+    `${apiUrl}/users/dashboard/`,
     {
       method: "GET",
 
