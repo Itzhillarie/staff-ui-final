@@ -25,8 +25,12 @@ export async function loginUserAction(
   }
 
   try {
+    const apiUrl =
+      process.env.API_SERVER_URL ??
+      process.env.NEXT_PUBLIC_API_URL;
+
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/users/login/`,
+      `${apiUrl}/users/login/`,
       {
         method: "POST",
         headers: {

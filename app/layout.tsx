@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
 import { Toaster } from "sonner";
 import AuthProvider from "@/app/providers/Authprovider";
 
-const inter = Inter({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-plus-jakarta",
   display: "swap",
 });
 
@@ -84,7 +84,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${inter.variable} bg-slate-100 font-sans antialiased`}
+        className={`${plusJakarta.className} ${plusJakarta.variable} bg-slate-100 antialiased`}
       >
 
           {/* Main Application */}

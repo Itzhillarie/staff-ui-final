@@ -55,12 +55,12 @@ const links = [
   },
   {
     name: "Notifications",
-    href: "/dashboard/Notification",
+    href: "/dashboard/notifications",
     icon: Bell,
   },
   {
     name: "Settings",
-    href: "/dashboard/Settings",
+    href: "/dashboard/settings",
     icon: Settings,
   },
 ];
@@ -71,7 +71,7 @@ export default function Sidebar() {
 
   async function handleLogout() {
     await logout();
-    router.replace("/auth/signin");
+    router.replace("/auth/login");
   }
 
   return (

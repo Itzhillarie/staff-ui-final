@@ -30,7 +30,7 @@ export interface PaginatedIdeasResponse {
 
 export interface ApiMessage {
   message: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /* ------------------------------------------

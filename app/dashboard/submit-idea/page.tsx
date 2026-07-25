@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Lightbulb,
   Plus,
@@ -56,7 +56,7 @@ export default function SubmitIdeaPage() {
      LOAD IDEAS
   ------------------------------------------ */
 
-  async function loadIdeas() {
+  const loadIdeas = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -69,22 +69,26 @@ export default function SubmitIdeaPage() {
       );
 
       setIdeas(drafts);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed loading ideas:", error);
 
       toast.error(
-        error.message || "Failed to load ideas."
+        getErrorMessage(error, "Failed to load ideas.")
       );
 
       setIdeas([]);
     } finally {
       setLoading(false);
     }
-  }
+  }, [page, pageSize]);
 
   useEffect(() => {
-    loadIdeas();
-  }, []);
+    const timeoutId = window.setTimeout(() => {
+      void loadIdeas();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [loadIdeas]);
 
   /* ------------------------------------------
      RESET FORM
@@ -136,11 +140,11 @@ export default function SubmitIdeaPage() {
       resetForm();
 
       await loadIdeas();
-          } catch (error: any) {
+          } catch (error: unknown) {
       console.error(error);
 
       toast.error(
-        error.message || "Unable to save idea."
+        getErrorMessage(error, "Unable to save idea.")
       );
     } finally {
       setSaving(false);
@@ -164,11 +168,11 @@ export default function SubmitIdeaPage() {
       toast.success("Draft deleted.");
 
       await loadIdeas();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
 
       toast.error(
-        error.message || "Unable to delete draft."
+        getErrorMessage(error, "Unable to delete draft.")
       );
     }
   }
@@ -192,11 +196,11 @@ export default function SubmitIdeaPage() {
       );
 
       await loadIdeas();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
 
       toast.error(
-        error.message || "Unable to submit idea."
+        getErrorMessage(error, "Unable to submit idea.")
       );
     }
   }
@@ -515,4 +519,10 @@ export default function SubmitIdeaPage() {
     </div>
 
   );
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error && error.message
+    ? error.message
+    : fallback;
 }

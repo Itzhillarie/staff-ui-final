@@ -2,7 +2,7 @@
 
 import { useAuthStore } from "@/app/store/authstore";
 
-export async function apiFetch<T = any>(
+export async function apiFetch<T = unknown>(
   input: RequestInfo | URL,
   init: RequestInit = {}
 ): Promise<T> {
@@ -10,9 +10,7 @@ export async function apiFetch<T = any>(
 
   if (init.body) {
     headers.set("Content-Type", "application/json");
-  }""
-
-  headers.set("ngrok-skip-browser-warning", "1");
+  }
 
   const token = useAuthStore.getState().token;
 
@@ -32,7 +30,7 @@ export async function apiFetch<T = any>(
   if (!response.ok) {
     const text = await response.text();
 
-    let data: any = {};
+    let data: Record<string, unknown> = {};
 
     try {
       data = JSON.parse(text);
@@ -47,10 +45,7 @@ export async function apiFetch<T = any>(
     }
 
     throw new Error(
-      data.error ||
-      data.detail ||
-      data.message ||
-      `HTTP ${response.status}`
+      getErrorMessage(data, response.status)
     );
   }
 
@@ -59,4 +54,19 @@ export async function apiFetch<T = any>(
   }
 
   return response.json();
+}
+
+function getErrorMessage(
+  data: Record<string, unknown>,
+  status: number
+) {
+  for (const key of ["error", "detail", "message"]) {
+    const value = data[key];
+
+    if (typeof value === "string" && value.trim()) {
+      return value;
+    }
+  }
+
+  return `HTTP ${status}`;
 }
