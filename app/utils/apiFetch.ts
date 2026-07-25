@@ -10,7 +10,7 @@ export async function apiFetch<T = any>(
 
   if (init.body) {
     headers.set("Content-Type", "application/json");
-  }
+  }""
 
   headers.set("ngrok-skip-browser-warning", "1");
 
