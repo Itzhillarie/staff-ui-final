@@ -1,14 +1,15 @@
 "use client";
 
-import { ClipboardList } from "lucide-react";
+import { Search, Clock3, ShieldCheck } from "lucide-react";
+import { useMemo, useState } from "react";
 
 export interface AuditLog {
   id: number;
   user: string;
   action: string;
-  module: string;
-  date: string;
-  status: "Success" | "Failed";
+  target: string;
+  ip: string;
+  created_at: string;
 }
 
 interface AuditLogTableProps {
@@ -18,29 +19,63 @@ interface AuditLogTableProps {
 export default function AuditLogTable({
   logs,
 }: AuditLogTableProps) {
+  const [search, setSearch] = useState("");
+
+  const filteredLogs = useMemo(() => {
+    return logs.filter(
+      (log) =>
+        log.user.toLowerCase().includes(search.toLowerCase()) ||
+        log.action.toLowerCase().includes(search.toLowerCase()) ||
+        log.target.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [logs, search]);
+
   return (
-    <div className="rounded-xl bg-white shadow-sm">
+    <div className="rounded-3xl border border-slate-200 bg-white shadow-sm">
 
       {/* Header */}
 
-      <div className="flex items-center gap-3 border-b p-6">
+      <div className="border-b border-slate-200 p-6">
 
-        <div className="rounded-lg bg-indigo-100 p-3">
-          <ClipboardList
-            size={22}
-            className="text-indigo-600"
-          />
+        <div className="flex items-center gap-3">
+
+          <div className="rounded-xl bg-indigo-100 p-3">
+
+            <ShieldCheck className="h-6 w-6 text-indigo-600" />
+
+          </div>
+
+          <div>
+
+            <h2 className="text-2xl font-bold text-slate-800">
+              Audit Logs
+            </h2>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Monitor security and administrative activity.
+            </p>
+
+          </div>
+
         </div>
 
-        <div>
+      </div>
 
-          <h2 className="text-xl font-semibold">
-            Audit Logs
-          </h2>
+      {/* Search */}
 
-          <p className="text-sm text-slate-500">
-            Monitor user activities across the system.
-          </p>
+      <div className="border-b border-slate-100 p-6">
+
+        <div className="relative">
+
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+
+          <input
+            type="text"
+            placeholder="Search logs..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-xl border border-slate-300 py-3 pl-12 pr-4 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          />
 
         </div>
 
@@ -56,24 +91,24 @@ export default function AuditLogTable({
 
             <tr>
 
-              <th className="px-6 py-3 text-left text-sm font-semibold">
+              <th className="px-6 py-4 text-left text-sm font-semibold">
                 User
               </th>
 
-              <th className="px-6 py-3 text-left text-sm font-semibold">
+              <th className="px-6 py-4 text-left text-sm font-semibold">
                 Action
               </th>
 
-              <th className="px-6 py-3 text-left text-sm font-semibold">
-                Module
+              <th className="px-6 py-4 text-left text-sm font-semibold">
+                Target
               </th>
 
-              <th className="px-6 py-3 text-left text-sm font-semibold">
-                Date
+              <th className="px-6 py-4 text-left text-sm font-semibold">
+                IP Address
               </th>
 
-              <th className="px-6 py-3 text-left text-sm font-semibold">
-                Status
+              <th className="px-6 py-4 text-left text-sm font-semibold">
+                Time
               </th>
 
             </tr>
@@ -82,61 +117,61 @@ export default function AuditLogTable({
 
           <tbody>
 
-            {logs.length === 0 ? (
+            {filteredLogs.map((log) => (
+
+              <tr
+                key={log.id}
+                className="border-t border-slate-100 hover:bg-slate-50"
+              >
+
+                <td className="px-6 py-5 font-medium">
+                  {log.user}
+                </td>
+
+                <td className="px-6 py-5">
+
+                  <span className="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
+                    {log.action}
+                  </span>
+
+                </td>
+
+                <td className="px-6 py-5 text-slate-600">
+                  {log.target}
+                </td>
+
+                <td className="px-6 py-5 font-mono text-sm text-slate-500">
+                  {log.ip}
+                </td>
+
+                <td className="px-6 py-5">
+
+                  <div className="flex items-center gap-2 text-slate-500">
+
+                    <Clock3 className="h-4 w-4" />
+
+                    {new Date(log.created_at).toLocaleString()}
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            ))}
+
+            {filteredLogs.length === 0 && (
 
               <tr>
 
                 <td
                   colSpan={5}
-                  className="py-10 text-center text-slate-500"
+                  className="py-16 text-center text-slate-500"
                 >
                   No audit logs found.
                 </td>
 
               </tr>
-
-            ) : (
-
-              logs.map((log) => (
-
-                <tr
-                  key={log.id}
-                  className="border-t hover:bg-slate-50"
-                >
-
-                  <td className="px-6 py-4">
-                    {log.user}
-                  </td>
-
-                  <td className="px-6 py-4">
-                    {log.action}
-                  </td>
-
-                  <td className="px-6 py-4">
-                    {log.module}
-                  </td>
-
-                  <td className="px-6 py-4">
-                    {log.date}
-                  </td>
-
-                  <td className="px-6 py-4">
-
-                    <span
-                      className={`rounded-full px-3 py-1 text-sm font-medium ${
-                        log.status === "Success"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {log.status}
-                    </span>
-
-                  </td>
-
-                </tr>
-
-              ))
 
             )}
 

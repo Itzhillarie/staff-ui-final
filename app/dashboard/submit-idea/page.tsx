@@ -19,6 +19,8 @@ import {
   submitIdea,
 } from "@/app/lib/ideas";
 
+import { toast } from "@/app/utils/toast";
+
 interface Idea {
   id: string;
   title: string;
@@ -32,47 +34,61 @@ interface Idea {
 
 export default function SubmitIdeaPage() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
+
   const [loading, setLoading] = useState(true);
+
   const [saving, setSaving] = useState(false);
 
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const [showModal, setShowModal] = useState(false);
 
+  const [page] = useState(1);
+
+  const [pageSize] = useState(20);
+
   const [form, setForm] = useState({
     title: "",
     description: "",
   });
 
-  const loadIdeas = async () => {
-  try {
-    setLoading(true);
+  /* ------------------------------------------
+     LOAD IDEAS
+  ------------------------------------------ */
 
-    const data = await getIdeas();
+  async function loadIdeas() {
+    try {
+      setLoading(true);
 
-    console.log("Ideas:", data);
+      const response = await getIdeas(page, pageSize);
 
-  setIdeas(
-  Array.isArray(data.results)
-    ? data.results.filter((idea: Idea) => idea.status === "Draft")
-    : []
-);
+      console.log("Ideas Response:", response);
 
-    console.log("edede",ideas)
-  } catch (err: any) {
-    console.error("LOAD IDEAS ERROR:", err);
+      const drafts = (response.results ?? []).filter(
+        (idea) => idea.status === "Draft"
+      );
 
-    alert(
-      JSON.stringify(err, null, 2)
-    );
-  } finally {
-    setLoading(false);
+      setIdeas(drafts);
+    } catch (error: any) {
+      console.error("Failed loading ideas:", error);
+
+      toast.error(
+        error.message || "Failed to load ideas."
+      );
+
+      setIdeas([]);
+    } finally {
+      setLoading(false);
+    }
   }
-};
 
   useEffect(() => {
     loadIdeas();
   }, []);
+
+  /* ------------------------------------------
+     RESET FORM
+  ------------------------------------------ */
 
   function resetForm() {
     setEditingId(null);
@@ -85,14 +101,18 @@ export default function SubmitIdeaPage() {
     setShowModal(false);
   }
 
+  /* ------------------------------------------
+     CREATE / UPDATE
+  ------------------------------------------ */
+
   async function handleSave() {
     if (!form.title.trim()) {
-      alert("Title is required.");
+      toast.error("Idea title is required.");
       return;
     }
 
     if (!form.description.trim()) {
-      alert("Description is required.");
+      toast.error("Idea description is required.");
       return;
     }
 
@@ -101,56 +121,82 @@ export default function SubmitIdeaPage() {
 
       if (editingId) {
         await updateIdea(editingId, form);
+
+        toast.success(
+          "Draft updated successfully."
+        );
       } else {
         await createIdea(form);
+
+        toast.success(
+          "Draft created successfully."
+        );
       }
 
       resetForm();
 
       await loadIdeas();
-    } catch (err: any) {
-      console.error(err);
+          } catch (error: any) {
+      console.error(error);
 
-      alert(
-        err?.body?.error ??
-          "Unable to save idea."
+      toast.error(
+        error.message || "Unable to save idea."
       );
     } finally {
       setSaving(false);
     }
   }
 
+  /* ------------------------------------------
+     DELETE IDEA
+  ------------------------------------------ */
+
   async function handleDelete(id: string) {
-    if (!confirm("Delete this draft?")) return;
+    const confirmed = confirm(
+      "Delete this draft idea?"
+    );
+
+    if (!confirmed) return;
 
     try {
       await deleteIdea(id);
 
+      toast.success("Draft deleted.");
+
       await loadIdeas();
-    } catch (err: any) {
-      alert(
-        err?.body?.error ??
-          "Unable to delete."
+    } catch (error: any) {
+      console.error(error);
+
+      toast.error(
+        error.message || "Unable to delete draft."
       );
     }
   }
 
+  /* ------------------------------------------
+     SUBMIT IDEA
+  ------------------------------------------ */
+
   async function handleSubmit(id: string) {
-    if (
-      !confirm(
-        "Submit this idea for peer review?"
-      )
-    )
-      return;
+    const confirmed = confirm(
+      "Submit this idea for Peer Review?"
+    );
+
+    if (!confirmed) return;
 
     try {
       await submitIdea(id);
 
+      toast.success(
+        "Idea submitted successfully."
+      );
+
       await loadIdeas();
-    } catch (err: any) {
-      alert(
-        err?.body?.error ??
-          "Unable to submit."
+    } catch (error: any) {
+      console.error(error);
+
+      toast.error(
+        error.message || "Unable to submit idea."
       );
     }
   }
@@ -191,7 +237,6 @@ export default function SubmitIdeaPage() {
             className="flex items-center gap-2 rounded-2xl bg-white px-6 py-4 font-semibold text-indigo-700 transition hover:scale-105"
           >
             <Plus size={22} />
-
             Create Idea
           </button>
 
@@ -199,7 +244,7 @@ export default function SubmitIdeaPage() {
 
       </div>
 
-      {/* Create/Edit Modal */}
+      {/* Modal */}
 
       {showModal && (
 
@@ -231,9 +276,7 @@ export default function SubmitIdeaPage() {
               <div>
 
                 <label className="mb-2 block font-semibold">
-
                   Idea Title
-
                 </label>
 
                 <input
@@ -253,9 +296,7 @@ export default function SubmitIdeaPage() {
               <div>
 
                 <label className="mb-2 block font-semibold">
-
                   Description
-
                 </label>
 
                 <textarea
@@ -264,8 +305,7 @@ export default function SubmitIdeaPage() {
                   onChange={(e) =>
                     setForm({
                       ...form,
-                      description:
-                        e.target.value,
+                      description: e.target.value,
                     })
                   }
                   placeholder="Describe your innovation..."
@@ -279,18 +319,15 @@ export default function SubmitIdeaPage() {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="rounded-xl bg-indigo-600 px-8 py-3 font-semibold text-white hover:bg-indigo-700"
+                  className="rounded-xl bg-indigo-600 px-8 py-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
                 >
                   {saving ? (
                     <span className="flex items-center gap-2">
-
                       <Loader2
                         size={18}
                         className="animate-spin"
                       />
-
                       Saving...
-
                     </span>
                   ) : editingId ? (
                     "Update Draft"
@@ -345,9 +382,7 @@ export default function SubmitIdeaPage() {
 
           <div className="flex justify-center py-20">
 
-            <Loader2
-              className="h-10 w-10 animate-spin text-indigo-600"
-            />
+            <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
 
           </div>
 
@@ -361,16 +396,12 @@ export default function SubmitIdeaPage() {
             />
 
             <h3 className="mt-6 text-xl font-semibold text-slate-700">
-
               No Draft Ideas
-
             </h3>
 
             <p className="mt-2 text-slate-500">
-
               Click <strong>Create Idea</strong> to start your first
               innovation.
-
             </p>
 
           </div>
@@ -378,7 +409,6 @@ export default function SubmitIdeaPage() {
         ) : (
 
           <div className="grid gap-6 p-6 lg:grid-cols-2">
-
 
             {ideas.map((idea) => (
 
@@ -392,15 +422,11 @@ export default function SubmitIdeaPage() {
                   <div>
 
                     <h3 className="text-xl font-bold text-slate-800">
-
                       {idea.title}
-
                     </h3>
 
                     <span className="mt-2 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-
                       {idea.status}
-
                     </span>
 
                   </div>
@@ -408,9 +434,7 @@ export default function SubmitIdeaPage() {
                 </div>
 
                 <p className="mt-5 line-clamp-4 text-slate-600">
-
                   {idea.description}
-
                 </p>
 
                 <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
@@ -418,15 +442,11 @@ export default function SubmitIdeaPage() {
                   <div>
 
                     <span className="font-semibold text-slate-500">
-
                       Priority
-
                     </span>
 
                     <p className="mt-1 font-medium">
-
                       {idea.priority ?? "-"}
-
                     </p>
 
                   </div>
@@ -434,15 +454,11 @@ export default function SubmitIdeaPage() {
                   <div>
 
                     <span className="font-semibold text-slate-500">
-
                       Creator
-
                     </span>
 
                     <p className="mt-1 font-medium">
-
                       {idea.creator}
-
                     </p>
 
                   </div>
@@ -453,7 +469,6 @@ export default function SubmitIdeaPage() {
 
                   <button
                     onClick={() => {
-
                       setEditingId(idea.id);
 
                       setForm({
@@ -462,37 +477,27 @@ export default function SubmitIdeaPage() {
                       });
 
                       setShowModal(true);
-
                     }}
                     className="flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-3 text-white transition hover:bg-amber-600"
                   >
-
                     <Pencil size={18} />
-
                     Edit
-
                   </button>
 
                   <button
                     onClick={() => handleDelete(idea.id)}
                     className="flex items-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-white transition hover:bg-red-700"
                   >
-
                     <Trash2 size={18} />
-
                     Delete
-
                   </button>
 
                   <button
                     onClick={() => handleSubmit(idea.id)}
                     className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-white transition hover:bg-indigo-700"
                   >
-
                     <Send size={18} />
-
                     Submit
-
                   </button>
 
                 </div>

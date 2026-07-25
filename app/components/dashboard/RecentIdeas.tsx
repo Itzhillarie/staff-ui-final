@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import {
@@ -11,7 +10,6 @@ import {
   Loader2,
 } from "lucide-react";
 
-import { getDashboardData } from "@/app/lib/dashboard";
 
 interface Idea {
   id: string;
@@ -21,6 +19,21 @@ interface Idea {
   comments: number;
   submitted: string;
 }
+
+
+interface Props {
+  ideas: Array<{
+    id: number;
+    title: string;
+    status: string;
+    likes?: number;
+    comments?: number;
+    created_at: string;
+  }>;
+
+  loading?: boolean;
+}
+
 
 const statusColors: Record<string, string> = {
   Draft: "bg-gray-100 text-gray-700",
@@ -34,39 +47,25 @@ const statusColors: Record<string, string> = {
   Archived: "bg-slate-100 text-slate-700",
 };
 
-export default function RecentIdeas() {
-  const [ideas, setIdeas] = useState<Idea[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function loadIdeas() {
-      try {
-        const dashboard = await getDashboardData();
+export default function RecentIdeas({
+  ideas: dashboardIdeas,
+  loading = false,
+}: Props) {
 
-        const recentIdeas =
-          dashboard.recent_ideas ?? [];
 
-        setIdeas(
-          recentIdeas.map((idea: any) => ({
-            id: String(idea.id),
-            title: idea.title,
-            status: idea.status,
-            likes: idea.likes ?? 0,
-            comments: idea.comments ?? 0,
-            submitted: new Date(
-              idea.created_at
-            ).toLocaleDateString(),
-          }))
-        );
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    }
+  const ideas: Idea[] =
+    dashboardIdeas.map((idea) => ({
+      id: String(idea.id),
+      title: idea.title,
+      status: idea.status,
+      likes: idea.likes ?? 0,
+      comments: idea.comments ?? 0,
+      submitted: new Date(
+        idea.created_at
+      ).toLocaleDateString("en-US"),
+    }));
 
-    loadIdeas();
-  }, []);
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -85,6 +84,7 @@ export default function RecentIdeas() {
 
         </div>
 
+
         <Link
           href="/dashboard/idea-board"
           className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
@@ -94,19 +94,25 @@ export default function RecentIdeas() {
 
       </div>
 
+
+
       <div className="overflow-x-auto">
 
         {loading ? (
 
           <div className="flex justify-center py-12">
+
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+
           </div>
+
 
         ) : ideas.length === 0 ? (
 
           <div className="py-12 text-center text-slate-500">
             You haven't submitted any ideas yet.
           </div>
+
 
         ) : (
 
@@ -116,16 +122,34 @@ export default function RecentIdeas() {
 
               <tr>
 
-                <th className="px-6 py-4 text-left">Idea</th>
-                <th className="px-6 py-4 text-left">Status</th>
-                <th className="px-6 py-4 text-center">Likes</th>
-                <th className="px-6 py-4 text-center">Comments</th>
-                <th className="px-6 py-4 text-center">Submitted</th>
-                <th className="px-6 py-4 text-center">Action</th>
+                <th className="px-6 py-4 text-left">
+                  Idea
+                </th>
+
+                <th className="px-6 py-4 text-left">
+                  Status
+                </th>
+
+                <th className="px-6 py-4 text-center">
+                  Likes
+                </th>
+
+                <th className="px-6 py-4 text-center">
+                  Comments
+                </th>
+
+                <th className="px-6 py-4 text-center">
+                  Submitted
+                </th>
+
+                <th className="px-6 py-4 text-center">
+                  Action
+                </th>
 
               </tr>
 
             </thead>
+
 
             <tbody>
 
@@ -140,6 +164,7 @@ export default function RecentIdeas() {
                     {idea.title}
                   </td>
 
+
                   <td className="px-6 py-5">
 
                     <span
@@ -152,6 +177,7 @@ export default function RecentIdeas() {
                     </span>
 
                   </td>
+
 
                   <td className="px-6 py-5 text-center">
 
@@ -168,6 +194,7 @@ export default function RecentIdeas() {
 
                   </td>
 
+
                   <td className="px-6 py-5 text-center">
 
                     <div className="flex items-center justify-center gap-2">
@@ -182,6 +209,7 @@ export default function RecentIdeas() {
                     </div>
 
                   </td>
+
 
                   <td className="px-6 py-5 text-center">
 
@@ -198,6 +226,7 @@ export default function RecentIdeas() {
 
                   </td>
 
+
                   <td className="px-6 py-5 text-center">
 
                     <Link
@@ -212,6 +241,7 @@ export default function RecentIdeas() {
                     </Link>
 
                   </td>
+
 
                 </tr>
 

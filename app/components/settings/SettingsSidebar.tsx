@@ -1,96 +1,105 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   User,
   Shield,
   Bell,
   Palette,
   Building2,
+  PlugZap,
   Users,
-  Plug,
   ClipboardList,
-  Settings,
 } from "lucide-react";
 
-const menuItems = [
+interface SettingsSidebarProps {
+  activeSection: string;
+  onSectionChange: (section: string) => void;
+}
+
+const sections = [
   {
-    name: "General",
-    href: "/dashboard/settings",
-    icon: Settings,
-  },
-  {
-    name: "Profile",
-    href: "/dashboard/settings/profile",
+    id: "profile",
+    label: "Profile",
     icon: User,
   },
   {
-    name: "Security",
-    href: "/dashboard/settings/security",
+    id: "account",
+    label: "Account",
+    icon: User,
+  },
+  {
+    id: "security",
+    label: "Security",
     icon: Shield,
   },
   {
-    name: "Notifications",
-    href: "/dashboard/settings/notifications",
-    icon: Bell,
-  },
-  {
-    name: "Appearance",
-    href: "/dashboard/settings/appearance",
+    id: "appearance",
+    label: "Appearance",
     icon: Palette,
   },
   {
-    name: "Organization",
-    href: "/dashboard/settings/organization",
+    id: "notifications",
+    label: "Notifications",
+    icon: Bell,
+  },
+  {
+    id: "organization",
+    label: "Organization",
     icon: Building2,
   },
   {
-    name: "Roles",
-    href: "/dashboard/settings/roles",
+    id: "integrations",
+    label: "Integrations",
+    icon: PlugZap,
+  },
+  {
+    id: "roles",
+    label: "Role Management",
     icon: Users,
   },
   {
-    name: "Integrations",
-    href: "/dashboard/settings/integrations",
-    icon: Plug,
-  },
-  {
-    name: "Audit Logs",
-    href: "/dashboard/settings/audit-logs",
+    id: "audit",
+    label: "Audit Logs",
     icon: ClipboardList,
   },
 ];
 
-export default function SettingsSidebar() {
-  const pathname = usePathname();
-
+export default function SettingsSidebar({
+  activeSection,
+  onSectionChange,
+}: SettingsSidebarProps) {
   return (
-    <aside className="w-full rounded-xl bg-white p-4 shadow-sm lg:w-64">
-      <h2 className="mb-6 text-lg font-bold text-slate-800">
+    <aside className="sticky top-24 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+
+      <h2 className="mb-5 text-lg font-bold text-slate-800">
         Settings
       </h2>
 
       <nav className="space-y-2">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const active = pathname === item.href;
+
+        {sections.map((section) => {
+          const Icon = section.icon;
+          const active = activeSection === section.id;
 
           return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`flex items-center gap-3 rounded-lg px-4 py-3 transition ${
+            <button
+              key={section.id}
+              onClick={() => onSectionChange(section.id)}
+              className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition-all ${
                 active
-                  ? "bg-indigo-600 text-white"
-                  : "text-slate-600 hover:bg-slate-100"
+                  ? "bg-linear-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               }`}
             >
-              <Icon size={18} />
-              <span>{item.name}</span>
-            </Link>
+              <Icon className="h-5 w-5" />
+
+              <span className="font-medium">
+                {section.label}
+              </span>
+            </button>
           );
         })}
+
       </nav>
     </aside>
   );

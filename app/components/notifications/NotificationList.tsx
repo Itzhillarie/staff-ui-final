@@ -1,51 +1,41 @@
 "use client";
 
-import NotificationCard from "./NotificationCard";
+import NotificationCard, {
+  Notification,
+} from "./NotificationCard";
 import EmptyNotifications from "./EmptyNotifications";
-
-interface Notification {
-  id: number;
-  title: string;
-  message: string;
-  type:
-    | "Idea"
-    | "Project"
-    | "Task"
-    | "Review"
-    | "Gamification"
-    | "System";
-  sender: string;
-  time: string;
-  priority: "High" | "Medium" | "Low";
-  read: boolean;
-}
 
 interface NotificationListProps {
   notifications: Notification[];
-  onView?: (notification: Notification) => void;
-  onArchive?: (notification: Notification) => void;
-  onMarkRead?: (notification: Notification) => void;
+  onRead?: (id: string) => void;
+  onArchive?: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
 export default function NotificationList({
   notifications,
-  onView,
+  onRead,
   onArchive,
-  onMarkRead,
+  onDelete,
 }: NotificationListProps) {
-  if (notifications.length === 0) {
-    return <EmptyNotifications />;
+  if (!notifications.length) {
+    return (
+      <EmptyNotifications
+        title="No Notifications"
+        description="You're all caught up. New notifications will appear here."
+      />
+    );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {notifications.map((notification) => (
         <NotificationCard
           key={notification.id}
           notification={notification}
-          onView={() => onView?.(notification)}
-          onArchive={() => onArchive?.(notification)}
-          onMarkRead={() => onMarkRead?.(notification)}
+          onRead={onRead}
+          onArchive={onArchive}
+          onDelete={onDelete}
         />
       ))}
     </div>

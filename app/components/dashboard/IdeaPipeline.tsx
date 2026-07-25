@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   FileEdit,
   Send,
@@ -12,12 +11,28 @@ import {
   Archive,
 } from "lucide-react";
 
-import { getDashboardData } from "@/app/lib/dashboard";
+
+interface Props {
+  ideas: {
+    draft: number;
+    submitted: number;
+    peer_review: number;
+    pm_review: number;
+    approved: number;
+    implementation: number;
+    impact: number;
+    archived: number;
+  };
+
+  loading?: boolean;
+}
+
 
 interface PipelineStage {
   stage: string;
   count: number;
 }
+
 
 const stageConfig = {
   Draft: {
@@ -54,71 +69,64 @@ const stageConfig = {
   },
 } as const;
 
-export default function IdeaPipeline() {
-  const [pipeline, setPipeline] = useState<PipelineStage[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function loadPipeline() {
-      try {
-        const dashboard = await getDashboardData();
+export default function IdeaPipeline({
+  ideas,
+  loading = false,
+}: Props) {
 
-        setPipeline([
-          {
-            stage: "Draft",
-            count: dashboard.ideas.draft,
-          },
-          {
-            stage: "Submitted",
-            count: dashboard.ideas.submitted,
-          },
-          {
-            stage: "Peer Review",
-            count: dashboard.ideas.peer_review,
-          },
-          {
-            stage: "Product Manager Review",
-            count: dashboard.ideas.pm_review,
-          },
-          {
-            stage: "Approved",
-            count: dashboard.ideas.approved,
-          },
-          {
-            stage: "Implementation",
-            count: dashboard.ideas.implementation,
-          },
-          {
-            stage: "Impact Evaluation",
-            count: dashboard.ideas.impact,
-          },
-          {
-            stage: "Archived",
-            count: dashboard.ideas.archived,
-          },
-        ]);
-      } catch (error) {
-        console.error("Pipeline Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
 
-    loadPipeline();
-  }, []);
+  const pipeline: PipelineStage[] = [
+    {
+      stage: "Draft",
+      count: ideas.draft,
+    },
+    {
+      stage: "Submitted",
+      count: ideas.submitted,
+    },
+    {
+      stage: "Peer Review",
+      count: ideas.peer_review,
+    },
+    {
+      stage: "Product Manager Review",
+      count: ideas.pm_review,
+    },
+    {
+      stage: "Approved",
+      count: ideas.approved,
+    },
+    {
+      stage: "Implementation",
+      count: ideas.implementation,
+    },
+    {
+      stage: "Impact Evaluation",
+      count: ideas.impact,
+    },
+    {
+      stage: "Archived",
+      count: ideas.archived,
+    },
+  ];
+
 
   const maxCount = Math.max(
     ...pipeline.map((item) => item.count),
     1
   );
 
+
   const totalIdeas = pipeline.reduce(
     (sum, item) => sum + item.count,
     0
   );
 
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+
 
       <div className="mb-8 flex items-center justify-between">
 
@@ -132,11 +140,14 @@ export default function IdeaPipeline() {
           </p>
         </div>
 
+
         <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
           {loading ? "Loading..." : `${totalIdeas} Total Ideas`}
         </span>
 
       </div>
+
+
 
       {loading ? (
 
@@ -149,24 +160,27 @@ export default function IdeaPipeline() {
         <div className="space-y-6">
 
           {pipeline.map((stage) => {
+
             const config =
               stageConfig[
                 stage.stage as keyof typeof stageConfig
               ];
 
-            if (!config) return null;
 
             const Icon = config.icon;
 
+
             const percentage =
-              maxCount === 0
-                ? 0
-                : (stage.count / maxCount) * 100;
+              (stage.count / maxCount) * 100;
+
 
             return (
+
               <div key={stage.stage}>
 
+
                 <div className="mb-2 flex items-center justify-between">
+
 
                   <div className="flex items-center gap-3">
 
@@ -176,17 +190,22 @@ export default function IdeaPipeline() {
                       <Icon size={18} />
                     </div>
 
+
                     <span className="font-medium text-slate-700">
                       {stage.stage}
                     </span>
 
                   </div>
 
+
                   <span className="font-bold text-slate-800">
                     {stage.count}
                   </span>
 
+
                 </div>
+
+
 
                 <div className="h-3 overflow-hidden rounded-full bg-slate-200">
 
@@ -199,8 +218,11 @@ export default function IdeaPipeline() {
 
                 </div>
 
+
               </div>
+
             );
+
           })}
 
         </div>

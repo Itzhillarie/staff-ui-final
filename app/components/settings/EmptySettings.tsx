@@ -1,52 +1,43 @@
 "use client";
 
-import { Settings, Plus } from "lucide-react";
+import { Settings2, RefreshCw } from "lucide-react";
 
 interface EmptySettingsProps {
   title?: string;
   description?: string;
   buttonText?: string;
-  onAction?: () => void;
+  onRetry?: () => void;
 }
 
 export default function EmptySettings({
   title = "No Settings Available",
-  description = "There are currently no settings to display.",
-  buttonText,
-  onAction,
+  description = "We couldn't load this settings section. Please try again later.",
+  buttonText = "Reload",
+  onRetry,
 }: EmptySettingsProps) {
   return (
-    <div className="flex min-h-10 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
+    <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-white px-8 py-20 text-center">
 
-      {/* Icon */}
+      <div className="rounded-full bg-slate-100 p-6">
 
-      <div className="mb-6 rounded-full bg-indigo-100 p-5">
-        <Settings
-          size={48}
-          className="text-indigo-600"
-        />
+        <Settings2 className="h-12 w-12 text-slate-400" />
+
       </div>
 
-      {/* Title */}
-
-      <h2 className="text-2xl font-bold text-slate-800">
+      <h2 className="mt-6 text-2xl font-bold text-slate-800">
         {title}
       </h2>
 
-      {/* Description */}
-
-      <p className="mt-3 max-w-md text-slate-500">
+      <p className="mt-3 max-w-lg text-slate-500">
         {description}
       </p>
 
-      {/* Optional Action */}
-
-      {buttonText && onAction && (
+      {onRetry && (
         <button
-          onClick={onAction}
-          className="mt-8 flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-3 text-white transition hover:bg-indigo-700"
+          onClick={onRetry}
+          className="mt-8 flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-medium text-white transition hover:bg-indigo-700"
         >
-          <Plus size={18} />
+          <RefreshCw className="h-4 w-4" />
           {buttonText}
         </button>
       )}

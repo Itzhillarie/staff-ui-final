@@ -1,41 +1,47 @@
 "use client";
 
-import SearchResultCard, {
-  SearchResult,
-} from "./SearchResultCard";
+import SearchResultCard, { type SearchResult } from "./SearchResultCard";
+import EmptySearch from "./EmptySearch";
 
-interface SearchResultsProps {
+interface SearchResultProps {
   results: SearchResult[];
-  onView?: (result: SearchResult) => void;
 }
 
-export default function SearchResults({
+export default function SearchResult({
   results,
-  onView,
-}: SearchResultsProps) {
-  if (results.length === 0) {
+}: SearchResultProps) {
+  if (!results.length) {
     return (
-      <div className="rounded-xl bg-white p-10 text-center shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-700">
-          No Results Found
-        </h3>
-
-        <p className="mt-2 text-sm text-slate-500">
-          Try a different keyword or filter.
-        </p>
-      </div>
+      <EmptySearch title="No Results Found" />
     );
   }
 
   return (
-    <div className="space-y-4">
-      {results.map((result) => (
-        <SearchResultCard
-          key={result.id}
-          result={result}
-          onView={onView}
-        />
-      ))}
+    <div className="space-y-6">
+
+      <div className="flex items-center justify-between">
+
+        <h2 className="text-2xl font-bold text-slate-800">
+          Search Results
+        </h2>
+
+        <span className="rounded-full bg-indigo-100 px-4 py-2 text-sm font-semibold text-indigo-700">
+          {results.length} Result{results.length !== 1 && "s"}
+        </span>
+
+      </div>
+
+      <div className="space-y-4">
+
+        {results.map((result) => (
+          <SearchResultCard
+            key={`${result.category}-${result.id}`}
+            result={result}
+          />
+        ))}
+
+      </div>
+
     </div>
   );
 }

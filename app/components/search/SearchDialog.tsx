@@ -1,126 +1,147 @@
 "use client";
 
-import { X, Calendar, Tag } from "lucide-react";
-import { SearchResult } from "./SearchResultCard";
+import { useEffect } from "react";
+import { Search, X } from "lucide-react";
+
+import SearchBar from "./SearchBar";
+import SearchSuggestions, {
+  SearchSuggestion,
+} from "./SearchSuggestions";
+import SearchResult from "./SearchResult";
+import type { SearchResult as Result } from "./SearchResultCard";
 
 interface SearchDialogProps {
   open: boolean;
-  result: SearchResult | null;
+  query: string;
+  loading?: boolean;
+
+  suggestions: SearchSuggestion[];
+  results: Result[];
+
   onClose: () => void;
+  onQueryChange: (value: string) => void;
+  onSearch: () => void;
+  onSuggestionSelect: (item: SearchSuggestion) => void;
 }
 
 export default function SearchDialog({
   open,
-  result,
+  query,
+  loading = false,
+  suggestions,
+  results,
   onClose,
+  onQueryChange,
+  onSearch,
+  onSuggestionSelect,
 }: SearchDialogProps) {
-  if (!open || !result) return null;
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    }
+
+    if (open) {
+      window.addEventListener("keydown", handleKey);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div className="fixed inset-0 z-100 bg-black/50 backdrop-blur-sm">
 
-      <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl">
+      <div className="mx-auto mt-16 w-full max-w-4xl rounded-3xl bg-white shadow-2xl">
 
         {/* Header */}
 
-        <div className="flex items-center justify-between border-b p-5">
+        <div className="flex items-center justify-between border-b border-slate-200 p-6">
 
-          <div>
-            <h2 className="text-xl font-bold text-slate-800">
-              Search Result
-            </h2>
+          <div className="flex items-center gap-3">
 
-            <p className="text-sm text-slate-500">
-              View search result details
-            </p>
+            <div className="rounded-xl bg-indigo-100 p-2">
+              <Search className="h-6 w-6 text-indigo-600" />
+            </div>
+
+            <div>
+
+              <h2 className="text-2xl font-bold text-slate-800">
+                Global Search
+              </h2>
+
+              <p className="text-sm text-slate-500">
+                Search across the entire system
+              </p>
+
+            </div>
+
           </div>
 
           <button
             onClick={onClose}
-            className="rounded-lg p-2 hover:bg-slate-100"
+            className="rounded-xl p-2 transition hover:bg-slate-100"
           >
-            <X size={20} />
+            <X className="h-6 w-6 text-slate-600" />
           </button>
 
         </div>
 
-        {/* Content */}
+        {/* Search */}
 
-        <div className="space-y-5 p-6">
+        <div className="relative p-6">
 
-          <div>
+          <SearchBar
+            value={query}
+            loading={loading}
+            onChange={onQueryChange}
+            onSearch={onSearch}
+            onClear={() => onQueryChange("")}
+            placeholder="Search ideas, projects, tasks, users..."
+          />
 
-            <h3 className="text-2xl font-bold">
-              {result.title}
-            </h3>
-
-            <p className="mt-3 text-slate-600">
-              {result.description}
-            </p>
-
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-3">
-
-            <div className="rounded-xl bg-slate-50 p-4">
-
-              <div className="mb-2 flex items-center gap-2">
-                <Tag size={16} />
-                <span className="text-sm text-slate-500">
-                  Type
-                </span>
-              </div>
-
-              <p className="font-semibold">
-                {result.type}
-              </p>
-
-            </div>
-
-            <div className="rounded-xl bg-slate-50 p-4">
-
-              <div className="mb-2 flex items-center gap-2">
-                <Tag size={16} />
-                <span className="text-sm text-slate-500">
-                  Status
-                </span>
-              </div>
-
-              <p className="font-semibold">
-                {result.status}
-              </p>
-
-            </div>
-
-            <div className="rounded-xl bg-slate-50 p-4">
-
-              <div className="mb-2 flex items-center gap-2">
-                <Calendar size={16} />
-                <span className="text-sm text-slate-500">
-                  Date
-                </span>
-              </div>
-
-              <p className="font-semibold">
-                {result.date}
-              </p>
-
-            </div>
-
-          </div>
+          <SearchSuggestions
+            visible={query.length > 0}
+            suggestions={suggestions}
+            onSelect={onSuggestionSelect}
+          />
 
         </div>
 
-        {/* Footer */}
+        {/* Results */}
 
-        <div className="flex justify-end border-t p-5">
+        <div className="max-h-[60vh] overflow-y-auto border-t border-slate-200 p-6">
 
-          <button
-            onClick={onClose}
-            className="rounded-lg bg-indigo-600 px-5 py-2 text-white transition hover:bg-indigo-700"
-          >
-            Close
-          </button>
+          {query ? (
+            <SearchResult results={results} />
+          ) : (
+            <div className="py-16 text-center">
+
+              <Search className="mx-auto h-14 w-14 text-slate-300" />
+
+              <h3 className="mt-6 text-2xl font-bold text-slate-700">
+                Start Typing...
+              </h3>
+
+              <p className="mt-2 text-slate-500">
+                Search Ideas, Projects, Tasks, Users,
+                Notifications and more.
+              </p>
+
+              <div className="mt-8 inline-flex items-center gap-2 rounded-xl bg-slate-100 px-4 py-2 text-sm text-slate-600">
+                <kbd className="rounded bg-white px-2 py-1 shadow">
+                  Esc
+                </kbd>
+
+                Close Search
+              </div>
+
+            </div>
+          )}
 
         </div>
 

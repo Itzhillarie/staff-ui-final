@@ -1,16 +1,22 @@
+import LoadingSettings from "@/app/components/settings/LoadingSettings";
+
 export default function Loading() {
   return (
-    <div className="flex h-screen items-center justify-center">
+    <div className="space-y-8">
 
-      <div className="space-y-4 text-center">
+      {/* Page Header */}
 
-        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+      <div className="rounded-3xl bg-white p-8 shadow-sm">
 
-        <p className="text-slate-500">
-          Loading Settings...
-        </p>
+        <div className="mb-4 h-9 w-72 animate-pulse rounded-xl bg-slate-200" />
+
+        <div className="h-5 w-96 animate-pulse rounded-xl bg-slate-100" />
 
       </div>
+
+      {/* Settings Skeleton */}
+
+      <LoadingSettings />
 
     </div>
   );

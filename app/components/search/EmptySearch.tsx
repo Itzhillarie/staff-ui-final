@@ -4,39 +4,29 @@ import { SearchX } from "lucide-react";
 
 interface EmptySearchProps {
   title?: string;
-  message?: string;
-  onClear?: () => void;
+  description?: string;
 }
 
 export default function EmptySearch({
   title = "No Results Found",
-  message = "Try using different keywords or adjust your filters.",
-  onClear,
+  description = "Try changing your search keywords or filters.",
 }: EmptySearchProps) {
   return (
-    <div className="rounded-xl bg-white p-10 text-center shadow-sm">
+    <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-16 text-center shadow-sm">
 
-      <SearchX
-        size={60}
-        className="mx-auto text-slate-300"
-      />
+      <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-slate-100">
 
-      <h2 className="mt-4 text-2xl font-bold text-slate-800">
+        <SearchX className="h-12 w-12 text-slate-400" />
+
+      </div>
+
+      <h2 className="mt-6 text-3xl font-bold text-slate-800">
         {title}
       </h2>
 
-      <p className="mt-2 text-slate-500">
-        {message}
+      <p className="mx-auto mt-3 max-w-xl text-slate-500">
+        {description}
       </p>
-
-      {onClear && (
-        <button
-          onClick={onClear}
-          className="mt-6 rounded-lg bg-indigo-600 px-5 py-2 text-white transition hover:bg-indigo-700"
-        >
-          Clear Search
-        </button>
-      )}
 
     </div>
   );

@@ -5,188 +5,91 @@ import {
   Coins,
   CheckCircle2,
   Lock,
-  Calendar,
-  ShoppingBag,
-  ArrowRight,
 } from "lucide-react";
 
-interface Reward {
-  id: number;
-  title: string;
+export interface Reward {
+  id: string;
+  name: string;
   description: string;
-  category: string;
-  pointsRequired: number;
-  available: boolean;
+  points_required: number;
   redeemed: boolean;
-  redeemedDate?: string;
 }
 
 interface RewardCardProps {
   reward: Reward;
-  userPoints: number;
-  onRedeem?: (reward: Reward) => void;
+  onRedeem?: (id: string) => void;
+  loading?: boolean;
 }
 
 export default function RewardCard({
   reward,
-  userPoints,
   onRedeem,
+  loading = false,
 }: RewardCardProps) {
-  const canRedeem =
-    reward.available &&
-    !reward.redeemed &&
-    userPoints >= reward.pointsRequired;
-
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
 
-      {/* Header */}
+      <div className="mb-6 flex items-center justify-between">
 
-      <div className="flex items-center justify-between border-b border-slate-100 bg-linear-to-r from-indigo-600 to-purple-600 p-6 text-white">
-
-        <div className="flex items-center gap-4">
-
-          <div className="rounded-2xl bg-white/20 p-4">
-
-            <Gift size={34} />
-
-          </div>
-
-          <div>
-
-            <h2 className="text-2xl font-bold">
-              {reward.title}
-            </h2>
-
-            <p className="text-indigo-100">
-              {reward.category}
-            </p>
-
-          </div>
-
+        <div className="rounded-full bg-emerald-100 p-4">
+          <Gift className="h-8 w-8 text-emerald-600" />
         </div>
 
-        <ShoppingBag size={28} />
+        {reward.redeemed ? (
+          <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
+            Redeemed
+          </span>
+        ) : (
+          <span className="rounded-full bg-orange-100 px-3 py-1 text-sm font-semibold text-orange-700">
+            Available
+          </span>
+        )}
 
       </div>
 
-      {/* Body */}
+      <h2 className="text-2xl font-bold text-slate-800">
+        {reward.name}
+      </h2>
 
-      <div className="space-y-6 p-6">
+      <p className="mt-3 text-slate-500">
+        {reward.description}
+      </p>
 
-        <p className="leading-7 text-slate-600">
-          {reward.description}
-        </p>
+      <div className="mt-5 flex items-center gap-2 rounded-xl bg-amber-50 p-3">
 
-        {/* Cost */}
+        <Coins className="h-5 w-5 text-amber-500" />
 
-        <div className="rounded-xl bg-slate-50 p-5">
+        <span className="font-semibold text-amber-700">
+          {reward.points_required.toLocaleString()} Points
+        </span>
 
-          <div className="flex items-center justify-between">
+      </div>
 
-            <div className="flex items-center gap-3">
-
-              <Coins
-                size={22}
-                className="text-yellow-500"
-              />
-
-              <span className="font-medium text-slate-700">
-                Cost
-              </span>
-
-            </div>
-
-            <span className="text-2xl font-bold text-indigo-600">
-              {reward.pointsRequired.toLocaleString()} pts
-            </span>
-
-          </div>
-
-        </div>
-
-        {/* User Balance */}
-
-        <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-5">
-
-          <div className="flex items-center justify-between">
-
-            <span className="font-medium text-slate-700">
-              Your Balance
-            </span>
-
-            <span className="text-xl font-bold text-indigo-700">
-              {userPoints.toLocaleString()} pts
-            </span>
-
-          </div>
-
-        </div>
-
-        {/* Status */}
+      <div className="mt-8">
 
         {reward.redeemed ? (
-          <div className="rounded-xl border border-green-200 bg-green-50 p-5">
-
-            <div className="flex items-center gap-3">
-
-              <CheckCircle2
-                size={24}
-                className="text-green-600"
-              />
-
-              <div>
-
-                <h3 className="font-semibold text-green-700">
-                  Reward Redeemed
-                </h3>
-
-                <div className="mt-1 flex items-center gap-2 text-sm text-green-600">
-
-                  <Calendar size={16} />
-
-                  {reward.redeemedDate}
-
-                </div>
-
-              </div>
-
-            </div>
-
+          <div className="flex items-center justify-center gap-2 rounded-xl bg-green-100 py-3 font-semibold text-green-700">
+            <CheckCircle2 className="h-5 w-5" />
+            Already Redeemed
           </div>
-        ) : canRedeem ? (
-          <button
-            onClick={() => onRedeem?.(reward)}
-            className="flex w-full items-center justify-center gap-3 rounded-xl bg-indigo-600 px-6 py-4 font-semibold text-white transition hover:bg-indigo-700"
-          >
-            Redeem Reward
-            <ArrowRight size={20} />
-          </button>
         ) : (
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-
-            <div className="flex items-center gap-3">
-
-              <Lock
-                size={22}
-                className="text-slate-500"
-              />
-
-              <div>
-
-                <h3 className="font-semibold text-slate-700">
-                  Locked
-                </h3>
-
-                <p className="text-sm text-slate-500">
-                  Earn more points to unlock this reward.
-                </p>
-
-              </div>
-
-            </div>
-
-          </div>
+          <button
+            onClick={() => onRedeem?.(reward.id)}
+            disabled={loading}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? (
+              <>
+                <Lock className="h-5 w-5 animate-pulse" />
+                Redeeming...
+              </>
+            ) : (
+              <>
+                <Gift className="h-5 w-5" />
+                Redeem Reward
+              </>
+            )}
+          </button>
         )}
 
       </div>

@@ -50,17 +50,17 @@ const links = [
   },
   {
     name: "Gamification",
-    href: "/dashboard/gamifications",
+    href: "/dashboard/gamification",
     icon: Trophy,
   },
   {
     name: "Notifications",
-    href: "/dashboard/notifications",
+    href: "/dashboard/Notification",
     icon: Bell,
   },
   {
     name: "Settings",
-    href: "/dashboard/settings",
+    href: "/dashboard/Settings",
     icon: Settings,
   },
 ];
@@ -114,7 +114,7 @@ export default function Sidebar() {
       <div className="shrink-0 border-t bg-white p-4">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center justify-center gap-3 rounded-full bg-red-600 px-8 py-4 font-semibold text-white shadow-md transition duration-200 hover:bg-red-700"
+          className="flex w-full items-center justify-center gap-3 rounded-xl bg-red-600 px-4 py-3 font-medium text-white transition hover:bg-red-700"
         >
           <LogOut size={20} />
           Logout

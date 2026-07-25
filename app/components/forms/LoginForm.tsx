@@ -30,64 +30,107 @@ const initialState = {
 
 const styles = {
   container: "w-full max-w-md",
+
   header: "space-y-1",
+
   title: "text-3xl font-bold text-blue-500",
+
   content: "space-y-4",
+
   fieldGroup: "space-y-2",
+
   footer: "flex flex-col",
+
   button:
     "w-full rounded-md bg-blue-500 py-2 text-white hover:bg-blue-600",
+
   prompt: "mt-4 text-center text-sm",
+
   link: "ml-2 text-blue-500",
 };
 
+
 export function SigninForm() {
+
   const router = useRouter();
 
-  const login = useAuthStore((state) => state.login);
+  const login = useAuthStore(
+    (state) => state.login
+  );
+
 
   const [state, formAction, pending] = useActionState(
     loginUserAction,
     initialState
   );
 
+
   useEffect(() => {
+
     if (!state.message) return;
 
+
     if (state.success) {
+
+      // Save logged-in user details in Zustand
       login(
         state.token ?? "",
-        state.username ?? "",
-        state.role ?? ""
+        {
+          username: state.username ?? "",
+          role: state.role ?? "",
+        }
       );
+
 
       toast.success(state.message);
 
+
       router.replace("/dashboard");
+
     } else {
+
       toast.error(state.message);
+
     }
+
+
   }, [state, login, router]);
 
+
+
   return (
+
     <div className={styles.container}>
+
       <form action={formAction}>
+
         <Card>
+
           <CardHeader className={styles.header}>
+
             <CardTitle className={styles.title}>
               LOGIN
             </CardTitle>
 
+
             <CardDescription>
               Enter your username and password
             </CardDescription>
+
+
           </CardHeader>
 
+
+
           <CardContent className={styles.content}>
+
+
             <div className={styles.fieldGroup}>
+
               <Label htmlFor="username">
                 Username
               </Label>
+
 
               <Input
                 id="username"
@@ -96,12 +139,18 @@ export function SigninForm() {
                 placeholder="Enter username"
                 required
               />
+
             </div>
 
+
+
+
             <div className={styles.fieldGroup}>
+
               <Label htmlFor="password">
                 Password
               </Label>
+
 
               <Input
                 id="password"
@@ -110,31 +159,62 @@ export function SigninForm() {
                 placeholder="Enter password"
                 required
               />
+
+
             </div>
+
+
           </CardContent>
 
+
+
+
           <CardFooter className={styles.footer}>
+
+
             <button
+
               type="submit"
+
               disabled={pending}
+
               className={styles.button}
+
             >
+
               {pending ? "Logging In..." : "LOGIN"}
+
+
             </button>
           </CardFooter>
         </Card>
-
         <div className={styles.prompt}>
+
           Forgot password?
 
+
           <Link
+
             href="/auth/forgot-password"
+
             className={styles.link}
+
           >
+
             Reset Password
+
+
           </Link>
+
+
         </div>
+
+
+
       </form>
+
+
     </div>
+
   );
 }

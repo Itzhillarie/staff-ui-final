@@ -3,245 +3,172 @@
 import {
   Bell,
   CheckCircle2,
-  Clock3,
-  MessageSquare,
-  Lightbulb,
-  FolderKanban,
-  ClipboardList,
-  Award,
-  Settings,
-  MoreVertical,
-  Eye,
   Archive,
+  Trash2,
+  FileText,
+  Users,
+  ClipboardCheck,
+  Rocket,
+  CalendarClock,
+  Trophy,
+  Gift,
 } from "lucide-react";
 
-interface Notification {
-  id: number;
+export interface Notification {
+  id: string;
   title: string;
   message: string;
-  type:
-    | "Idea"
-    | "Project"
-    | "Task"
-    | "Review"
-    | "Gamification"
-    | "System";
-  sender: string;
-  time: string;
-  priority: "High" | "Medium" | "Low";
-  read: boolean;
+  type: string;
+  is_read: boolean;
+  created_at: string;
 }
 
 interface NotificationCardProps {
   notification: Notification;
-  onView?: () => void;
-  onArchive?: () => void;
-  onMarkRead?: () => void;
+  onRead?: (id: string) => void;
+  onArchive?: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
 export default function NotificationCard({
   notification,
-  onView,
+  onRead,
   onArchive,
-  onMarkRead,
+  onDelete,
 }: NotificationCardProps) {
-  const iconMap = {
-    Idea: Lightbulb,
-    Project: FolderKanban,
-    Task: ClipboardList,
-    Review: MessageSquare,
-    Gamification: Award,
-    System: Settings,
-  };
+  function getType() {
+    switch (notification.type.toLowerCase()) {
+      case "idea":
+        return {
+          icon: FileText,
+          bg: "bg-blue-100",
+          color: "text-blue-600",
+        };
 
-  const Icon = iconMap[notification.type];
+      case "peer_review":
+        return {
+          icon: Users,
+          bg: "bg-purple-100",
+          color: "text-purple-600",
+        };
 
-  const priorityColor = {
-    High: "bg-red-100 text-red-700",
-    Medium: "bg-yellow-100 text-yellow-700",
-    Low: "bg-green-100 text-green-700",
-  };
+      case "pm_review":
+        return {
+          icon: ClipboardCheck,
+          bg: "bg-orange-100",
+          color: "text-orange-600",
+        };
+
+      case "implementation":
+        return {
+          icon: Rocket,
+          bg: "bg-green-100",
+          color: "text-green-600",
+        };
+
+      case "task":
+        return {
+          icon: CalendarClock,
+          bg: "bg-red-100",
+          color: "text-red-600",
+        };
+
+      case "achievement":
+        return {
+          icon: Trophy,
+          bg: "bg-yellow-100",
+          color: "text-yellow-600",
+        };
+
+      case "reward":
+        return {
+          icon: Gift,
+          bg: "bg-emerald-100",
+          color: "text-emerald-600",
+        };
+
+      default:
+        return {
+          icon: Bell,
+          bg: "bg-slate-100",
+          color: "text-slate-600",
+        };
+    }
+  }
+
+  const style = getType();
+  const Icon = style.icon;
 
   return (
     <div
-      className={`rounded-2xl border transition-all duration-300 hover:shadow-lg ${
-        notification.read
-          ? "border-slate-200 bg-white"
-          : "border-indigo-300 bg-indigo-50/40"
+      className={`rounded-2xl border bg-white p-6 shadow-sm transition hover:shadow-lg ${
+        !notification.is_read
+          ? "border-indigo-300"
+          : "border-slate-200"
       }`}
     >
-      {/* Header */}
-
-      <div className="flex items-start justify-between border-b p-6">
+      <div className="flex items-start justify-between">
 
         <div className="flex gap-4">
 
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100">
-            <Icon
-              size={28}
-              className="text-indigo-600"
-            />
+          <div className={`rounded-2xl ${style.bg} p-3`}>
+            <Icon className={`h-6 w-6 ${style.color}`} />
           </div>
 
           <div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
 
-              <h3 className="text-lg font-bold text-slate-800">
+              <h2 className="text-lg font-bold text-slate-800">
                 {notification.title}
-              </h3>
+              </h2>
 
-              {!notification.read && (
-                <span className="rounded-full bg-indigo-600 px-2 py-1 text-xs font-semibold text-white">
-                  NEW
-                </span>
+              {!notification.is_read && (
+                <span className="h-2.5 w-2.5 rounded-full bg-indigo-600" />
               )}
 
             </div>
 
-            <p className="mt-2 text-slate-600">
+            <p className="mt-2 text-slate-500">
               {notification.message}
+            </p>
+
+            <p className="mt-3 text-sm text-slate-400">
+              {new Date(notification.created_at).toLocaleString()}
             </p>
 
           </div>
 
         </div>
 
-        <button className="rounded-lg p-2 hover:bg-slate-100">
-          <MoreVertical size={18} />
-        </button>
+        <div className="flex gap-2">
 
-      </div>
-
-      {/* Details */}
-
-      <div className="grid gap-5 p-6 md:grid-cols-4">
-
-        <div>
-
-          <p className="text-xs uppercase text-slate-500">
-            Type
-          </p>
-
-          <div className="mt-2 flex items-center gap-2">
-
-            <Bell
-              size={18}
-              className="text-indigo-600"
-            />
-
-            <span className="font-semibold">
-              {notification.type}
-            </span>
-
-          </div>
-
-        </div>
-
-        <div>
-
-          <p className="text-xs uppercase text-slate-500">
-            Sender
-          </p>
-
-          <p className="mt-2 font-semibold">
-            {notification.sender}
-          </p>
-
-        </div>
-
-        <div>
-
-          <p className="text-xs uppercase text-slate-500">
-            Time
-          </p>
-
-          <div className="mt-2 flex items-center gap-2">
-
-            <Clock3
-              size={18}
-              className="text-slate-500"
-            />
-
-            <span>{notification.time}</span>
-
-          </div>
-
-        </div>
-
-        <div>
-
-          <p className="text-xs uppercase text-slate-500">
-            Priority
-          </p>
-
-          <span
-            className={`mt-2 inline-block rounded-full px-3 py-1 text-sm font-semibold ${priorityColor[notification.priority]}`}
-          >
-            {notification.priority}
-          </span>
-
-        </div>
-
-      </div>
-
-      {/* Footer */}
-
-      <div className="flex flex-wrap items-center justify-between border-t bg-slate-50 px-6 py-5">
-
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-
-          {notification.read ? (
-            <>
-              <CheckCircle2
-                size={18}
-                className="text-green-600"
-              />
-              Read
-            </>
-          ) : (
-            <>
-              <Bell
-                size={18}
-                className="text-indigo-600"
-              />
-              Unread
-            </>
-          )}
-
-        </div>
-
-        <div className="flex gap-3">
-
-          {!notification.read && (
+          {!notification.is_read && (
             <button
-              onClick={onMarkRead}
-              className="rounded-xl border border-slate-300 px-4 py-2 transition hover:bg-slate-100"
+              onClick={() => onRead?.(notification.id)}
+              className="rounded-xl bg-green-100 p-2 text-green-600 transition hover:bg-green-200"
             >
-              Mark as Read
+              <CheckCircle2 className="h-5 w-5" />
             </button>
           )}
 
           <button
-            onClick={onArchive}
-            className="flex items-center gap-2 rounded-xl border border-slate-300 px-4 py-2 transition hover:bg-slate-100"
+            onClick={() => onArchive?.(notification.id)}
+            className="rounded-xl bg-yellow-100 p-2 text-yellow-600 transition hover:bg-yellow-200"
           >
-            <Archive size={16} />
-            Archive
+            <Archive className="h-5 w-5" />
           </button>
 
           <button
-            onClick={onView}
-            className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2 text-white transition hover:bg-indigo-700"
+            onClick={() => onDelete?.(notification.id)}
+            className="rounded-xl bg-red-100 p-2 text-red-600 transition hover:bg-red-200"
           >
-            <Eye size={16} />
-            View
+            <Trash2 className="h-5 w-5" />
           </button>
 
         </div>
 
       </div>
-
     </div>
   );
 }

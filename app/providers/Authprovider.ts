@@ -10,16 +10,13 @@ interface AuthProviderProps {
 
 export default function AuthProvider({
   children,
-}: AuthProviderProps): React.ReactNode {
+}: AuthProviderProps) {
   const router = useRouter();
   const pathname = usePathname();
 
   const token = useAuthStore((state) => state.token);
-  const setLoading = useAuthStore((state) => state.setLoading);
 
   useEffect(() => {
-    setLoading(true);
-
     const timer = setTimeout(() => {
       // Only redirect authenticated users away from auth pages
       if (
@@ -30,17 +27,10 @@ export default function AuthProvider({
       ) {
         router.replace("/dashboard");
       }
-
-      setLoading(false);
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [
-    token,
-    pathname,
-    router,
-    setLoading,
-  ]);
+  }, [token, pathname, router]);
 
-  return children as React.ReactNode;
+  return {children};
 }

@@ -1,261 +1,246 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState, type ComponentProps } from "react";
+import { toast } from "sonner";
 
-import SearchBar from "../../components/search/SearchBar";
-import SearchFilters from "../../components/search/SearchFilters";
-import SearchStats from "../../components/search/SearchStats";
-import SearchResults from "../../components/search/SearchResult";
-import SearchSuggestions, {
-  SearchSuggestion,
-} from "../../components/search/SearchSuggestions";
-import RecentSearches, {
+import {
+  SearchBar,
+  SearchFilters,
+  SearchStats,
+  SearchResult,
+  RecentSearches,
+  SavedSearches,
+  LoadingSearch,
+} from "@/app/components/search";
+
+import type {
   RecentSearch,
-} from "../../components/search/RecentSearches";
-import SavedSearches, {
   SavedSearch,
-} from "../../components/search/SavedSearches";
-import SearchDialog from "../../components/search/SearchDialog";
-import AdvancedSearch, {
-  AdvancedFilters,
-} from "../../components/search/AdvancedSearch";
-import EmptySearch from "../../components/search/EmptySearch";
+} from "@/app/components/search";
 
-import { SearchResult } from "../../components/search/SearchResultCard";
+import {
+  search,
+  getRecentSearches,
+  getSavedSearches,
+  getSearchStats,
+  clearRecentSearches,
+  deleteSavedSearch,
+} from "@/app/lib/search";
+
+type SearchResultType = {
+  id: string;
+  title?: string;
+  description?: string;
+  category?: string;
+  status?: string;
+  priority?: string;
+  href: string;
+  [key: string]: unknown;
+};
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
 
-  const [category, setCategory] = useState("All");
-  const [status, setStatus] = useState("All");
+  const [category, setCategory] = useState("all");
+  const [status, setStatus] = useState("");
+  const [priority, setPriority] = useState("");
 
-  const [filters, setFilters] = useState<AdvancedFilters>({
-    department: "",
-    category: "",
-    status: "",
-    priority: "",
+  const [loading, setLoading] = useState(false);
+
+  const [results, setResults] = useState<SearchResultType[]>([]);
+  const [recentSearches, setRecentSearches] = useState<
+    RecentSearch[]
+  >([]);
+  const [savedSearches, setSavedSearches] = useState<
+    SavedSearch[]
+  >([]);
+
+  const [stats, setStats] = useState({
+    totalResults: 0,
+    searchTime: 0,
+    categoriesFound: 0,
+    savedSearches: 0,
   });
 
-  const [selectedResult, setSelectedResult] =
-    useState<SearchResult | null>(null);
+  useEffect(() => {
+    loadPage();
+  }, []);
 
-  const [dialogOpen, setDialogOpen] = useState(false);
+  async function loadPage() {
+    try {
+      const [
+        recent,
+        saved,
+        searchStats,
+      ] = await Promise.all([
+        getRecentSearches(),
+        getSavedSearches(),
+        getSearchStats(),
+      ]);
 
-  // Sample Results (Replace with API)
-
-  const results: SearchResult[] = [
-    {
-      id: 1,
-      title: "AI Customer Support",
-      description: "AI powered customer support solution.",
-      type: "Idea",
-      status: "Approved",
-      date: "14 Jul 2026",
-    },
-    {
-      id: 2,
-      title: "Digital Transformation",
-      description: "Implementation project.",
-      type: "Project",
-      status: "In Progress",
-      date: "10 Jul 2026",
-    },
-    {
-      id: 3,
-      title: "Review Innovation Proposal",
-      description: "Pending review task.",
-      type: "Task",
-      status: "Pending",
-      date: "12 Jul 2026",
-    },
-  ];
-
-  const suggestions: SearchSuggestion[] = [
-    {
-      id: 1,
-      title: "AI Customer Support",
-      type: "Idea",
-    },
-    {
-      id: 2,
-      title: "Digital Transformation",
-      type: "Project",
-    },
-  ];
-
-  const recentSearches: RecentSearch[] = [
-    {
-      id: 1,
-      query: "AI",
-      searchedAt: "Today",
-    },
-    {
-      id: 2,
-      query: "Projects",
-      searchedAt: "Yesterday",
-    },
-  ];
-
-  const savedSearches: SavedSearch[] = [
-    {
-      id: 1,
-      name: "Approved Ideas",
-      query: "status:approved",
-    },
-  ];
-
-  const filteredResults = useMemo(() => {
-    return results.filter((item) => {
-      const matchQuery =
-        item.title.toLowerCase().includes(query.toLowerCase()) ||
-        item.description
-          .toLowerCase()
-          .includes(query.toLowerCase());
-
-      const matchCategory =
-        category === "All" ||
-        item.type === category.slice(0, -1);
-
-      const matchStatus =
-        status === "All" || item.status === status;
-
-      return (
-        matchQuery &&
-        matchCategory &&
-        matchStatus
+      setRecentSearches(
+        Array.isArray(recent)
+          ? recent
+          : recent.results || []
       );
-    });
-  }, [query, category, status]);
+
+      const savedData = Array.isArray(saved)
+        ? saved
+        : saved.results || [];
+
+      setSavedSearches(savedData);
+
+      setStats({
+        totalResults: 0,
+        searchTime: searchStats.search_time || 0,
+        categoriesFound:
+          searchStats.categories_found || 0,
+        savedSearches: savedData.length,
+      });
+    } catch {
+      toast.error("Failed to load search data.");
+    }
+  }
+
+  async function handleSearch(customQuery?: string) {
+    const value = customQuery ?? query;
+
+    if (!value.trim()) {
+      toast.warning("Enter a search term.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const start = performance.now();
+
+      const data = await search(value, category);
+
+      const end = performance.now();
+
+      const searchResults = Array.isArray(data)
+        ? data
+        : data.results || [];
+
+      setResults(searchResults);
+
+      setStats((prev) => ({
+        ...prev,
+        totalResults: searchResults.length,
+        searchTime: Math.round(end - start),
+      }));
+
+      if (searchResults.length === 0) {
+        toast.info("No matching results found.");
+      } else {
+        toast.success(
+          `${searchResults.length} result(s) found.`
+        );
+      }
+    } catch {
+      toast.error("Search failed.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleClearRecent() {
+    try {
+      await clearRecentSearches();
+
+      setRecentSearches([]);
+
+      toast.success("Recent searches cleared.");
+    } catch {
+      toast.error("Unable to clear history.");
+    }
+  }
+
+  async function handleDeleteSaved(id: string) {
+    try {
+      await deleteSavedSearch(id);
+
+      setSavedSearches((prev) =>
+        prev.filter((item) => item.id !== id)
+      );
+
+      toast.success("Saved search deleted.");
+    } catch {
+      toast.error("Unable to delete saved search.");
+    }
+  }
+
+  if (loading && results.length === 0) {
+    return <LoadingSearch />;
+  }
 
   return (
-    <div className="space-y-8 p-8">
-
-      {/* Header */}
+    <div className="space-y-8">
 
       <div>
 
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-bold text-slate-800">
           Global Search
         </h1>
 
-        <p className="text-slate-500">
-          Search ideas, projects, tasks, employees and
-          notifications.
+        <p className="mt-2 text-slate-500">
+          Search Ideas, Projects, Tasks,
+          Notifications, Users and Reviews.
         </p>
 
       </div>
 
-      {/* Search */}
-
       <SearchBar
         value={query}
+        loading={loading}
         onChange={setQuery}
+        onSearch={() => handleSearch()}
+        onClear={() => {
+          setQuery("");
+          setResults([]);
+        }}
       />
-
-      <SearchSuggestions
-        suggestions={
-          query ? suggestions : []
-        }
-        onSelect={(item) =>
-          setQuery(item.title)
-        }
-      />
-
-      {/* Stats */}
-
-      <SearchStats
-        total={filteredResults.length}
-        ideas={
-          filteredResults.filter(
-            (x) => x.type === "Idea"
-          ).length
-        }
-        projects={
-          filteredResults.filter(
-            (x) => x.type === "Project"
-          ).length
-        }
-        tasks={
-          filteredResults.filter(
-            (x) => x.type === "Task"
-          ).length
-        }
-      />
-
-      {/* Filters */}
 
       <SearchFilters
         category={category}
         status={status}
+        priority={priority}
         onCategoryChange={setCategory}
         onStatusChange={setStatus}
+        onPriorityChange={setPriority}
       />
 
-      <AdvancedSearch
-        filters={filters}
-        onChange={setFilters}
-        onApply={() =>
-          console.log(filters)
-        }
-        onReset={() =>
-          setFilters({
-            department: "",
-            category: "",
-            status: "",
-            priority: "",
-          })
-        }
+      <SearchStats
+        totalResults={stats.totalResults}
+        searchTime={stats.searchTime}
+        categoriesFound={stats.categoriesFound}
+        savedSearches={stats.savedSearches}
       />
 
-      {/* Results */}
+      <SearchResult results={results} />
 
-      {filteredResults.length === 0 ? (
-        <EmptySearch
-          onClear={() => {
-            setQuery("");
-            setCategory("All");
-            setStatus("All");
-          }}
-        />
-      ) : (
-        <SearchResults
-          results={filteredResults}
-          onView={(item: SearchResult) => {
-            setSelectedResult(item);
-            setDialogOpen(true);
-          }}
-        />
-      )}
-
-      {/* Bottom */}
-
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-2">
 
         <RecentSearches
           searches={recentSearches}
-          onSelect={setQuery}
+          onSelect={(value) => {
+            setQuery(value);
+            handleSearch(value);
+          }}
+          onClear={handleClearRecent}
         />
 
         <SavedSearches
           searches={savedSearches}
-          onSelect={setQuery}
-          onDelete={(id) =>
-            console.log(id)
-          }
+          onRun={(item) => {
+            setQuery(item.query);
+            handleSearch(item.query);
+          }}
+          onDelete={handleDeleteSaved}
         />
 
       </div>
-
-      {/* Dialog */}
-
-      <SearchDialog
-        open={dialogOpen}
-        result={selectedResult}
-        onClose={() => {
-          setDialogOpen(false);
-          setSelectedResult(null);
-        }}
-      />
 
     </div>
   );

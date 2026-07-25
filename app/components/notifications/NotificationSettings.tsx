@@ -1,121 +1,88 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Bell,
-  Mail,
-  Smartphone,
-  CalendarClock,
-  Lightbulb,
-  FolderKanban,
-  ClipboardList,
-  Award,
-  Shield,
-  Save,
-} from "lucide-react";
+import { Save } from "lucide-react";
 
-export default function NotificationSettings() {
-  const [settings, setSettings] = useState({
-    email: true,
-    inApp: true,
-    push: false,
-    taskAssignments: true,
-    taskReminders: true,
-    ideaUpdates: true,
-    projectUpdates: true,
-    reviewNotifications: true,
-    gamification: true,
-    announcements: true,
-    securityAlerts: true,
-    weeklyDigest: false,
-  });
+export interface NotificationSettingsData {
+  email_notifications: boolean;
+  push_notifications: boolean;
+  idea_updates: boolean;
+  peer_reviews: boolean;
+  pm_reviews: boolean;
+  implementation_updates: boolean;
+  achievements: boolean;
+}
 
-  const toggleSetting = (key: keyof typeof settings) => {
-    setSettings((prev) => ({
+interface NotificationSettingsProps {
+  settings: NotificationSettingsData;
+  loading?: boolean;
+  onSave: (settings: NotificationSettingsData) => void;
+}
+
+export default function NotificationSettings({
+  settings,
+  loading = false,
+  onSave,
+}: NotificationSettingsProps) {
+  const [form, setForm] =
+    useState<NotificationSettingsData>(settings);
+
+  function toggle(
+    key: keyof NotificationSettingsData
+  ) {
+    setForm((prev) => ({
       ...prev,
       [key]: !prev[key],
     }));
-  };
+  }
 
   const options = [
     {
-      key: "email",
-      title: "Email Notifications",
-      description: "Receive notifications through email.",
-      icon: Mail,
+      key: "email_notifications",
+      label: "Email Notifications",
+      description:
+        "Receive notifications through email.",
     },
     {
-      key: "inApp",
-      title: "In-App Notifications",
-      description: "Show notifications inside the system.",
-      icon: Bell,
+      key: "push_notifications",
+      label: "Push Notifications",
+      description:
+        "Receive browser push notifications.",
     },
     {
-      key: "push",
-      title: "Push Notifications",
-      description: "Receive browser push notifications.",
-      icon: Smartphone,
+      key: "idea_updates",
+      label: "Idea Updates",
+      description:
+        "Notifications when ideas are updated.",
     },
     {
-      key: "taskAssignments",
-      title: "Task Assignments",
-      description: "Notify when tasks are assigned to you.",
-      icon: ClipboardList,
+      key: "peer_reviews",
+      label: "Peer Reviews",
+      description:
+        "Notifications about peer reviews.",
     },
     {
-      key: "taskReminders",
-      title: "Task Reminders",
-      description: "Notify before task due dates.",
-      icon: CalendarClock,
+      key: "pm_reviews",
+      label: "Product Manager Reviews",
+      description:
+        "Notifications from product managers.",
     },
     {
-      key: "ideaUpdates",
-      title: "Idea Updates",
-      description: "Idea approvals, comments and likes.",
-      icon: Lightbulb,
+      key: "implementation_updates",
+      label: "Implementation Updates",
+      description:
+        "Project and task notifications.",
     },
     {
-      key: "projectUpdates",
-      title: "Project Updates",
-      description: "Project progress and milestones.",
-      icon: FolderKanban,
-    },
-    {
-      key: "reviewNotifications",
-      title: "Review Notifications",
-      description: "Product Manager review activities.",
-      icon: ClipboardList,
-    },
-    {
-      key: "gamification",
-      title: "Gamification",
-      description: "Points, badges and achievements.",
-      icon: Award,
-    },
-    {
-      key: "announcements",
-      title: "System Announcements",
-      description: "Maintenance and organization news.",
-      icon: Bell,
-    },
-    {
-      key: "securityAlerts",
-      title: "Security Alerts",
-      description: "Password changes and login alerts.",
-      icon: Shield,
-    },
-    {
-      key: "weeklyDigest",
-      title: "Weekly Digest",
-      description: "Receive a weekly notification summary.",
-      icon: Mail,
+      key: "achievements",
+      label: "Achievements & Rewards",
+      description:
+        "Gamification notifications.",
     },
   ] as const;
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-
-      {/* Header */}
 
       <div className="border-b border-slate-200 p-6">
 
@@ -123,79 +90,69 @@ export default function NotificationSettings() {
           Notification Settings
         </h2>
 
-        <p className="mt-2 text-slate-500">
-          Choose which notifications you would like to receive.
+        <p className="mt-1 text-slate-500">
+          Choose which notifications you want to receive.
         </p>
 
       </div>
 
-      {/* Settings */}
+      <div className="divide-y divide-slate-200">
 
-      <div className="divide-y divide-slate-100">
+        {options.map((option) => (
 
-        {options.map((option) => {
-          const Icon = option.icon;
+          <div
+            key={option.key}
+            className="flex items-center justify-between p-6"
+          >
 
-          return (
-            <div
-              key={option.key}
-              className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between"
-            >
-              <div className="flex items-start gap-4">
+            <div>
 
-                <div className="rounded-xl bg-indigo-100 p-3">
-                  <Icon
-                    size={22}
-                    className="text-indigo-600"
-                  />
-                </div>
+              <h3 className="font-semibold text-slate-800">
+                {option.label}
+              </h3>
 
-                <div>
-
-                  <h3 className="font-semibold text-slate-800">
-                    {option.title}
-                  </h3>
-
-                  <p className="mt-1 text-sm text-slate-500">
-                    {option.description}
-                  </p>
-
-                </div>
-
-              </div>
-
-              {/* Toggle */}
-
-              <button
-                onClick={() => toggleSetting(option.key)}
-                className={`relative h-7 w-14 rounded-full transition ${
-                  settings[option.key]
-                    ? "bg-indigo-600"
-                    : "bg-slate-300"
-                }`}
-              >
-                <span
-                  className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${
-                    settings[option.key]
-                      ? "left-8"
-                      : "left-1"
-                  }`}
-                />
-              </button>
+              <p className="mt-1 text-sm text-slate-500">
+                {option.description}
+              </p>
 
             </div>
-          );
-        })}
+
+            <button
+              onClick={() => toggle(option.key)}
+              className={`relative h-7 w-14 rounded-full transition ${
+                form[option.key]
+                  ? "bg-indigo-600"
+                  : "bg-slate-300"
+              }`}
+            >
+
+              <span
+                className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${
+                  form[option.key]
+                    ? "left-8"
+                    : "left-1"
+                }`}
+              />
+
+            </button>
+
+          </div>
+
+        ))}
 
       </div>
 
-      {/* Footer */}
+      <div className="border-t border-slate-200 p-6">
 
-      <div className="flex justify-end border-t border-slate-200 bg-slate-50 p-6">
+        <button
+          onClick={() => onSave(form)}
+          disabled={loading}
+          className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-60"
+        >
+          <Save className="h-5 w-5" />
 
-        <button className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-medium text-white transition hover:bg-indigo-700">
-          <Save size={18} />
-          Save Settings
+          {loading ? "Saving..." : "Save Settings"}
+
         </button>
 
       </div>

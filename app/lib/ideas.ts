@@ -2,108 +2,172 @@ import { apiFetch } from "@/app/utils/apiFetch";
 
 const API = process.env.NEXT_PUBLIC_API_URL!;
 
+export interface Idea {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
+  priority: string | null;
+  likes: number;
+  dislikes: number;
+  creator: string;
+}
+
 export interface IdeaPayload {
   title: string;
   description: string;
+}
+
+export interface PaginatedIdeasResponse {
+  count: number;
+  total_pages: number;
+  current_page: number;
+  page_size: number;
+  has_next: boolean;
+  has_previous: boolean;
+  results: Idea[];
+}
+
+export interface ApiMessage {
+  message: string;
+  [key: string]: any;
 }
 
 /* ------------------------------------------
    GET ALL IDEAS
 ------------------------------------------ */
 
-export async function getIdeas() {
-  return await apiFetch(`${API}/ideas/list/`, {
-    method: "GET",
-  });
+export function getIdeas(
+  page = 1,
+  pageSize = 10
+): Promise<PaginatedIdeasResponse> {
+  return apiFetch<PaginatedIdeasResponse>(
+    `${API}/ideas/list/?page=${page}&page_size=${pageSize}`,
+    {
+      method: "GET",
+    }
+  );
 }
 
 /* ------------------------------------------
    GET SINGLE IDEA
 ------------------------------------------ */
 
-export async function getIdea(id: string) {
-  return await apiFetch(`${API}/ideas/detail/${id}/`, {
-    method: "GET",
-  });
+export function getIdea(id: string): Promise<Idea> {
+  return apiFetch<Idea>(
+    `${API}/ideas/detail/${id}/`,
+    {
+      method: "GET",
+    }
+  );
 }
 
 /* ------------------------------------------
    CREATE IDEA
 ------------------------------------------ */
 
-export async function createIdea(data: IdeaPayload) {
-  return await apiFetch(`${API}/ideas/create/`, {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+export function createIdea(
+  data: IdeaPayload
+): Promise<ApiMessage> {
+  return apiFetch<ApiMessage>(
+    `${API}/ideas/create/`,
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+    }
+  );
 }
 
 /* ------------------------------------------
    UPDATE IDEA
 ------------------------------------------ */
 
-export async function updateIdea(
+export function updateIdea(
   id: string,
   data: IdeaPayload
-) {
-  return await apiFetch(`${API}/ideas/update/${id}/`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-  });
+): Promise<ApiMessage> {
+  return apiFetch<ApiMessage>(
+    `${API}/ideas/update/${id}/`,
+    {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }
+  );
 }
 
 /* ------------------------------------------
    DELETE IDEA
 ------------------------------------------ */
 
-export async function deleteIdea(id: string) {
-  return await apiFetch(`${API}/ideas/delete/${id}/`, {
-    method: "DELETE",
-  });
+export function deleteIdea(
+  id: string
+): Promise<ApiMessage> {
+  return apiFetch<ApiMessage>(
+    `${API}/ideas/delete/${id}/`,
+    {
+      method: "DELETE",
+    }
+  );
 }
 
 /* ------------------------------------------
    SUBMIT IDEA
 ------------------------------------------ */
 
-export async function submitIdea(id: string) {
-  return await apiFetch(`${API}/ideas/submit/${id}/`, {
-    method: "POST",
-  });
+export function submitIdea(
+  id: string
+): Promise<ApiMessage> {
+  return apiFetch<ApiMessage>(
+    `${API}/ideas/submit/${id}/`,
+    {
+      method: "POST",
+    }
+  );
 }
 
 /* ------------------------------------------
    LIKE IDEA
 ------------------------------------------ */
 
-export async function likeIdea(id: string) {
-  return await apiFetch(`${API}/ideas/like/${id}/`, {
-    method: "POST",
-  });
+export function likeIdea(
+  id: string
+): Promise<ApiMessage> {
+  return apiFetch<ApiMessage>(
+    `${API}/ideas/like/${id}/`,
+    {
+      method: "POST",
+    }
+  );
 }
 
 /* ------------------------------------------
    DISLIKE IDEA
 ------------------------------------------ */
 
-export async function dislikeIdea(id: string) {
-  return await apiFetch(`${API}/ideas/dislike/${id}/`, {
-    method: "POST",
-  });
+export function dislikeIdea(
+  id: string
+): Promise<ApiMessage> {
+  return apiFetch<ApiMessage>(
+    `${API}/ideas/dislike/${id}/`,
+    {
+      method: "POST",
+    }
+  );
 }
 
 /* ------------------------------------------
    COMMENT IDEA
 ------------------------------------------ */
 
-export async function commentIdea(
+export function commentIdea(
   id: string,
   comment: string
-) {
-  return await apiFetch(`${API}/ideas/comment/${id}/`, {
-    method: "POST",
-    body: JSON.stringify({
-      comment,
-    }),
-  });
+): Promise<ApiMessage> {
+  return apiFetch<ApiMessage>(
+    `${API}/ideas/comment/${id}/`,
+    {
+      method: "POST",
+      body: JSON.stringify({ comment }),
+    }
+  );
 }

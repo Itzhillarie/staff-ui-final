@@ -1,123 +1,150 @@
 "use client";
 
-import { Mail, UserCircle } from "lucide-react";
+import { Globe, Languages, Clock } from "lucide-react";
 
-export interface Account {
-  username: string;
-  email: string;
-  role: string;
-  accountStatus: string;
+export interface AccountSettingsData {
+  language: string;
+  timezone: string;
+  date_format: string;
 }
 
 interface AccountSettingsProps {
-  account: Account;
-  onSave: (account: Account) => void;
+  settings: AccountSettingsData;
+  onChange: (
+    field: keyof AccountSettingsData,
+    value: string
+  ) => void;
 }
 
 export default function AccountSettings({
-  account,
-  onSave,
+  settings,
+  onChange,
 }: AccountSettingsProps) {
   return (
-    <div className="rounded-xl bg-white p-6 shadow-sm">
+    <div className="rounded-3xl border border-slate-200 bg-white shadow-sm">
 
       {/* Header */}
 
-      <div className="mb-6 flex items-center gap-3">
+      <div className="border-b border-slate-200 p-6">
 
-        <div className="rounded-lg bg-indigo-100 p-3">
-          <UserCircle
-            size={22}
-            className="text-indigo-600"
-          />
-        </div>
+        <h2 className="text-2xl font-bold text-slate-800">
+          Account Preferences
+        </h2>
 
-        <div>
-          <h2 className="text-xl font-semibold">
-            Account Settings
-          </h2>
-
-          <p className="text-sm text-slate-500">
-            View your account information.
-          </p>
-        </div>
+        <p className="mt-1 text-sm text-slate-500">
+          Customize your account preferences and regional settings.
+        </p>
 
       </div>
 
-      {/* Details */}
+      {/* Body */}
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="space-y-8 p-8">
 
-        <div>
-          <label className="mb-1 block text-sm text-slate-500">
-            Username
-          </label>
-
-          <input
-            value={account.username}
-            readOnly
-            className="w-full rounded-lg border bg-slate-100 p-3"
-          />
-        </div>
+        {/* Language */}
 
         <div>
-          <label className="mb-1 block text-sm text-slate-500">
-            Email
+
+          <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-600">
+
+            <Languages className="h-4 w-4" />
+
+            Language
+
           </label>
 
-          <div className="relative">
-
-            <Mail
-              size={18}
-              className="absolute left-3 top-3.5 text-slate-400"
-            />
-
-            <input
-              value={account.email}
-              readOnly
-              className="w-full rounded-lg border bg-slate-100 py-3 pl-10 pr-3"
-            />
-
-          </div>
+          <select
+            value={settings.language}
+            onChange={(e) =>
+              onChange("language", e.target.value)
+            }
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          >
+            <option value="en">English</option>
+            <option value="sw">Swahili</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+          </select>
 
         </div>
 
-        <div>
-          <label className="mb-1 block text-sm text-slate-500">
-            Role
-          </label>
-
-          <input
-            value={account.role}
-            readOnly
-            className="w-full rounded-lg border bg-slate-100 p-3"
-          />
-        </div>
+        {/* Timezone */}
 
         <div>
-          <label className="mb-1 block text-sm text-slate-500">
-            Account Status
+
+          <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-600">
+
+            <Clock className="h-4 w-4" />
+
+            Time Zone
+
           </label>
 
-          <input
-            value={account.accountStatus}
-            readOnly
-            className="w-full rounded-lg border bg-slate-100 p-3"
-          />
+          <select
+            value={settings.timezone}
+            onChange={(e) =>
+              onChange("timezone", e.target.value)
+            }
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          >
+            <option value="Africa/Nairobi">
+              Africa/Nairobi (EAT)
+            </option>
+
+            <option value="UTC">
+              UTC
+            </option>
+
+            <option value="Europe/London">
+              Europe/London
+            </option>
+
+            <option value="America/New_York">
+              America/New_York
+            </option>
+
+            <option value="Asia/Dubai">
+              Asia/Dubai
+            </option>
+
+          </select>
+
         </div>
 
-      </div>
+        {/* Date Format */}
 
-      {/* Footer */}
+        <div>
 
-      <div className="mt-6 flex justify-end">
+          <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-600">
 
-        <button
-          onClick={() => onSave(account)}
-          className="rounded-lg bg-indigo-600 px-6 py-2 text-white hover:bg-indigo-700"
-        >
-          Refresh
-        </button>
+            <Globe className="h-4 w-4" />
+
+            Date Format
+
+          </label>
+
+          <select
+            value={settings.date_format}
+            onChange={(e) =>
+              onChange("date_format", e.target.value)
+            }
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          >
+            <option value="DD/MM/YYYY">
+              DD/MM/YYYY
+            </option>
+
+            <option value="MM/DD/YYYY">
+              MM/DD/YYYY
+            </option>
+
+            <option value="YYYY-MM-DD">
+              YYYY-MM-DD
+            </option>
+
+          </select>
+
+        </div>
 
       </div>
 

@@ -31,6 +31,7 @@ export async function loginUserAction(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "1",
         },
         body: JSON.stringify({
           username,
@@ -52,33 +53,10 @@ export async function loginUserAction(
       };
     }
 
-    if (!data.token) {
-      return {
-        success: false,
-        message: "Login succeeded but no token was returned.",
-      };
-    }
-
     const cookieStore = await cookies();
 
     cookieStore.set("jwt", data.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60,
-    });
-
-    cookieStore.set("username", data.username ?? "", {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60,
-    });
-
-    cookieStore.set("role", data.role ?? "", {
-      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
@@ -93,7 +71,7 @@ export async function loginUserAction(
       role: data.role,
     };
   } catch (error) {
-    console.error("Login Error:", error);
+    console.error(error);
 
     return {
       success: false,

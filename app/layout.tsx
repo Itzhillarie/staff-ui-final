@@ -86,7 +86,6 @@ export default function RootLayout({
       <body
         className={`${inter.variable} bg-slate-100 font-sans antialiased`}
       >
-        <AuthProvider>
 
           {/* Main Application */}
           <main className="min-h-screen">
@@ -108,8 +107,6 @@ export default function RootLayout({
               },
             }}
           />
-
-        </AuthProvider>
       </body>
     </html>
   );

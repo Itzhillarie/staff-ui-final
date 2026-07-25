@@ -1,94 +1,124 @@
 "use client";
 
-import { Plug, CheckCircle2, XCircle } from "lucide-react";
-
-export interface Integration {
-  id: number;
-  name: string;
-  description: string;
-  connected: boolean;
-}
+import {
+  CheckCircle2,
+  XCircle,
+  ExternalLink,
+  Link2,
+  Loader2,
+} from "lucide-react";
 
 interface IntegrationCardProps {
-  integration: Integration;
-  onToggle: (id: number) => void;
+  id: string;
+  name: string;
+  description: string;
+  logo?: string;
+  connected: boolean;
+  loading?: boolean;
+
+  onConnect: (id: string) => void;
+  onDisconnect: (id: string) => void;
 }
 
 export default function IntegrationCard({
-  integration,
-  onToggle,
+  id,
+  name,
+  description,
+  logo,
+  connected,
+  loading = false,
+  onConnect,
+  onDisconnect,
 }: IntegrationCardProps) {
   return (
-    <div className="rounded-xl border bg-white p-6 shadow-sm">
+    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
 
       {/* Header */}
 
       <div className="flex items-start justify-between">
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
 
-          <div className="rounded-lg bg-indigo-100 p-3">
-            <Plug
-              size={22}
-              className="text-indigo-600"
-            />
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
+
+            {logo ? (
+              <img
+                src={logo}
+                alt={name}
+                className="h-10 w-10 object-contain"
+              />
+            ) : (
+              <Link2 className="h-7 w-7 text-slate-500" />
+            )}
+
           </div>
 
           <div>
 
-            <h3 className="font-semibold text-slate-800">
-              {integration.name}
+            <h3 className="text-lg font-semibold text-slate-800">
+              {name}
             </h3>
 
             <p className="mt-1 text-sm text-slate-500">
-              {integration.description}
+              {description}
             </p>
 
           </div>
 
         </div>
 
-        {integration.connected ? (
-          <CheckCircle2
-            className="text-green-600"
-            size={22}
-          />
+        {connected ? (
+          <span className="flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+            <CheckCircle2 className="h-4 w-4" />
+            Connected
+          </span>
         ) : (
-          <XCircle
-            className="text-red-500"
-            size={22}
-          />
+          <span className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+            <XCircle className="h-4 w-4" />
+            Not Connected
+          </span>
         )}
 
       </div>
 
-      {/* Status */}
+      {/* Actions */}
 
-      <div className="mt-6 flex items-center justify-between">
+      <div className="mt-6 flex gap-3">
 
-        <span
-          className={`rounded-full px-3 py-1 text-sm font-medium ${
-            integration.connected
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-700"
-          }`}
-        >
-          {integration.connected
-            ? "Connected"
-            : "Disconnected"}
-        </span>
+        {connected ? (
+          <button
+            disabled={loading}
+            onClick={() => onDisconnect(id)}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-50 px-4 py-3 font-medium text-red-700 transition hover:bg-red-100 disabled:opacity-60"
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <XCircle className="h-4 w-4" />
+            )}
+
+            Disconnect
+          </button>
+        ) : (
+          <button
+            disabled={loading}
+            onClick={() => onConnect(id)}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 font-medium text-white transition hover:bg-indigo-700 disabled:opacity-60"
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Link2 className="h-4 w-4" />
+            )}
+
+            Connect
+          </button>
+        )}
 
         <button
-          onClick={() => onToggle(integration.id)}
-          className={`rounded-lg px-5 py-2 text-white transition ${
-            integration.connected
-              ? "bg-red-600 hover:bg-red-700"
-              : "bg-indigo-600 hover:bg-indigo-700"
-          }`}
+          className="rounded-xl border border-slate-200 px-4 py-3 transition hover:bg-slate-100"
         >
-          {integration.connected
-            ? "Disconnect"
-            : "Connect"}
+          <ExternalLink className="h-5 w-5 text-slate-600" />
         </button>
 
       </div>

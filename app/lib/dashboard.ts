@@ -1,10 +1,20 @@
-import { apiFetch } from "@/app/utils/apiFetch";
+import { cookies } from "next/headers";
+import { apiFetch } from "@/app/utils/apiFetchDashboard";
+
 
 export interface DashboardData {
+
+  user?: {
+    username: string;
+    role: string;
+  };
+
+
   users: {
     total_users: number;
     active_users: number;
   };
+
 
   ideas: {
     total: number;
@@ -19,6 +29,7 @@ export interface DashboardData {
     archived: number;
   };
 
+
   projects: {
     total: number;
     completed: number;
@@ -27,12 +38,14 @@ export interface DashboardData {
     average_progress: number;
   };
 
+
   tasks: {
     total: number;
     completed: number;
     pending: number;
     overdue: number;
   };
+
 
   gamification: {
     top_contributors: {
@@ -43,19 +56,62 @@ export interface DashboardData {
     points_awarded: number;
   };
 
+
   charts: {
     leaderboard: {
       username: string;
       points: number;
     }[];
   };
+
+
+  notifications: {
+    unread: number;
+  };
+
+
+  audit_logs?: {
+    recent?: {
+      event_message: string;
+      event_type__name?: string;
+      created_at: string;
+    }[];
+  };
+
+
+  recent_ideas?: {
+    id: number;
+    title: string;
+    status: string;
+    likes?: number;
+    comments?: number;
+    created_at: string;
+  }[];
+
 }
 
+
+
 export async function getDashboardData(): Promise<DashboardData> {
+
+  const cookieStore = await cookies();
+
+  const token =
+    cookieStore.get("jwt")?.value;
+
+
   return await apiFetch(
     `${process.env.NEXT_PUBLIC_API_URL}/users/dashboard/`,
     {
       method: "GET",
+
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "1",
+      },
+
+      cache: "no-store",
     }
   );
+
 }

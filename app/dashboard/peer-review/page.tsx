@@ -216,8 +216,8 @@ export default function PeerReviewPage() {
 
                 </div>
 
-                <div className="flex gap-3"></div>
-                                  <button
+                <div className="flex gap-3">
+                                    <button
                     onClick={() => handleLike(idea.id)}
                     className="flex items-center gap-2 rounded-xl bg-green-600 px-5 py-2 text-white transition hover:bg-green-700"
                   >
@@ -247,6 +247,8 @@ export default function PeerReviewPage() {
                 </div>
 
               </div>
+
+            </div>
 
           ))}
 

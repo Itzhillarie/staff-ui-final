@@ -12,15 +12,10 @@ interface AuthState {
   token: string | null;
   user: User | null;
   isAuthenticated: boolean;
-  loading: boolean;
 
-  login: (token: string, username: string, role: string) => void;
+  login: (token: string, user: User) => void;
 
   logout: () => void;
-
-  setLoading: (loading: boolean) => void;
-
-  updateUser: (user: User) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -32,17 +27,11 @@ export const useAuthStore = create<AuthState>()(
 
       isAuthenticated: false,
 
-      loading: false,
-
-      login: (token, username, role) =>
+      login: (token, user) =>
         set({
           token,
-          user: {
-            username,
-            role,
-          },
+          user,
           isAuthenticated: true,
-          loading: false,
         }),
 
       logout: () =>
@@ -50,27 +39,11 @@ export const useAuthStore = create<AuthState>()(
           token: null,
           user: null,
           isAuthenticated: false,
-          loading: false,
-        }),
-
-      setLoading: (loading) =>
-        set({
-          loading,
-        }),
-
-      updateUser: (user) =>
-        set({
-          user,
         }),
     }),
+
     {
       name: "auth-storage",
-
-      partialize: (state) => ({
-        token: state.token,
-        user: state.user,
-        isAuthenticated: state.isAuthenticated,
-      }),
     }
   )
 );

@@ -1,7 +1,7 @@
 "use client";
 
 interface SettingToggleProps {
-  label: string;
+  title: string;
   description?: string;
   checked: boolean;
   disabled?: boolean;
@@ -9,19 +9,19 @@ interface SettingToggleProps {
 }
 
 export default function SettingToggle({
-  label,
+  title,
   description,
   checked,
   disabled = false,
   onChange,
 }: SettingToggleProps) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4">
+    <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-slate-300">
 
-      <div>
+      <div className="pr-6">
 
-        <h3 className="font-medium text-slate-800">
-          {label}
+        <h3 className="font-semibold text-slate-900">
+          {title}
         </h3>
 
         {description && (
@@ -36,21 +36,21 @@ export default function SettingToggle({
         type="button"
         disabled={disabled}
         onClick={() => onChange(!checked)}
-        className={`relative h-7 w-14 rounded-full transition ${
+        className={`relative inline-flex h-7 w-12 items-center rounded-full transition ${
           checked
             ? "bg-indigo-600"
             : "bg-slate-300"
         } ${
           disabled
             ? "cursor-not-allowed opacity-50"
-            : ""
+            : "cursor-pointer"
         }`}
       >
         <span
-          className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${
+          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition ${
             checked
-              ? "left-8"
-              : "left-1"
+              ? "translate-x-6"
+              : "translate-x-1"
           }`}
         />
       </button>

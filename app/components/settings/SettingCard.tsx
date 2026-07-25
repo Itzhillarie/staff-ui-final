@@ -1,41 +1,44 @@
 "use client";
 
 import { ReactNode } from "react";
-import { ChevronRight } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 interface SettingCardProps {
   title: string;
   description?: string;
-  icon?: ReactNode;
+  icon?: LucideIcon;
   children: ReactNode;
-  action?: ReactNode;
+  actions?: ReactNode;
+  className?: string;
 }
 
 export default function SettingCard({
   title,
   description,
-  icon,
+  icon: Icon,
   children,
-  action,
+  actions,
+  className = "",
 }: SettingCardProps) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-
+    <div
+      className={`overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm ${className}`}
+    >
       {/* Header */}
 
-      <div className="flex items-center justify-between border-b border-slate-100 p-5">
+      <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
 
         <div className="flex items-center gap-4">
 
-          {icon && (
-            <div className="rounded-lg bg-indigo-100 p-3 text-indigo-600">
-              {icon}
+          {Icon && (
+            <div className="rounded-xl bg-indigo-100 p-3">
+              <Icon className="h-6 w-6 text-indigo-600" />
             </div>
           )}
 
           <div>
 
-            <h2 className="text-lg font-semibold text-slate-800">
+            <h2 className="text-xl font-bold text-slate-900">
               {title}
             </h2>
 
@@ -49,13 +52,9 @@ export default function SettingCard({
 
         </div>
 
-        {action && (
+        {actions && (
           <div className="flex items-center gap-2">
-            {action}
-            <ChevronRight
-              size={18}
-              className="text-slate-400"
-            />
+            {actions}
           </div>
         )}
 

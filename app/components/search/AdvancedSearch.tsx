@@ -1,130 +1,239 @@
 "use client";
 
-import { Filter } from "lucide-react";
+import { Filter, RotateCcw } from "lucide-react";
 
-export interface AdvancedFilters {
-  department: string;
+export interface AdvancedSearchFilters {
+  query: string;
   category: string;
   status: string;
   priority: string;
+  start_date: string;
+  end_date: string;
 }
 
 interface AdvancedSearchProps {
-  filters: AdvancedFilters;
-  onChange: (filters: AdvancedFilters) => void;
-  onApply: () => void;
+  filters: AdvancedSearchFilters;
+  loading?: boolean;
+
+  onChange: (
+    key: keyof AdvancedSearchFilters,
+    value: string
+  ) => void;
+
+  onSearch: () => void;
   onReset: () => void;
 }
 
 export default function AdvancedSearch({
   filters,
+  loading = false,
   onChange,
-  onApply,
+  onSearch,
   onReset,
 }: AdvancedSearchProps) {
-  const updateFilter = (
-    key: keyof AdvancedFilters,
-    value: string
-  ) => {
-    onChange({
-      ...filters,
-      [key]: value,
-    });
-  };
-
   return (
-    <div className="rounded-xl bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
 
       {/* Header */}
 
-      <div className="mb-6 flex items-center gap-2">
-        <Filter
-          size={20}
-          className="text-indigo-600"
-        />
-        <h2 className="text-lg font-semibold">
-          Advanced Search
-        </h2>
-      </div>
+      <div className="border-b border-slate-200 p-6">
 
-      {/* Filters */}
+        <div className="flex items-center gap-3">
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-xl bg-indigo-100 p-2">
+            <Filter className="h-5 w-5 text-indigo-600" />
+          </div>
 
-        <select
-          value={filters.department}
-          onChange={(e) =>
-            updateFilter("department", e.target.value)
-          }
-          className="rounded-lg border px-4 py-2"
-        >
-          <option value="">All Departments</option>
-          <option value="ICT">ICT</option>
-          <option value="Finance">Finance</option>
-          <option value="HR">HR</option>
-          <option value="Operations">Operations</option>
-        </select>
+          <div>
 
-        <select
-          value={filters.category}
-          onChange={(e) =>
-            updateFilter("category", e.target.value)
-          }
-          className="rounded-lg border px-4 py-2"
-        >
-          <option value="">All Categories</option>
-          <option value="Idea">Idea</option>
-          <option value="Project">Project</option>
-          <option value="Task">Task</option>
-          <option value="Employee">Employee</option>
-        </select>
+            <h2 className="text-xl font-bold text-slate-800">
+              Advanced Search
+            </h2>
 
-        <select
-          value={filters.status}
-          onChange={(e) =>
-            updateFilter("status", e.target.value)
-          }
-          className="rounded-lg border px-4 py-2"
-        >
-          <option value="">All Status</option>
-          <option value="Draft">Draft</option>
-          <option value="Submitted">Submitted</option>
-          <option value="Approved">Approved</option>
-          <option value="Rejected">Rejected</option>
-          <option value="Completed">Completed</option>
-        </select>
+            <p className="text-sm text-slate-500">
+              Filter search results across the entire system.
+            </p>
 
-        <select
-          value={filters.priority}
-          onChange={(e) =>
-            updateFilter("priority", e.target.value)
-          }
-          className="rounded-lg border px-4 py-2"
-        >
-          <option value="">All Priority</option>
-          <option value="High">High</option>
-          <option value="Medium">Medium</option>
-          <option value="Low">Low</option>
-        </select>
+          </div>
+
+        </div>
 
       </div>
 
-      {/* Actions */}
+      {/* Body */}
 
-      <div className="mt-6 flex justify-end gap-3">
+      <div className="grid gap-6 p-6 md:grid-cols-2 xl:grid-cols-3">
+
+        {/* Search */}
+
+        <div className="xl:col-span-3">
+
+          <label className="mb-2 block text-sm font-medium text-slate-600">
+            Search
+          </label>
+
+          <input
+            value={filters.query}
+            onChange={(e) =>
+              onChange("query", e.target.value)
+            }
+            placeholder="Search..."
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          />
+
+        </div>
+
+        {/* Category */}
+
+        <div>
+
+          <label className="mb-2 block text-sm font-medium text-slate-600">
+            Category
+          </label>
+
+          <select
+            value={filters.category}
+            onChange={(e) =>
+              onChange("category", e.target.value)
+            }
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          >
+            <option value="">All Categories</option>
+            <option value="ideas">Ideas</option>
+            <option value="projects">Projects</option>
+            <option value="tasks">Tasks</option>
+            <option value="users">Users</option>
+            <option value="notifications">
+              Notifications
+            </option>
+            <option value="peer_reviews">
+              Peer Reviews
+            </option>
+            <option value="pm_reviews">
+              PM Reviews
+            </option>
+          </select>
+
+        </div>
+
+        {/* Status */}
+
+        <div>
+
+          <label className="mb-2 block text-sm font-medium text-slate-600">
+            Status
+          </label>
+
+          <select
+            value={filters.status}
+            onChange={(e) =>
+              onChange("status", e.target.value)
+            }
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          >
+            <option value="">Any Status</option>
+            <option value="draft">Draft</option>
+            <option value="submitted">Submitted</option>
+            <option value="peer_review">
+              Peer Review
+            </option>
+            <option value="pm_review">
+              PM Review
+            </option>
+            <option value="approved">
+              Approved
+            </option>
+            <option value="implementation">
+              Implementation
+            </option>
+            <option value="completed">
+              Completed
+            </option>
+          </select>
+
+        </div>
+
+        {/* Priority */}
+
+        <div>
+
+          <label className="mb-2 block text-sm font-medium text-slate-600">
+            Priority
+          </label>
+
+          <select
+            value={filters.priority}
+            onChange={(e) =>
+              onChange("priority", e.target.value)
+            }
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          >
+            <option value="">Any Priority</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+
+        </div>
+
+        {/* Start */}
+
+        <div>
+
+          <label className="mb-2 block text-sm font-medium text-slate-600">
+            From
+          </label>
+
+          <input
+            type="date"
+            value={filters.start_date}
+            onChange={(e) =>
+              onChange("start_date", e.target.value)
+            }
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          />
+
+        </div>
+
+        {/* End */}
+
+        <div>
+
+          <label className="mb-2 block text-sm font-medium text-slate-600">
+            To
+          </label>
+
+          <input
+            type="date"
+            value={filters.end_date}
+            onChange={(e) =>
+              onChange("end_date", e.target.value)
+            }
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          />
+
+        </div>
+
+      </div>
+
+      {/* Footer */}
+
+      <div className="flex justify-end gap-4 border-t border-slate-200 p-6">
 
         <button
           onClick={onReset}
-          className="rounded-lg border px-5 py-2 hover:bg-slate-100"
+          className="flex items-center gap-2 rounded-xl border border-slate-300 px-5 py-3 font-medium text-slate-700 transition hover:bg-slate-100"
         >
+          <RotateCcw className="h-4 w-4" />
           Reset
         </button>
 
         <button
-          onClick={onApply}
-          className="rounded-lg bg-indigo-600 px-5 py-2 text-white hover:bg-indigo-700"
+          onClick={onSearch}
+          disabled={loading}
+          className="rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-60"
         >
-          Apply Filters
+          {loading ? "Searching..." : "Search"}
         </button>
 
       </div>

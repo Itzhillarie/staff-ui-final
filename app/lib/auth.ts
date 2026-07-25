@@ -3,7 +3,6 @@
 import { useAuthStore } from "@/app/store/authstore";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
-const token = useAuthStore.getState().token;
 
 interface LoginPayload {
   username: string;
@@ -27,11 +26,10 @@ export async function login(data: LoginPayload) {
     throw new Error(result.error || "Login failed");
   }
 
-  useAuthStore.getState().login(
-    result.token,
-    result.username,
-    result.role
-  );
+ useAuthStore.getState().login(result.token, {
+  username: result.username,
+  role: result.role,
+});
 
   return result;
 }

@@ -1,112 +1,167 @@
 "use client";
 
-import { Shield, Key, Smartphone } from "lucide-react";
-
-export interface SecuritySettingsData {
-  twoFactorEnabled: boolean;
-  lastPasswordChange: string;
-}
+import {
+  Shield,
+  KeyRound,
+  Smartphone,
+  LogOut,
+  ChevronRight,
+} from "lucide-react";
 
 interface SecuritySettingsProps {
-  security: SecuritySettingsData;
+  twoFactorEnabled: boolean;
+  activeSessions: number;
+
   onChangePassword: () => void;
-  onToggleTwoFactor: () => void;
+  onManageTwoFactor: () => void;
+  onLogoutOtherSessions: () => void;
 }
 
 export default function SecuritySettings({
-  security,
+  twoFactorEnabled,
+  activeSessions,
   onChangePassword,
-  onToggleTwoFactor,
+  onManageTwoFactor,
+  onLogoutOtherSessions,
 }: SecuritySettingsProps) {
   return (
-    <div className="rounded-xl bg-white p-6 shadow-sm">
+    <div className="rounded-3xl border border-slate-200 bg-white shadow-sm">
 
       {/* Header */}
 
-      <div className="mb-6 flex items-center gap-3">
+      <div className="border-b border-slate-200 p-6">
 
-        <div className="rounded-lg bg-indigo-100 p-3">
-          <Shield
-            size={22}
-            className="text-indigo-600"
-          />
-        </div>
+        <div className="flex items-center gap-3">
 
-        <div>
-          <h2 className="text-xl font-semibold">
-            Security Settings
-          </h2>
+          <div className="rounded-xl bg-indigo-100 p-3">
+            <Shield className="h-6 w-6 text-indigo-600" />
+          </div>
 
-          <p className="text-sm text-slate-500">
-            Manage your account security.
-          </p>
+          <div>
+
+            <h2 className="text-2xl font-bold text-slate-800">
+              Security
+            </h2>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Manage your account security and authentication.
+            </p>
+
+          </div>
+
         </div>
 
       </div>
 
-      {/* Password */}
+      {/* Body */}
 
-      <div className="mb-4 flex items-center justify-between rounded-lg border p-4">
+      <div className="divide-y divide-slate-100">
 
-        <div className="flex items-center gap-3">
-
-          <Key className="text-indigo-600" />
-
-          <div>
-            <h3 className="font-medium">
-              Password
-            </h3>
-
-            <p className="text-sm text-slate-500">
-              Last changed: {security.lastPasswordChange}
-            </p>
-          </div>
-
-        </div>
+        {/* Password */}
 
         <button
           onClick={onChangePassword}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
+          className="flex w-full items-center justify-between p-6 transition hover:bg-slate-50"
         >
-          Change
-        </button>
 
-      </div>
+          <div className="flex items-center gap-4">
 
-      {/* Two Factor */}
+            <div className="rounded-xl bg-blue-100 p-3">
+              <KeyRound className="h-5 w-5 text-blue-600" />
+            </div>
 
-      <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="text-left">
 
-        <div className="flex items-center gap-3">
+              <h3 className="font-semibold text-slate-800">
+                Change Password
+              </h3>
 
-          <Smartphone className="text-green-600" />
+              <p className="text-sm text-slate-500">
+                Update your account password.
+              </p>
 
-          <div>
-            <h3 className="font-medium">
-              Two-Factor Authentication
-            </h3>
+            </div>
 
-            <p className="text-sm text-slate-500">
-              {security.twoFactorEnabled
-                ? "Enabled"
-                : "Disabled"}
-            </p>
           </div>
 
-        </div>
+          <ChevronRight className="h-5 w-5 text-slate-400" />
+
+        </button>
+
+        {/* Two Factor */}
 
         <button
-          onClick={onToggleTwoFactor}
-          className={`rounded-lg px-4 py-2 text-white ${
-            security.twoFactorEnabled
-              ? "bg-red-600 hover:bg-red-700"
-              : "bg-green-600 hover:bg-green-700"
-          }`}
+          onClick={onManageTwoFactor}
+          className="flex w-full items-center justify-between p-6 transition hover:bg-slate-50"
         >
-          {security.twoFactorEnabled
-            ? "Disable"
-            : "Enable"}
+
+          <div className="flex items-center gap-4">
+
+            <div className="rounded-xl bg-green-100 p-3">
+              <Smartphone className="h-5 w-5 text-green-600" />
+            </div>
+
+            <div className="text-left">
+
+              <h3 className="font-semibold text-slate-800">
+                Two-Factor Authentication
+              </h3>
+
+              <p className="text-sm text-slate-500">
+                {twoFactorEnabled
+                  ? "Enabled"
+                  : "Disabled"}
+              </p>
+
+            </div>
+
+          </div>
+
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              twoFactorEnabled
+                ? "bg-green-100 text-green-700"
+                : "bg-slate-100 text-slate-600"
+            }`}
+          >
+            {twoFactorEnabled ? "ON" : "OFF"}
+          </span>
+
         </button>
+
+        {/* Sessions */}
+
+        <div className="flex items-center justify-between p-6">
+
+          <div className="flex items-center gap-4">
+
+            <div className="rounded-xl bg-orange-100 p-3">
+              <LogOut className="h-5 w-5 text-orange-600" />
+            </div>
+
+            <div>
+
+              <h3 className="font-semibold text-slate-800">
+                Active Sessions
+              </h3>
+
+              <p className="text-sm text-slate-500">
+                {activeSessions} active session
+                {activeSessions !== 1 && "s"}
+              </p>
+
+            </div>
+
+          </div>
+
+          <button
+            onClick={onLogoutOtherSessions}
+            className="rounded-xl bg-red-100 px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-200"
+          >
+            Logout Others
+          </button>
+
+        </div>
 
       </div>
 
