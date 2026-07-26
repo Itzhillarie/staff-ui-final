@@ -1,12 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { LoaderCircle, LockKeyhole, UserRound } from "lucide-react";
+import { useActionState, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  LoaderCircle,
+  LockKeyhole,
+  UserRound,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { loginUserAction } from "@/app/data/actions/auth";
+import SpinmobileLoader from "@/app/components/common/SpinmobileLoader";
 import { useAuthStore } from "@/app/store/authstore";
 
 import {
@@ -70,16 +75,35 @@ const styles = {
 export function SigninForm() {
 
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const login = useAuthStore(
     (state) => state.login
   );
+  const logout = useAuthStore(
+    (state) => state.logout
+  );
+  const [redirecting, setRedirecting] = useState(false);
 
 
   const [state, formAction, pending] = useActionState(
     loginUserAction,
     initialState
   );
+
+  useEffect(() => {
+    if (searchParams.get("session") !== "expired") {
+      return;
+    }
+
+    logout();
+    localStorage.removeItem("auth-storage");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+
+    toast.info("Your session expired. Please sign in again.");
+  }, [logout, searchParams]);
 
 
   useEffect(() => {
@@ -88,7 +112,6 @@ export function SigninForm() {
 
 
     if (state.success) {
-
       // Save logged-in user details in Zustand
       login(
         state.token ?? "",
@@ -98,11 +121,18 @@ export function SigninForm() {
         }
       );
 
+      const redirectingTimeoutId = window.setTimeout(() => {
+        setRedirecting(true);
+      }, 0);
 
-      toast.success(state.message);
+      const redirectTimeoutId = window.setTimeout(() => {
+        router.replace("/dashboard");
+      }, 500);
 
-
-      router.replace("/dashboard");
+      return () => {
+        window.clearTimeout(redirectingTimeoutId);
+        window.clearTimeout(redirectTimeoutId);
+      };
 
     } else {
 
@@ -118,6 +148,12 @@ export function SigninForm() {
   return (
 
     <div className={styles.container}>
+      {redirecting && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-white/85 backdrop-blur-sm">
+          <SpinmobileLoader label="Loading dashboard" />
+        </div>
+      )}
+
       <div className={styles.eyebrow}>Staff Innovation</div>
 
       <form action={formAction}>
@@ -203,19 +239,19 @@ export function SigninForm() {
 
               type="submit"
 
-              disabled={pending}
+              disabled={pending || redirecting}
 
               className={styles.button}
 
             >
 
-              {pending && (
+              {(pending || redirecting) && (
                 <LoaderCircle
                   aria-hidden="true"
                   className="h-4 w-4 animate-spin"
                 />
               )}
-              {pending ? "Signing in..." : "Sign in"}
+              {redirecting ? "" : pending ? "Signing in..." : "Sign in"}
 
 
             </button>

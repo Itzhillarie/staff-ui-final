@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 
 import { Toaster } from "sonner";
@@ -87,10 +88,14 @@ export default function RootLayout({
         className={`${plusJakarta.className} ${plusJakarta.variable} bg-slate-100 antialiased`}
       >
 
-          {/* Main Application */}
-          <main className="min-h-screen">
-            {children}
-          </main>
+          <Suspense>
+            <AuthProvider>
+              {/* Main Application */}
+              <main className="min-h-screen">
+                {children}
+              </main>
+            </AuthProvider>
+          </Suspense>
 
           {/* Toast Notifications */}
           <Toaster

@@ -1,30 +1,36 @@
 import Sidebar from "../components/layout/Sidebar";
 import TopNavbar from "../components/layout/TopNavbar";
+import { ensureActiveServerSession } from "../lib/session";
+import { DashboardThemeProvider } from "../providers/DashboardThemeProvider";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  await ensureActiveServerSession();
+
   return (
-    <div className="min-h-screen bg-gray-100">
+    <DashboardThemeProvider>
+      <div className="dashboard-themed min-h-screen bg-slate-100 text-slate-950 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
 
-      {/* Fixed Sidebar */}
-      <Sidebar />
+        {/* Fixed Sidebar */}
+        <Sidebar />
 
-      {/* Main Content */}
-      <div className="ml-72 flex min-h-screen flex-col">
+        {/* Main Content */}
+        <div className="ml-72 flex min-h-screen flex-col">
 
-        {/* Top Navigation */}
-        <TopNavbar />
+          {/* Top Navigation */}
+          <TopNavbar />
 
-        {/* Page Content */}
-        <main className="flex-1 p-8 overflow-auto">
-          {children}
-        </main>
+          {/* Page Content */}
+          <main className="flex-1 overflow-auto p-8 transition-colors duration-300">
+            {children}
+          </main>
+
+        </div>
 
       </div>
-
-    </div>
+    </DashboardThemeProvider>
   );
 }
