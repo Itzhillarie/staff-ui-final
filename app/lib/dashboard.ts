@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { apiFetch } from "@/app/utils/apiFetchDashboard";
 
 
@@ -99,23 +100,41 @@ export async function getDashboardData(): Promise<DashboardData> {
   const token =
     cookieStore.get("jwt")?.value;
 
+  if (!token) {
+    redirect("/auth/login?session=expired");
+  }
 
   const apiUrl =
     process.env.API_SERVER_URL ??
     process.env.NEXT_PUBLIC_API_URL;
 
-  return await apiFetch(
-    `${apiUrl}/users/dashboard/`,
-    {
-      method: "GET",
+  try {
+    return await apiFetch(
+      `${apiUrl}/users/dashboard/`,
+      {
+        method: "GET",
 
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "ngrok-skip-browser-warning": "1",
-      },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "1",
+        },
 
-      cache: "no-store",
+        cache: "no-store",
+      }
+    );
+  } catch (error) {
+    const status =
+      typeof error === "object" &&
+      error !== null &&
+      "status" in error
+        ? error.status
+        : null;
+
+    if (status === 401 || status === 403 || status === 404) {
+      redirect("/auth/login?session=expired");
     }
-  );
+
+    throw error;
+  }
 
 }

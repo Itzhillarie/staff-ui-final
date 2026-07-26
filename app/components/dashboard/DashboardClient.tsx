@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { toast } from "sonner";
-
 import DashboardHeader from "@/app/components/dashboard/DashboardHeader";
 import DashboardStats from "@/app/components/dashboard/DashboardStats";
 import QuickActions from "@/app/components/dashboard/QuickActions";
@@ -22,17 +19,6 @@ interface Props {
 export default function DashboardClient({
   dashboard,
 }: Props) {
-
-
-  useEffect(() => {
-
-    toast.success(
-      "Dashboard loaded successfully"
-    );
-
-  }, []);
-
-
 
   return (
     <main className="space-y-8">

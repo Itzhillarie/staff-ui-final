@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FileSearch, RefreshCw } from "lucide-react";
 
 import AuditLogTable, {
@@ -11,13 +11,13 @@ import LoadingSettings from "@/app/components/settings/LoadingSettings";
 import EmptySettings from "@/app/components/settings/EmptySettings";
 
 import { getAuditLogs } from "@/app/lib/settings";
-import { showErrorToast } from "@/app/lib/notification";
+import { toast } from "@/app/utils/toast";
 
 export default function AuditLogsPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
 
-  async function fetchLogs() {
+  const fetchLogs = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -27,17 +27,21 @@ export default function AuditLogsPage() {
     } catch (error) {
       console.error(error);
 
-      showErrorToast(
+      toast.error(
         "Unable to load audit logs."
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
-    fetchLogs();
-  }, []);
+    const timeoutId = window.setTimeout(() => {
+      void fetchLogs();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [fetchLogs]);
 
   if (loading) {
     return <LoadingSettings />;

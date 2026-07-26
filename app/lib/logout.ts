@@ -2,7 +2,16 @@
 
 import { useAuthStore } from "@/app/store/authstore";
 
-export function logout() {
+export async function logout() {
+  try {
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      cache: "no-store",
+    });
+  } catch (error) {
+    console.error("Unable to expire server session.", error);
+  }
+
   // Clear Zustand state
   useAuthStore.getState().logout();
 

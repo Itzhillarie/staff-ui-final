@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/app/store/authstore";
 
 interface AuthProviderProps {
@@ -13,10 +13,22 @@ export default function AuthProvider({
 }: AuthProviderProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const token = useAuthStore((state) => state.token);
+  const logout = useAuthStore((state) => state.logout);
 
   useEffect(() => {
+    if (searchParams.get("session") === "expired") {
+      logout();
+      localStorage.removeItem("auth-storage");
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("username");
+      localStorage.removeItem("role");
+
+      return;
+    }
+
     const timer = setTimeout(() => {
       // Only redirect authenticated users away from auth pages
       if (
@@ -30,7 +42,7 @@ export default function AuthProvider({
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [token, pathname, router]);
+  }, [logout, pathname, router, searchParams, token]);
 
-  return {children};
+  return children;
 }
