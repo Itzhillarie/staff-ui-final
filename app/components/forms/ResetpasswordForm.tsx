@@ -47,7 +47,7 @@ export function SignupForm() {
           </CardHeader>
           <CardContent className={styles.content}>
             <div className={styles.fieldGroup}>
-              <Label htmlFor="username" className="text-red-500">
+              <Label htmlFor="username" className="text-darkgray-500">
                 Username
               </Label>
               <Input
@@ -58,7 +58,7 @@ export function SignupForm() {
               />
             </div>
             <div className={styles.fieldGroup}>
-              <Label htmlFor="email" className="text-red-500">
+              <Label htmlFor="email" className="text-black-500">
                 Email
               </Label>
               <Input
@@ -79,12 +79,12 @@ export function SignupForm() {
             </div>
           </CardContent>
           <CardFooter className={styles.footer}>
-            <Button className={styles.button}>login</Button>
+            <Button className={styles.button}>Reset</Button>
           </CardFooter>
         </Card>
         <div className={styles.prompt}>
           Have an account?
-          <Link className={styles.link} href="/auth/signin">
+          <Link className={styles.link} href="/auth/login">
             login
           </Link>
         </div>

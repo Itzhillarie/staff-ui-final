@@ -55,7 +55,7 @@ export default function DashboardStats({
         value={loading ? "..." : stats.ideas.total}
         subtitle="Total ideas submitted"
         icon={<Lightbulb size={30} />}
-        color="bg-blue-600"
+        color="bg-cyan-600"
       />
 
 
@@ -64,7 +64,7 @@ export default function DashboardStats({
         value={loading ? "..." : stats.ideas.peer_review}
         subtitle="Awaiting peer review"
         icon={<Users size={30} />}
-        color="bg-purple-600"
+        color="bg-cyan-600"
       />
 
 
@@ -73,7 +73,7 @@ export default function DashboardStats({
         value={loading ? "..." : stats.ideas.pm_review}
         subtitle="Manager review stage"
         icon={<ClipboardCheck size={30} />}
-        color="bg-orange-500"
+        color="bg-cyan-500"
       />
 
 
@@ -95,7 +95,7 @@ export default function DashboardStats({
         }
         subtitle="Innovation points issued"
         icon={<Trophy size={30} />}
-        color="bg-yellow-500"
+        color="bg-cyan-500"
       />
 
 
@@ -108,7 +108,7 @@ export default function DashboardStats({
         }
         subtitle={`${stats.users.total_users} Total Users`}
         icon={<Award size={30} />}
-        color="bg-green-600"
+        color="bg-cyan-600"
       />
 
 

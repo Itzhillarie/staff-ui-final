@@ -126,7 +126,7 @@ export default function PeerReviewPage() {
 
           <Loader2
             size={36}
-            className="animate-spin text-blue-600"
+            className="animate-spin text-cyan-600"
           />
 
         </div>
@@ -193,7 +193,7 @@ export default function PeerReviewPage() {
                   <div className="flex items-center gap-2">
                     <ThumbsUp
                       size={18}
-                      className="text-green-600"
+                      className="text-cyan-600"
                     />
                     {idea.likes}
                   </div>
@@ -201,7 +201,7 @@ export default function PeerReviewPage() {
                   <div className="flex items-center gap-2">
                     <ThumbsDown
                       size={18}
-                      className="text-red-600"
+                      className="text-cyan-600"
                     />
                     {idea.dislikes}
                   </div>
@@ -209,7 +209,7 @@ export default function PeerReviewPage() {
                   <div className="flex items-center gap-2">
                     <MessageCircle
                       size={18}
-                      className="text-purple-600"
+                      className="text-cyan-600"
                     />
                     {idea.comments ?? 0}
                   </div>
@@ -219,7 +219,7 @@ export default function PeerReviewPage() {
                 <div className="flex gap-3">
                                     <button
                     onClick={() => handleLike(idea.id)}
-                    className="flex items-center gap-2 rounded-xl bg-green-600 px-5 py-2 text-white transition hover:bg-green-700"
+                    className="flex items-center gap-2 rounded-xl bg-cyan-600 px-5 py-2 text-white transition hover:bg-cyan-700"
                   >
                     <ThumbsUp size={18} />
                     Like
@@ -227,7 +227,7 @@ export default function PeerReviewPage() {
 
                   <button
                     onClick={() => handleDislike(idea.id)}
-                    className="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2 text-white transition hover:bg-red-700"
+                    className="flex items-center gap-2 rounded-xl bg-cyan-600 px-5 py-2 text-white transition hover:bg-cyan-700"
                   >
                     <ThumbsDown size={18} />
                     Dislike
@@ -238,7 +238,7 @@ export default function PeerReviewPage() {
                       setSelectedIdea(idea.id);
                       setShowComment(true);
                     }}
-                    className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2 text-white transition hover:bg-blue-700"
+                    className="flex items-center gap-2 rounded-xl bg-cyan-600 px-5 py-2 text-white transition hover:bg-cyan-700"
                   >
                     <MessageCircle size={18} />
                     Comment
@@ -275,7 +275,7 @@ export default function PeerReviewPage() {
                 setComment(e.target.value)
               }
               placeholder="Write your review..."
-              className="w-full rounded-xl border p-4 outline-none focus:border-blue-500"
+              className="w-full rounded-xl border p-4 outline-none focus:border-blue-400"
             />
 
             <div className="mt-6 flex justify-end gap-4">
@@ -293,7 +293,7 @@ export default function PeerReviewPage() {
 
               <button
                 onClick={submitComment}
-                className="rounded-xl bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
+                className="rounded-xl bg-cyan-600 px-6 py-3 text-white hover:bg-cyan-700"
               >
                 Submit Comment
               </button>

@@ -26,7 +26,7 @@ export default function LeaderboardPage() {
   if (loading) {
     return (
       <div className="flex h-[70vh] items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
+        <Loader2 className="h-10 w-10 animate-spin text-cyan-600" />
       </div>
     );
   }
@@ -36,7 +36,7 @@ export default function LeaderboardPage() {
 
       {/* Header */}
 
-      <div className="rounded-3xl bg-linear-to-r from-yellow-500 via-orange-500 to-red-500 p-8 text-white shadow-xl">
+      <div className="rounded-3xl bg-linear-to-r from-cyan-500 via-cyan-500 to-cyan-500 p-8 text-white shadow-xl">
 
         <div className="flex items-center gap-4">
 
@@ -86,9 +86,9 @@ export default function LeaderboardPage() {
 
           {/* First */}
 
-          <div className="rounded-2xl border-2 border-yellow-400 bg-yellow-50 p-10 text-center shadow-lg">
+          <div className="rounded-2xl border-2 border-cyan-400 bg-cyan-50 p-10 text-center shadow-lg">
 
-            <Crown className="mx-auto mb-4 h-14 w-14 text-yellow-500" />
+            <Crown className="mx-auto mb-4 h-14 w-14 text-cyan-500" />
 
             <h2 className="text-3xl font-bold">
               {users[0].username}
@@ -98,7 +98,7 @@ export default function LeaderboardPage() {
               🥇 Rank #{users[0].rank}
             </p>
 
-            <p className="mt-5 text-5xl font-bold text-yellow-600">
+            <p className="mt-5 text-5xl font-bold text-cyan-600">
               {users[0].points}
             </p>
 
@@ -108,7 +108,7 @@ export default function LeaderboardPage() {
 
           <div className="rounded-2xl border bg-white p-8 text-center shadow">
 
-            <Medal className="mx-auto mb-4 h-12 w-12 text-orange-500" />
+            <Medal className="mx-auto mb-4 h-12 w-12 text-cyan-500" />
 
             <h2 className="text-2xl font-bold">
               {users[2].username}
@@ -118,7 +118,7 @@ export default function LeaderboardPage() {
               #{users[2].rank}
             </p>
 
-            <p className="mt-4 text-4xl font-bold text-orange-600">
+            <p className="mt-4 text-4xl font-bold text-cyan-600">
               {users[2].points}
             </p>
 
@@ -168,7 +168,7 @@ export default function LeaderboardPage() {
 
               <tr
                 key={user.id}
-                className="border-t hover:bg-slate-50"
+                className="border-t hover:bg-cyan-50"
               >
 
                 <td className="px-6 py-5 font-bold">
@@ -185,7 +185,7 @@ export default function LeaderboardPage() {
                   {user.username}
                 </td>
 
-                <td className="px-6 py-5 text-right font-bold text-indigo-700">
+                <td className="px-6 py-5 text-right font-bold text-cyan-700">
                   {user.points}
                 </td>
 

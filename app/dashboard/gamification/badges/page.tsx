@@ -26,7 +26,7 @@ export default function BadgesPage() {
   if (loading) {
     return (
       <div className="flex h-[70vh] items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
+        <Loader2 className="h-10 w-10 animate-spin text-cyan-600" />
       </div>
     );
   }
@@ -36,7 +36,7 @@ export default function BadgesPage() {
 
       {/* Header */}
 
-      <div className="rounded-3xl bg-linear-to-r from-amber-500 via-orange-500 to-red-500 p-8 text-white shadow-xl">
+      <div className="rounded-3xl bg-linear-to-r from-cyan-500 via-cyan-500 to-cyan-500 p-8 text-white shadow-xl">
 
         <div className="flex items-center gap-4">
 
@@ -48,7 +48,7 @@ export default function BadgesPage() {
               My Badges
             </h1>
 
-            <p className="mt-2 text-orange-100">
+            <p className="mt-2 text-cyan-400">
               Earn badges by participating in innovation activities.
             </p>
 
@@ -62,7 +62,7 @@ export default function BadgesPage() {
 
       <div className="grid gap-6 md:grid-cols-3">
 
-        <div className="rounded-2xl bg-white p-6 shadow">
+        <div className="rounded-2xl bg-cyan p-6 shadow">
 
           <p className="text-sm text-slate-500">
             Total Badges
@@ -110,7 +110,7 @@ export default function BadgesPage() {
             key={badge.id}
             className={`rounded-2xl border p-6 shadow transition hover:shadow-lg ${
               badge.earned
-                ? "bg-white"
+                ? "bg-cyan"
                 : "bg-slate-100 opacity-70"
             }`}
           >
@@ -118,7 +118,7 @@ export default function BadgesPage() {
             <div className="mb-5 flex justify-center">
 
               {badge.earned ? (
-                <Award className="h-16 w-16 text-yellow-500" />
+                <Award className="h-16 w-16 text-cyan-500" />
               ) : (
                 <Lock className="h-16 w-16 text-slate-400" />
               )}
@@ -134,7 +134,7 @@ export default function BadgesPage() {
             </p>
 
             {badge.earned ? (
-              <div className="mt-6 flex items-center justify-center gap-2 rounded-full bg-green-100 py-2 text-green-700">
+              <div className="mt-6 flex items-center justify-center gap-2 rounded-full bg-cyan-100 py-2 text-green-700">
 
                 <CheckCircle2 size={18} />
 
@@ -142,7 +142,7 @@ export default function BadgesPage() {
 
               </div>
             ) : (
-              <div className="mt-6 flex items-center justify-center gap-2 rounded-full bg-slate-200 py-2 text-slate-600">
+              <div className="mt-6 flex items-center justify-center gap-2 rounded-full bg-cyan-200 py-2 text-slate-600">
 
                 <Lock size={18} />
 

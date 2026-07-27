@@ -210,7 +210,7 @@ export default function SubmitIdeaPage() {
 
       {/* Header */}
 
-      <div className="rounded-3xl bg-linear-to-r from-indigo-700 via-purple-700 to-fuchsia-700 p-10 text-white shadow-xl">
+      <div className="rounded-3xl bg-linear-to-r from-cyan-700 via--700 to-light-blue-700 p-10 text-white shadow-xl">
 
         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
 
@@ -224,7 +224,7 @@ export default function SubmitIdeaPage() {
 
             </h1>
 
-            <p className="mt-4 max-w-2xl text-lg text-indigo-100">
+            <p className="mt-4 max-w-2xl text-lg text-gray-100">
 
               Create and manage your draft ideas before
               submitting them into the innovation pipeline.
@@ -238,7 +238,7 @@ export default function SubmitIdeaPage() {
               resetForm();
               setShowModal(true);
             }}
-            className="flex items-center gap-2 rounded-2xl bg-white px-6 py-4 font-semibold text-indigo-700 transition hover:scale-105"
+            className="flex items-center gap-2 rounded-2xl bg-white px-6 py-4 font-semibold text-green-700 transition hover:scale-105"
           >
             <Plus size={22} />
             Create Idea
@@ -323,7 +323,7 @@ export default function SubmitIdeaPage() {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="rounded-xl bg-indigo-600 px-8 py-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+                  className="rounded-xl bg-cyan-600 px-8 py-3 font-semibold text-white hover:bg-cyan-700 disabled:opacity-60"
                 >
                   {saving ? (
                     <span className="flex items-center gap-2">
@@ -374,7 +374,7 @@ export default function SubmitIdeaPage() {
 
           </div>
 
-          <span className="rounded-full bg-indigo-100 px-4 py-2 text-sm font-semibold text-indigo-700">
+          <span className="rounded-full bg-indigo-100 px-4 py-2 text-sm font-semibold text-cyan-700">
 
             {ideas.length} Draft{ideas.length !== 1 ? "s" : ""}
 
@@ -386,7 +386,7 @@ export default function SubmitIdeaPage() {
 
           <div className="flex justify-center py-20">
 
-            <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
+            <Loader2 className="h-10 w-10 animate-spin text-cyan-600" />
 
           </div>
 
@@ -482,7 +482,7 @@ export default function SubmitIdeaPage() {
 
                       setShowModal(true);
                     }}
-                    className="flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-3 text-white transition hover:bg-amber-600"
+                    className="flex items-center gap-2 rounded-xl bg-cyan-500 px-4 py-3 text-white transition hover:bg-cyan-600"
                   >
                     <Pencil size={18} />
                     Edit
@@ -490,7 +490,7 @@ export default function SubmitIdeaPage() {
 
                   <button
                     onClick={() => handleDelete(idea.id)}
-                    className="flex items-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-white transition hover:bg-red-700"
+                    className="flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-3 text-white transition hover:bg-cyan-700"
                   >
                     <Trash2 size={18} />
                     Delete
@@ -498,7 +498,7 @@ export default function SubmitIdeaPage() {
 
                   <button
                     onClick={() => handleSubmit(idea.id)}
-                    className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-white transition hover:bg-indigo-700"
+                    className="flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-3 text-white transition hover:bg-cyan-700"
                   >
                     <Send size={18} />
                     Submit

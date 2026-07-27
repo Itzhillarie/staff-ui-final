@@ -69,7 +69,7 @@ export default function Error({
 
           <button
             onClick={() => reset()}
-            className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white transition hover:bg-indigo-700"
+            className="flex items-center justify-center gap-2 rounded-xl bg-cyan-600 px-6 py-3 font-semibold text-white transition hover:bg-indigo-700"
           >
             <RefreshCw className="h-5 w-5" />
 

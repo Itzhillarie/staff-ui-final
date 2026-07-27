@@ -38,15 +38,15 @@ const iconMap = {
   },
   comment: {
     icon: MessageCircle,
-    color: "text-green-500",
+    color: "text-blue-500",
   },
   approval: {
     icon: CheckCircle,
-    color: "text-purple-500",
+    color: "text-blue-500",
   },
   implementation: {
     icon: Rocket,
-    color: "text-orange-500",
+    color: "text-blue-500",
   },
   notification: {
     icon: Bell,

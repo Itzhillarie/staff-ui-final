@@ -81,7 +81,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="flex h-20 shrink-0 items-center border-b border-slate-200 px-8 dark:border-slate-800">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-600/20 dark:bg-cyan-300 dark:text-slate-950 dark:shadow-cyan-300/20">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-600 text-white shadow-lg shadow-blue-600/20 dark:bg-cyan-300 dark:text-slate-950 dark:shadow-cyan-300/20">
             <Sparkles size={20} />
           </div>
           <div>
@@ -108,8 +108,8 @@ export default function Sidebar() {
                 href={item.href}
                 className={`flex items-center gap-4 rounded-xl px-5 py-4 transition-all ${
                   pathname === item.href
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20 dark:bg-cyan-300 dark:text-slate-950 dark:shadow-cyan-300/20"
-                    : "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white"
+                    ? "bg-cyan-600 text-white shadow-lg shadow-blue-600/20 dark:bg-cyan-300 dark:text-slate-950 dark:shadow-cyan-300/20"
+                    : "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-cyan-900 dark:hover:text-white"
                 }`}
               >
                 <Icon size={22} />
@@ -122,12 +122,12 @@ export default function Sidebar() {
       </div>
 
       {/* Fixed Logout */}
-      <div className="shrink-0 border-t border-slate-200 bg-white p-4 transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950">
+      <div className="shrink-0 border-t border-cyan-200 bg-slate p-4 transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center justify-center gap-3 rounded-xl bg-red-600 px-4 py-3 font-medium text-white transition hover:bg-red-700"
+          className="flex w-full items-center justify-center gap-3 rounded-xl bg-red-600 px-4 py-3 font-medium text-slate transition hover:bg-red-600"
         >
-          <LogOut size={20} />
+          <LogOut size={2} />
           Logout
         </button>
       </div>

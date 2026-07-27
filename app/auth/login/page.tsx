@@ -12,6 +12,7 @@ export default function Signin() {
             <div className="h-28 rounded-lg border border-white/10 bg-white/5" />
             <div className="h-28 rounded-lg border border-white/10 bg-teal-400/20" />
           </div>
+          
 
           <div className="relative z-10 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white text-base font-black text-slate-950">

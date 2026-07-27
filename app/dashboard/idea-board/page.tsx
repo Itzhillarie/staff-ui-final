@@ -27,14 +27,14 @@ interface Idea {
 }
 
 const statusColors: Record<string, string> = {
-  Draft: "bg-gray-100 text-gray-700",
-  Submitted: "bg-blue-100 text-blue-700",
-  "Peer Review": "bg-purple-100 text-purple-700",
+  Draft: "bg-cyan-100 text-gray-700",
+  Submitted: "bg-cyan-100 text-blue-700",
+  "Peer Review": "bg-cyan-100 text-purple-700",
   "Product Manager Review": "bg-orange-100 text-orange-700",
-  Approved: "bg-green-100 text-green-700",
-  Rejected: "bg-red-100 text-red-700",
+  Approved: "bg-cyan-100 text-green-700",
+  Rejected: "bg-cyan-100 text-red-700",
   Implementation: "bg-cyan-100 text-cyan-700",
-  "Impact Evaluation": "bg-pink-100 text-pink-700",
+  "Impact Evaluation": "bg-cyan-100 text-pink-700",
   Archived: "bg-slate-100 text-slate-700",
 };
 
@@ -125,7 +125,7 @@ export default function IdeaBoardPage() {
 
         <Link
           href="/dashboard/submit-idea"
-          className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
+          className="flex items-center gap-2 rounded-xl bg-cyan-600 px-6 py-3 text-white hover:bg-cyan-700"
         >
           <Plus size={20} />
           Create Idea
@@ -149,7 +149,7 @@ export default function IdeaBoardPage() {
 
           </div>
 
-          <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
+          <span className="rounded-full bg-cyan-100 px-4 py-2 text-sm font-semibold text-blue-400">
             {ideas.length} Ideas
           </span>
 
@@ -273,7 +273,7 @@ export default function IdeaBoardPage() {
 
                         <button
                           onClick={() => handleEdit(idea)}
-                          className="rounded-lg bg-yellow-500 p-2 text-white hover:bg-yellow-600"
+                          className="rounded-lg bg-cyan-500 p-2 text-white hover:bg-cyan-600"
                         >
                           <Pencil size={18} />
                         </button>
@@ -282,7 +282,7 @@ export default function IdeaBoardPage() {
                           onClick={() =>
                             handleDelete(idea.id)
                           }
-                          className="rounded-lg bg-red-600 p-2 text-white hover:bg-red-700"
+                          className="rounded-lg bg-cyan-600 p-2 text-white hover:bg-cyan-700"
                         >
                           <Trash2 size={18} />
                         </button>

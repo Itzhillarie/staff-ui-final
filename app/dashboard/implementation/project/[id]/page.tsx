@@ -80,7 +80,7 @@ export default function ProjectDetailsPage() {
     try {
       setLoading(true);
 
-      const data = await getProject(id as string);
+      const data = (await getProject(id as string)) as Project;
 
       setProject(data);
     } catch (err) {
