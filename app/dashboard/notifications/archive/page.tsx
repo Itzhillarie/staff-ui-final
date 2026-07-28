@@ -21,29 +21,33 @@ export default function ArchivedNotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadArchived();
-  }, []);
-
   async function loadArchived() {
     try {
       setLoading(true);
 
       const data = await getArchivedNotifications();
-      const archivedNotifications = Array.isArray(data)
-        ? data
-        : (data as { results?: Notification[] })?.results || [];
 
-      setNotifications(archivedNotifications);
+      setNotifications(
+        Array.isArray(data)
+          ? data
+          : data.results || []
+      );
     } catch (error: any) {
       toast.error(
-        error?.body?.message ??
+        error instanceof Error
+          ? error.message
+          :
           "Failed to load archived notifications."
       );
     } finally {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadArchived();
+  }, []);
 
   async function handleRestore(id: string) {
     try {
@@ -116,4 +120,3 @@ export default function ArchivedNotificationsPage() {
     </div>
   );
 }
-
