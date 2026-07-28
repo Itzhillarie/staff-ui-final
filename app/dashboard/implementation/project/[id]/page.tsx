@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import {
   Calendar,
@@ -139,11 +139,11 @@ export default function ProjectDetailsPage() {
   });
   const [taskForms, setTaskForms] = useState<Record<string, TaskForm>>({});
 
-  async function loadProject() {
+  const loadProject = useCallback(async () => {
     try {
       setLoading(true);
 
-      const data = (await getProject(id as string)) as Project;
+      const data = (await getProject(projectId)) as Project;
 
       setProject(data);
     } catch (err) {
@@ -152,13 +152,12 @@ export default function ProjectDetailsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [projectId]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadProject();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId]);
+  }, [loadProject]);
 
   const projectProgress = useMemo(
     () => (project ? calculateProjectProgress(project) : 0),

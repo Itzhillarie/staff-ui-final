@@ -5,7 +5,7 @@ export { default as ProfileForm } from "./ProfileForm";
 export { default as AccountSettings } from "./AccountSettings";
 export { default as SecuritySettings } from "./SecuritySettings";
 export { default as AppearanceSettings } from "./AppearanceSettings";
-export { default as NotificationSettings } from "./NotificationSettings";
+export { default as NotificationSettings } from "./Notificationsettings";
 export { default as OrganizationSettings } from "./OrganizationSettings";
 
 export { default as IntegrationCard } from "./IntegrationCard";
@@ -26,7 +26,7 @@ export { default as EmptySettings } from "./EmptySettings";
 export type { ProfileData } from "./ProfileForm";
 export type { AccountSettingsData } from "./AccountSettings";
 export type { AppearanceSettingsData } from "./AppearanceSettings";
-export type { NotificationSettingsData } from "./NotificationSettings";
+export type { NotificationSettingsData } from "./Notificationsettings";
 export type { OrganizationSettingsData } from "./OrganizationSettings";
 export type { UserRole } from "./RoleManagement";
 export type { AuditLog } from "./AuditLogTable";

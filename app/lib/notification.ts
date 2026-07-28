@@ -1,4 +1,8 @@
 import { apiFetch } from "@/app/utils/apiFetch";
+import type {
+  Notification,
+  NotificationSettingsData,
+} from "@/app/components/notifications";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -7,17 +11,16 @@ const API = process.env.NEXT_PUBLIC_API_URL;
 ------------------------------------------ */
 
 export async function getNotifications() {
-  return apiFetch(`${API}/notifications/list/`, {
-    method: "GET",
-  });
+  return apiFetch<Notification[] | { results?: Notification[] }>(
+    `${API}/notifications/list/`,
+    {
+      method: "GET",
+    }
+  );
 }
 
-/* ------------------------------------------
-   GET SINGLE NOTIFICATION
------------------------------------------- */
-
 export async function getNotification(id: string) {
-  return apiFetch(`${API}/notifications/detail/${id}/`, {
+  return apiFetch<Notification>(`${API}/notifications/detail/${id}/`, {
     method: "GET",
   });
 }
@@ -67,9 +70,12 @@ export async function deleteNotification(id: string) {
 ------------------------------------------ */
 
 export async function getArchivedNotifications() {
-  return apiFetch(`${API}/notifications/archive/list/`, {
-    method: "GET",
-  });
+  return apiFetch<Notification[] | { results?: Notification[] }>(
+    `${API}/notifications/archive/list/`,
+    {
+      method: "GET",
+    }
+  );
 }
 
 /* ------------------------------------------
@@ -87,7 +93,7 @@ export async function restoreNotification(id: string) {
 ------------------------------------------ */
 
 export async function getNotificationSettings() {
-  return apiFetch(`${API}/notifications/settings/`, {
+  return apiFetch<NotificationSettingsData>(`${API}/notifications/settings/`, {
     method: "GET",
   });
 }
@@ -96,15 +102,9 @@ export async function getNotificationSettings() {
    UPDATE NOTIFICATION SETTINGS
 ------------------------------------------ */
 
-export async function updateNotificationSettings(data: {
-  email_notifications: boolean;
-  push_notifications: boolean;
-  idea_updates: boolean;
-  peer_reviews: boolean;
-  pm_reviews: boolean;
-  implementation_updates: boolean;
-  achievements: boolean;
-}) {
+export async function updateNotificationSettings(
+  data: NotificationSettingsData
+) {
   return apiFetch(`${API}/notifications/settings/update/`, {
     method: "PUT",
     body: JSON.stringify(data),
