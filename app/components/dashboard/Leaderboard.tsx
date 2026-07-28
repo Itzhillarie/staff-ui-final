@@ -40,12 +40,12 @@ const icons = [
 
 
 const colors = [
-  "bg-yellow-500",
-  "bg-gray-500",
-  "bg-amber-700",
-  "bg-blue-600",
-  "bg-green-600",
-  "bg-purple-600",
+  "bg-cyan-500",
+  "bg-cyan-500",
+  "bg-cyan-700",
+  "bg-cyan-600",
+  "bg-cyan-600",
+  "bg-cyan-600",
 ];
 
 
@@ -80,11 +80,11 @@ export default function Leaderboard({
       <div className="flex items-center justify-between border-b p-6">
 
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">
+          <h2 className="text-2xl font-bold text-cyan-800">
             Innovation Leaderboard
           </h2>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-green-500">
             Top contributors across the organization
           </p>
         </div>

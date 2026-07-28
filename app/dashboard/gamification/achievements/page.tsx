@@ -6,7 +6,7 @@ import {
   Target,
   CheckCircle2,
   Loader2,
-  Lock,
+  Lock,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
 } from "lucide-react";
 
 import {
@@ -46,11 +46,11 @@ export default function AchievementsPage() {
 
       {/* Header */}
 
-      <div className="rounded-3xl bg-linear-to-r from-indigo-700 via-purple-700 to-pink-700 p-8 text-white shadow-xl">
+      <div className="rounded-3xl bg-linear-to-r from-cyan-700 via-cyan-700 to-cyan-700 p-8 text-white shadow-xl">
 
         <div className="flex items-center gap-4">
 
-          <Trophy className="h-12 w-12 text-yellow-300" />
+          <Trophy className="h-12 w-12 text-cyan-300" />
 
           <div>
 
@@ -58,7 +58,7 @@ export default function AchievementsPage() {
               Achievements
             </h1>
 
-            <p className="mt-2 text-purple-100">
+            <p className="mt-2 text-cyan-100">
               Complete milestones to become a top innovator.
             </p>
 
@@ -129,7 +129,7 @@ export default function AchievementsPage() {
           return (
             <div
               key={achievement.id}
-              className="rounded-2xl border bg-white p-6 shadow transition hover:shadow-lg"
+              className="rounded-2xl border bg-cyan p-6 shadow transition hover:shadow-lg"
             >
               <div className="mb-5 flex items-center justify-between">
 
@@ -168,8 +168,8 @@ export default function AchievementsPage() {
                   <div
                     className={`h-full rounded-full ${
                       achievement.completed
-                        ? "bg-green-500"
-                        : "bg-indigo-600"
+                        ? "bg-cyan-500"
+                        : "bg-cyan-600"
                     }`}
                     style={{
                       width: `${progress}%`,
@@ -187,7 +187,7 @@ export default function AchievementsPage() {
                     ✓ Completed
                   </div>
                 ) : (
-                  <div className="rounded-full bg-indigo-100 py-2 text-center font-semibold text-indigo-700">
+                  <div className="rounded-full bg-cyan-500 py-2 text-center font-semibold text-indigo-700">
                     In Progress
                   </div>
                 )}
@@ -201,7 +201,7 @@ export default function AchievementsPage() {
       </div>
 
       {achievements.length === 0 && (
-        <div className="rounded-2xl bg-white p-12 text-center shadow">
+        <div className="rounded-2xl bg-cyan p-12 text-center shadow">
 
           <Trophy className="mx-auto mb-5 h-16 w-16 text-slate-300" />
 

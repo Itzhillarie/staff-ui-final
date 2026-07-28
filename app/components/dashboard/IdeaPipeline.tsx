@@ -36,23 +36,23 @@ interface PipelineStage {
 
 const stageConfig = {
   Draft: {
-    color: "bg-slate-500",
+    color: "bg-cyan-500",
     icon: FileEdit,
   },
   Submitted: {
-    color: "bg-blue-500",
+    color: "bg-cyan-500",
     icon: Send,
   },
   "Peer Review": {
-    color: "bg-purple-500",
+    color: "bg-cyan-500",
     icon: Users,
   },
   "Product Manager Review": {
-    color: "bg-orange-500",
+    color: "bg-cyan-500",
     icon: ClipboardCheck,
   },
   Approved: {
-    color: "bg-green-500",
+    color: "bg-cyan-500",
     icon: CheckCircle2,
   },
   Implementation: {
@@ -60,11 +60,11 @@ const stageConfig = {
     icon: Rocket,
   },
   "Impact Evaluation": {
-    color: "bg-pink-500",
+    color: "bg-cyan-500",
     icon: BarChart3,
   },
   Archived: {
-    color: "bg-gray-700",
+    color: "bg-cyan-700",
     icon: Archive,
   },
 } as const;

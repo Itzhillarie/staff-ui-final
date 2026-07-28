@@ -12,8 +12,7 @@ export default async function DashboardLayout({
 
   return (
     <DashboardThemeProvider>
-      <div className="dashboard-themed min-h-screen bg-slate-100 text-slate-950 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
-
+<div className="dashboard-themed min-h-screen bg-slate-100 text-slate-950 transition-colors dark:bg-slate-950 dark:text-slate-100">
         {/* Fixed Sidebar */}
         <Sidebar />
 

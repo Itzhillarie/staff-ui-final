@@ -60,7 +60,7 @@ export default function GamificationPage() {
 
       {/* Header */}
 
-      <div className="rounded-3xl bg-linear-to-r from-violet-700 via-purple-700 to-indigo-700 p-8 text-white shadow-xl">
+      <div className="rounded-3xl bg-linear-to-r from-cyan-700 via-cyan-700 to-cyan-700 p-8 text-white shadow-xl">
 
         <h1 className="flex items-center gap-3 text-4xl font-bold">
           <Trophy className="h-10 w-10 text-yellow-300" />
@@ -79,7 +79,7 @@ export default function GamificationPage() {
 
         <div className="rounded-2xl border bg-white p-6 shadow-sm">
 
-          <Star className="mb-4 h-8 w-8 text-yellow-500" />
+          <Star className="mb-4 h-8 w-8 text-slate-500" />
 
           <p className="text-sm text-slate-500">
             Total Points
@@ -105,7 +105,7 @@ export default function GamificationPage() {
 
         </div>
 
-        <div className="rounded-2xl border bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border bg-cyan p-6 shadow-sm">
 
           <Award className="mb-4 h-8 w-8 text-green-600" />
 
@@ -121,7 +121,7 @@ export default function GamificationPage() {
 
         <div className="rounded-2xl border bg-white p-6 shadow-sm">
 
-          <TrendingUp className="mb-4 h-8 w-8 text-purple-600" />
+          <TrendingUp className="mb-4 h-8 w-8 text-slate-600" />
 
           <p className="text-sm text-slate-500">
             Level
@@ -137,7 +137,7 @@ export default function GamificationPage() {
 
       {/* Level Progress */}
 
-      <div className="rounded-2xl border bg-white p-8 shadow-sm">
+      <div className="rounded-2xl border bg-cyan p-8 shadow-sm">
 
         <div className="mb-5 flex items-center justify-between">
 
@@ -145,7 +145,7 @@ export default function GamificationPage() {
             Level Progress
           </h2>
 
-          <span className="rounded-full bg-violet-100 px-4 py-2 text-sm font-semibold text-violet-700">
+          <span className="rounded-full bg-cyan-100 px-4 py-2 text-sm font-semibold text-cyan-700">
             Level {dashboard.level}
           </span>
 
@@ -154,7 +154,7 @@ export default function GamificationPage() {
         <div className="h-4 overflow-hidden rounded-full bg-slate-200">
 
           <div
-            className="h-full rounded-full bg-linear-to-r from-violet-600 to-indigo-600"
+            className="h-full rounded-full bg-linear-to-r from-cyan-600 to-cyan-600"
             style={{
               width: `${Math.min(
                 (dashboard.total_points /
@@ -215,7 +215,7 @@ export default function GamificationPage() {
 
                   </div>
 
-                  <span className="rounded-full bg-green-100 px-3 py-1 font-bold text-green-700">
+                  <span className="rounded-full bg-cyan-100 px-3 py-1 font-bold text-green-700">
                     +{item.points}
                   </span>
 
@@ -241,7 +241,7 @@ export default function GamificationPage() {
 
             <Link
               href="/dashboard/gamification/leaderboard"
-              className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700"
+              className="flex items-center gap-1 text-sm font-medium text-cyan-600 hover:text-slate-700"
             >
               View All
               <ArrowRight size={16} />
@@ -265,7 +265,7 @@ export default function GamificationPage() {
 
                 </div>
 
-                <span className="font-bold text-yellow-600">
+                <span className="font-bold text-slate-600">
                   {user.points} pts
                 </span>
 
@@ -285,9 +285,9 @@ export default function GamificationPage() {
 
         <Link
           href="/dashboard/gamification/badges"
-          className="rounded-2xl border bg-white p-8 shadow-sm transition hover:shadow-lg"
+          className="rounded-2xl border bg-cyan p-8 shadow-sm transition hover:shadow-lg"
         >
-          <Award className="mb-5 h-10 w-10 text-green-600" />
+          <Award className="mb-5 h-10 w-10 text-slate-600" />
 
           <h3 className="text-2xl font-bold">
             Badges
@@ -301,9 +301,9 @@ export default function GamificationPage() {
 
         <Link
           href="/dashboard/gamification/achievements"
-          className="rounded-2xl border bg-white p-8 shadow-sm transition hover:shadow-lg"
+          className="rounded-2xl border bg-cyan p-8 shadow-sm transition hover:shadow-lg"
         >
-          <Trophy className="mb-5 h-10 w-10 text-yellow-500" />
+          <Trophy className="mb-5 h-10 w-10 text-slate-500" />
 
           <h3 className="text-2xl font-bold">
             Achievements
@@ -317,9 +317,9 @@ export default function GamificationPage() {
 
         <Link
           href="/dashboard/gamification/rewards"
-          className="rounded-2xl border bg-white p-8 shadow-sm transition hover:shadow-lg"
+          className="rounded-2xl border bg-slate p-8 shadow-sm transition hover:shadow-lg"
         >
-          <Gift className="mb-5 h-10 w-10 text-purple-600" />
+          <Gift className="mb-5 h-10 w-10 text-slate-600" />
 
           <h3 className="text-2xl font-bold">
             Rewards

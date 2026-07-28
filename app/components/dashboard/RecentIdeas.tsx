@@ -36,15 +36,15 @@ interface Props {
 
 
 const statusColors: Record<string, string> = {
-  Draft: "bg-gray-100 text-gray-700",
-  Submitted: "bg-blue-100 text-blue-700",
-  "Peer Review": "bg-purple-100 text-purple-700",
-  "Product Manager Review": "bg-orange-100 text-orange-700",
-  Approved: "bg-green-100 text-green-700",
+  Draft: "bg-gray-100 text-cyan-700",
+  Submitted: "bg-blue-100 text-cyan-700",
+  "Peer Review": "bg-purple-100 text-cyan-700",
+  "Product Manager Review": "bg-orange-100 text-cyan-700",
+  Approved: "bg-green-100 text-cyan-700",
   Rejected: "bg-red-100 text-red-700",
   Implementation: "bg-cyan-100 text-cyan-700",
-  "Impact Evaluation": "bg-pink-100 text-pink-700",
-  Archived: "bg-slate-100 text-slate-700",
+  "Impact Evaluation": "bg-pink-100 text-cyan-700",
+  Archived: "bg-slate-100 text-cyan-700",
 };
 
 
@@ -102,7 +102,7 @@ export default function RecentIdeas({
 
           <div className="flex justify-center py-12">
 
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <Loader2 className="h-8 w-8 animate-spin text-cyan-600" />
 
           </div>
 
@@ -201,7 +201,7 @@ export default function RecentIdeas({
 
                       <MessageCircle
                         size={16}
-                        className="text-green-600"
+                        className="text-cyan-600"
                       />
 
                       {idea.comments}
@@ -217,7 +217,7 @@ export default function RecentIdeas({
 
                       <Clock3
                         size={16}
-                        className="text-orange-500"
+                        className="text-cyan-500"
                       />
 
                       {idea.submitted}

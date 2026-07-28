@@ -168,7 +168,7 @@ export function SigninForm() {
 
 
             <CardDescription className={styles.description}>
-              Sign in to review ideas, manage implementation work, and keep
+              Login to review ideas, manage implementation work, and keep
               your team moving.
             </CardDescription>
 
@@ -251,7 +251,7 @@ export function SigninForm() {
                   className="h-4 w-4 animate-spin"
                 />
               )}
-              {redirecting ? "" : pending ? "Signing in..." : "Sign in"}
+              {redirecting ? "" : pending ? "Logging in..." : "Login"}
 
 
             </button>
@@ -264,7 +264,7 @@ export function SigninForm() {
 
           <Link
 
-            href="/auth/forgot-password"
+            href="/auth/Reset_password"
 
             className={styles.link}
 

@@ -142,9 +142,12 @@ export default function ProjectDetailsPage() {
   async function loadProject() {
     try {
       setLoading(true);
-      const data = await getProject(projectId);
-      setProject(data as Project);
-    } catch {
+
+      const data = (await getProject(id as string)) as Project;
+
+      setProject(data);
+    } catch (err) {
+      console.error(err);
       toast.error("Unable to load project.");
     } finally {
       setLoading(false);

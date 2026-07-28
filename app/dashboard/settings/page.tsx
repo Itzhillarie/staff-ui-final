@@ -109,15 +109,15 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-3xl bg-slate-950 p-8 text-white shadow-xl">
+      <section className="rounded-3xl bg-cyan-800 p-8 text-white shadow-xl">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-5">
             <div className="rounded-2xl bg-white/10 p-4">
-              <Settings className="h-9 w-9 text-teal-200" />
+              <Settings className="h-9 w-9 text-teal-400" />
             </div>
 
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-200">
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-white-600">
                 Admin configuration
               </p>
               <h1 className="mt-2 text-4xl font-semibold">Settings</h1>
@@ -130,7 +130,7 @@ export default function SettingsPage() {
 
           <button
             onClick={handleSave}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-teal-50"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-teal-50"
           >
             <Save className="h-4 w-4" />
             Save Changes
@@ -143,30 +143,30 @@ export default function SettingsPage() {
           icon={ShieldCheck}
           label="Permission Groups"
           value={roles.length.toString()}
-          tone="text-teal-700 bg-teal-50"
+          tone="text-teal-700 bg-cyan-500"
         />
         <SummaryCard
           icon={SlidersHorizontal}
           label="Review Threshold"
           value={`${settings.peerReviewLikeThreshold} likes`}
-          tone="text-indigo-700 bg-indigo-50"
+          tone="text-indigo-700 bg-cyan-500"
         />
         <SummaryCard
           icon={KeyRound}
           label="Enabled Policies"
           value={`${enabledCount}/7`}
-          tone="text-amber-700 bg-amber-50"
+          tone="text-cyan-700 bg-cyan-50"
         />
         <SummaryCard
           icon={ClipboardList}
           label="Audit Route"
           value="Active"
-          tone="text-rose-700 bg-rose-50"
+          tone="text-cyan-700 bg-cyan-50"
         />
       </section>
 
       <div className="grid gap-8 xl:grid-cols-[280px_1fr]">
-        <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+        <aside className="h-fit rounded-2xl border border-cyan-200 bg-white p-3 shadow-sm">
           <SettingsNavButton
             active={activeSection === "permissions"}
             icon={ShieldCheck}
@@ -229,12 +229,12 @@ function SummaryCard({
   tone: string;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-cyan-200 bg-white p-5 shadow-sm">
       <div className={`mb-5 inline-flex rounded-xl p-3 ${tone}`}>
         <Icon className="h-5 w-5" />
       </div>
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-2 text-3xl font-semibold text-slate-950">{value}</p>
+      <p className="text-sm text-cyan-500">{label}</p>
+      <p className="mt-2 text-3xl font-semibold text-cyan-950">{value}</p>
     </div>
   );
 }
@@ -255,8 +255,8 @@ function SettingsNavButton({
       onClick={onClick}
       className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold transition ${
         active
-          ? "bg-slate-950 text-white"
-          : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+          ? "bg-cyan-950 text-white"
+          : "text-slate-600 hover:bg-cyan-100 hover:text-slate-500"
       }`}
     >
       <Icon className="h-5 w-5" />
@@ -267,7 +267,7 @@ function SettingsNavButton({
 
 function PermissionsPanel() {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <section className="rounded-2xl border border-cyan-200 bg-white shadow-sm">
       <PanelHeader
         title="Permissions"
         description="Control which roles can access each capability."
@@ -275,15 +275,15 @@ function PermissionsPanel() {
 
       <div className="overflow-x-auto">
         <table className="min-w-full">
-          <thead className="bg-slate-50">
+          <thead className="bg-cyan-50">
             <tr>
-              <th className="w-[320px] px-6 py-4 text-left text-sm font-semibold text-slate-600">
+              <th className="w-[320px] px-6 py-4 text-left text-sm font-semibold text-cyan-600">
                 Capability
               </th>
               {roles.map((role) => (
                 <th
                   key={role}
-                  className="px-6 py-4 text-center text-sm font-semibold text-slate-600"
+                  className="px-6 py-4 text-center text-sm font-semibold text-cyan-600"
                 >
                   {role}
                 </th>
@@ -294,10 +294,10 @@ function PermissionsPanel() {
             {permissions.map((permission) => (
               <tr key={permission.key} className="border-t border-slate-100">
                 <td className="px-6 py-5">
-                  <p className="font-semibold text-slate-900">
+                  <p className="font-semibold text-cyan-900">
                     {permission.label}
                   </p>
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="mt-1 text-sm text-cyan-500">
                     {permission.description}
                   </p>
                 </td>
@@ -309,8 +309,8 @@ function PermissionsPanel() {
                       <span
                         className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${
                           enabled
-                            ? "bg-teal-100 text-teal-700"
-                            : "bg-slate-100 text-slate-300"
+                            ? "bg-cyan-100 text-teal-700"
+                            : "bg-cyan-100 text-slate-300"
                         }`}
                       >
                         {enabled && <Check className="h-4 w-4" />}
@@ -379,16 +379,16 @@ function WorkflowPanel({
   ];
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <section className="rounded-2xl border border-cyan-200 bg-white shadow-sm">
       <PanelHeader
         title="Workflow Config"
         description="Set system thresholds and automation behavior."
       />
 
-      <div className="border-b border-slate-100 p-6">
+      <div className="border-b border-cyan-100 p-6">
         <label
           htmlFor="peerReviewLikeThreshold"
-          className="text-sm font-semibold text-slate-900"
+          className="text-sm font-semibold text-cyan-900"
         >
           Peer review promotion threshold
         </label>
@@ -402,13 +402,13 @@ function WorkflowPanel({
             min={1}
             value={settings.peerReviewLikeThreshold}
             onChange={(event) => onThresholdChange(event.target.value)}
-            className="h-11 w-24 rounded-xl border border-slate-300 px-3 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+            className="h-11 w-24 rounded-xl border border-slate-300 px-3 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-cyan-500/10"
           />
           <span className="text-sm text-slate-500">likes</span>
         </div>
       </div>
 
-      <div className="divide-y divide-slate-100">
+      <div className="divide-y divide-cyan-100">
         {items.map((item) => (
           <PolicyRow
             key={item.key}
@@ -483,13 +483,13 @@ function ConfigPanel({
   rows: Array<[string, string]>;
 }) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <section className="rounded-2xl border border-cyan-200 bg-white shadow-sm">
       <PanelHeader title={title} description={description} icon={Icon} />
       <div className="grid gap-4 p-6 md:grid-cols-2">
         {rows.map(([label, value]) => (
           <div
             key={label}
-            className="rounded-xl border border-slate-200 bg-slate-50 p-5"
+            className="rounded-xl border border-cyan-200 bg-slate-50 p-5"
           >
             <p className="text-sm text-slate-500">{label}</p>
             <p className="mt-2 font-semibold text-slate-950">{value}</p>
@@ -499,7 +499,7 @@ function ConfigPanel({
       <div className="border-t border-slate-100 p-6">
         <Link
           href="/dashboard/settings/audit-logs"
-          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          className="inline-flex items-center gap-2 rounded-xl border border-cyan-500 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
         >
           <ClipboardList className="h-4 w-4" />
           View audit logs
@@ -529,7 +529,7 @@ function PolicyRow({
       <button
         onClick={onToggle}
         className={`relative h-7 w-12 rounded-full transition ${
-          enabled ? "bg-teal-600" : "bg-slate-300"
+          enabled ? "bg-cyan-600" : "bg-cyan-300"
         }`}
         aria-label={title}
       >
@@ -556,7 +556,7 @@ function PanelHeader({
     <div className="border-b border-slate-200 p-6">
       <div className="flex items-center gap-3">
         {Icon && (
-          <div className="rounded-xl bg-slate-100 p-3 text-slate-700">
+          <div className="rounded-xl bg-cyan-100 p-3 text-slate-700">
             <Icon className="h-5 w-5" />
           </div>
         )}
