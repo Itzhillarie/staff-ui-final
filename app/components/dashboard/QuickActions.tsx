@@ -38,7 +38,7 @@ const actions = [
     description: "Share a new innovation",
     href: "/dashboard/submit-idea",
     icon: Lightbulb,
-    color: "bg-blue-500",
+    color: "bg-cyan-500",
     badge: null,
   },
   {
@@ -46,7 +46,7 @@ const actions = [
     description: "Browse all submitted ideas",
     href: "/dashboard/idea-board",
     icon: ClipboardList,
-    color: "bg-blue-500",
+    color: "bg-cyan-500",
     badge: "submittedIdeas",
   },
   {
@@ -54,7 +54,7 @@ const actions = [
     description: "Review colleague ideas",
     href: "/dashboard/peer-review",
     icon: Users,
-    color: "bg-blue-500",
+    color: "bg-cyan-500",
     badge: "peerReview",
   },
   {
@@ -62,7 +62,7 @@ const actions = [
     description: "Implementation projects",
     href: "/dashboard/implementation",
     icon: Rocket,
-    color: "bg-blue-600",
+    color: "bg-cyan-600",
     badge: "projects",
   },
   {
@@ -70,7 +70,7 @@ const actions = [
     description: "Organization rankings",
     href: "/dashboard/leaderboard",
     icon: Trophy,
-    color: "bg-blue-500",
+    color: "bg-cyan-500",
     badge: null,
   },
   {
@@ -78,7 +78,7 @@ const actions = [
     description: "Recent activity",
     href: "/dashboard/notifications",
     icon: Bell,
-    color: "bg-blue-500",
+    color: "bg-cyan-500",
     badge: "notifications",
   },
 ];

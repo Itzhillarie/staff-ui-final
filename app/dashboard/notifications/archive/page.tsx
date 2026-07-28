@@ -30,12 +30,11 @@ export default function ArchivedNotificationsPage() {
       setLoading(true);
 
       const data = await getArchivedNotifications();
+      const archivedNotifications = Array.isArray(data)
+        ? data
+        : (data as { results?: Notification[] })?.results || [];
 
-      setNotifications(
-        Array.isArray(data)
-          ? data
-          : data.results || []
-      );
+      setNotifications(archivedNotifications);
     } catch (error: any) {
       toast.error(
         error?.body?.message ??
@@ -117,3 +116,4 @@ export default function ArchivedNotificationsPage() {
     </div>
   );
 }
+

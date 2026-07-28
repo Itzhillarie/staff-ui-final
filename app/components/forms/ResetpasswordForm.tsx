@@ -79,7 +79,7 @@ export function SignupForm() {
             </div>
           </CardContent>
           <CardFooter className={styles.footer}>
-            <Button className={styles.button}>Reset</Button>
+            <Button className ={styles.button}>Reset</Button>
           </CardFooter>
         </Card>
         <div className={styles.prompt}>

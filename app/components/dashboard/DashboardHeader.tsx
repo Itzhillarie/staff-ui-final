@@ -58,7 +58,7 @@ export default function DashboardHeader({
 
   return (
     <section className="mb-4">
-<div className="flex flex-col gap-4 rounded-3xl bg-linear-to-r from-cyan-500 via-emerald-500 to-green-700 p-5 text-white shadow-xl lg:flex-row lg:items-center lg:justify-between">        <div className="flex-1">
+<div className="flex flex-col gap-4 rounded-3xl bg-linear-to-r from-cyan-950 via-cyan-700 to-cyan-500 p-5 text-white shadow-xl lg:flex-row lg:items-center lg:justify-between">        <div className="flex-1">
 
           <div className="mb-3 flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-yellow-300" />
@@ -82,11 +82,11 @@ export default function DashboardHeader({
 
         </div>
 
-        <div className="w-full max-w-md rounded-2xl bg-green-400/80 p-4 backdrop-blur-md shadow-2xl">
+        <div className="w-full max-w-md rounded-2xl bg-cyan-800/80 p-4 backdrop-blur-md shadow-2xl">
 
           <div className="flex items-center gap-3">
 
-            <CalendarDays className="h-6 w-6 text-cyan-300" />
+            <CalendarDays className="h-6 w-6 text-slate-300" />
 
             <div>
               <p className="text-sm text-blue/80">
