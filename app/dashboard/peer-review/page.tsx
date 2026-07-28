@@ -17,6 +17,7 @@ import {
   dislikeIdea,
   commentIdea,
 } from "@/app/lib/ideas";
+import { createLocalNotification } from "@/app/lib/notification";
 
 interface Idea {
   id: string;
@@ -63,24 +64,48 @@ export default function PeerReviewPage() {
   }
 
   useEffect(() => {
-    loadIdeas();
+    const timeoutId = window.setTimeout(() => {
+      void loadIdeas();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   async function handleLike(id: string) {
     try {
+      const idea = ideas.find((item) => item.id === id);
+
       await likeIdea(id);
+
+      await createLocalNotification({
+        title: "Idea liked",
+        message: `"${idea?.title ?? "An idea"}" received a like.`,
+        type: "peer_review",
+        category: "peer_reviews",
+      });
+
       await loadIdeas();
-    } catch (err: any) {
-      alert(err?.body?.error || "Unable to like idea.");
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, "Unable to like idea."));
     }
   }
 
   async function handleDislike(id: string) {
     try {
+      const idea = ideas.find((item) => item.id === id);
+
       await dislikeIdea(id);
+
+      await createLocalNotification({
+        title: "Idea disliked",
+        message: `"${idea?.title ?? "An idea"}" received a dislike.`,
+        type: "peer_review",
+        category: "peer_reviews",
+      });
+
       await loadIdeas();
-    } catch (err: any) {
-      alert(err?.body?.error || "Unable to dislike idea.");
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, "Unable to dislike idea."));
     }
   }
 
@@ -93,15 +118,24 @@ export default function PeerReviewPage() {
     }
 
     try {
+      const idea = ideas.find((item) => item.id === selectedIdea);
+
       await commentIdea(selectedIdea, comment);
+
+      await createLocalNotification({
+        title: "Idea commented",
+        message: `A comment was added to "${idea?.title ?? "an idea"}".`,
+        type: "peer_review",
+        category: "peer_reviews",
+      });
 
       setComment("");
       setSelectedIdea(null);
       setShowComment(false);
 
       await loadIdeas();
-    } catch (err: any) {
-      alert(err?.body?.error || "Unable to add comment.");
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, "Unable to add comment."));
     }
   }
 
@@ -308,4 +342,10 @@ export default function PeerReviewPage() {
 
     </div>
   );
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error && error.message
+    ? error.message
+    : fallback;
 }

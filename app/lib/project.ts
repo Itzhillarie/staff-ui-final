@@ -2,6 +2,40 @@ import { apiFetch } from "@/app/utils/apiFetch";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
+type ProjectTask = {
+  id: string;
+  title: string;
+  description?: string;
+  assigned_to?: string;
+  assigned_to_name?: string;
+  priority?: string;
+  due_date?: string;
+  completed?: boolean;
+  status?: string;
+  phase?: string;
+  phase_name?: string;
+  project?: string;
+  project_name?: string;
+};
+
+type ProjectPhase = {
+  id: string;
+  phase_name?: string;
+  tasks?: ProjectTask[];
+};
+
+type ProjectSummary = {
+  id: string;
+  project_name?: string;
+  name?: string;
+  title?: string;
+  phases?: ProjectPhase[];
+};
+
+function listFromResponse<T>(data: T[] | { results?: T[] }) {
+  return Array.isArray(data) ? data : data.results ?? [];
+}
+
 function authHeaders() {
   const token =
     typeof window !== "undefined"
@@ -50,7 +84,10 @@ export async function createPhase(
   return apiFetch(`${API}/projects/${projectId}/phases/create/`, {
     method: "POST",
     headers: authHeaders(),
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      ...data,
+      Description: data.description,
+    }),
   });
 }
 
@@ -64,7 +101,10 @@ export async function updatePhase(
   return apiFetch(`${API}/projects/phases/update/${phaseId}/`, {
     method: "PUT",
     headers: authHeaders(),
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      ...data,
+      Description: data.description,
+    }),
   });
 }
 
@@ -80,10 +120,45 @@ export async function deletePhase(phaseId: string) {
 ========================================== */
 
 export async function getTasks() {
-  return apiFetch(`${API}/projects/tasks/list/`, {
-    method: "GET",
-    headers: authHeaders(),
-  });
+  const data = await getProjects();
+  const projects = listFromResponse(
+    data as ProjectSummary[] | { results?: ProjectSummary[] }
+  );
+
+  const detailedProjects = await Promise.all(
+    projects.map(async (project) => {
+      if (project.phases) {
+        return project;
+      }
+
+      try {
+        return (await getProject(project.id)) as ProjectSummary;
+      } catch {
+        return project;
+      }
+    })
+  );
+
+  return detailedProjects.flatMap((project) =>
+    (project.phases ?? []).flatMap((phase) =>
+      (phase.tasks ?? []).map((task) => ({
+        ...task,
+        phase: task.phase ?? phase.phase_name ?? phase.id,
+        phase_name: task.phase_name ?? phase.phase_name,
+        project:
+          task.project ??
+          project.project_name ??
+          project.name ??
+          project.title ??
+          project.id,
+        project_name:
+          task.project_name ??
+          project.project_name ??
+          project.name ??
+          project.title,
+      }))
+    )
+  );
 }
 
 export async function getTask(id: string) {

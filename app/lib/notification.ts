@@ -1,112 +1,226 @@
-import { apiFetch } from "@/app/utils/apiFetch";
 import type {
   Notification,
   NotificationSettingsData,
 } from "@/app/components/notifications";
 
-const API = process.env.NEXT_PUBLIC_API_URL;
+type NotificationCategory =
+  | "idea_updates"
+  | "peer_reviews"
+  | "pm_reviews"
+  | "implementation_updates"
+  | "achievements";
 
-/* ------------------------------------------
-   GET ALL NOTIFICATIONS
------------------------------------------- */
+type CreateNotificationInput = {
+  title: string;
+  message: string;
+  type: string;
+  category?: NotificationCategory;
+};
+
+const NOTIFICATIONS_KEY = "innovport.notifications";
+const ARCHIVED_NOTIFICATIONS_KEY = "innovport.notifications.archived";
+const NOTIFICATION_SETTINGS_KEY = "innovport.notification-settings";
+
+const defaultSettings: NotificationSettingsData = {
+  email_notifications: true,
+  push_notifications: true,
+  idea_updates: true,
+  peer_reviews: true,
+  pm_reviews: true,
+  implementation_updates: true,
+  achievements: true,
+};
+
+function canUseStorage() {
+  return typeof window !== "undefined";
+}
+
+function readJson<T>(key: string, fallback: T): T {
+  if (!canUseStorage()) {
+    return fallback;
+  }
+
+  const value = window.localStorage.getItem(key);
+
+  if (!value) {
+    return fallback;
+  }
+
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeJson<T>(key: string, value: T) {
+  if (!canUseStorage()) {
+    return;
+  }
+
+  window.localStorage.setItem(key, JSON.stringify(value));
+  window.dispatchEvent(new Event("innovport-notifications-changed"));
+}
+
+function createId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function getLocalSettings() {
+  return {
+    ...defaultSettings,
+    ...readJson<Partial<NotificationSettingsData>>(
+      NOTIFICATION_SETTINGS_KEY,
+      {}
+    ),
+  };
+}
+
+function getLocalNotifications() {
+  return readJson<Notification[]>(NOTIFICATIONS_KEY, []);
+}
+
+function getLocalArchivedNotifications() {
+  return readJson<Notification[]>(ARCHIVED_NOTIFICATIONS_KEY, []);
+}
+
+function setLocalNotifications(notifications: Notification[]) {
+  writeJson(NOTIFICATIONS_KEY, notifications);
+}
+
+function setLocalArchivedNotifications(notifications: Notification[]) {
+  writeJson(ARCHIVED_NOTIFICATIONS_KEY, notifications);
+}
+
+export async function createLocalNotification({
+  title,
+  message,
+  type,
+  category = "idea_updates",
+}: CreateNotificationInput) {
+  const settings = getLocalSettings();
+
+  if (!settings[category]) {
+    return null;
+  }
+
+  const notification: Notification = {
+    id: createId(),
+    title,
+    message,
+    type,
+    is_read: false,
+    created_at: new Date().toISOString(),
+  };
+
+  setLocalNotifications([notification, ...getLocalNotifications()]);
+
+  return notification;
+}
+
+export async function createSettingsNotification() {
+  const notification: Notification = {
+    id: createId(),
+    title: "Notification settings updated",
+    message: "Your notification preferences have been saved.",
+    type: "settings",
+    is_read: false,
+    created_at: new Date().toISOString(),
+  };
+
+  setLocalNotifications([notification, ...getLocalNotifications()]);
+
+  return notification;
+}
 
 export async function getNotifications() {
-  return apiFetch<Notification[] | { results?: Notification[] }>(
-    `${API}/notifications/list/`,
-    {
-      method: "GET",
-    }
-  );
+  return getLocalNotifications();
 }
 
 export async function getNotification(id: string) {
-  return apiFetch<Notification>(`${API}/notifications/detail/${id}/`, {
-    method: "GET",
-  });
-}
-
-/* ------------------------------------------
-   MARK AS READ
------------------------------------------- */
-
-export async function markAsRead(id: string) {
-  return apiFetch(`${API}/notifications/read/${id}/`, {
-    method: "POST",
-  });
-}
-
-/* ------------------------------------------
-   MARK ALL AS READ
------------------------------------------- */
-
-export async function markAllAsRead() {
-  return apiFetch(`${API}/notifications/read-all/`, {
-    method: "POST",
-  });
-}
-
-/* ------------------------------------------
-   ARCHIVE NOTIFICATION
------------------------------------------- */
-
-export async function archiveNotification(id: string) {
-  return apiFetch(`${API}/notifications/archive/${id}/`, {
-    method: "POST",
-  });
-}
-
-/* ------------------------------------------
-   DELETE NOTIFICATION
------------------------------------------- */
-
-export async function deleteNotification(id: string) {
-  return apiFetch(`${API}/notifications/delete/${id}/`, {
-    method: "DELETE",
-  });
-}
-
-/* ------------------------------------------
-   GET ARCHIVED NOTIFICATIONS
------------------------------------------- */
-
-export async function getArchivedNotifications() {
-  return apiFetch<Notification[] | { results?: Notification[] }>(
-    `${API}/notifications/archive/list/`,
-    {
-      method: "GET",
-    }
+  return getLocalNotifications().find(
+    (notification) => notification.id === id
   );
 }
 
-/* ------------------------------------------
-   RESTORE ARCHIVED NOTIFICATION
------------------------------------------- */
+export async function markAsRead(id: string) {
+  setLocalNotifications(
+    getLocalNotifications().map((notification) =>
+      notification.id === id
+        ? { ...notification, is_read: true }
+        : notification
+    )
+  );
+}
+
+export async function markAllAsRead() {
+  setLocalNotifications(
+    getLocalNotifications().map((notification) => ({
+      ...notification,
+      is_read: true,
+    }))
+  );
+}
+
+export async function archiveNotification(id: string) {
+  const notifications = getLocalNotifications();
+  const notification = notifications.find((item) => item.id === id);
+
+  if (!notification) {
+    return;
+  }
+
+  setLocalNotifications(
+    notifications.filter((item) => item.id !== id)
+  );
+  setLocalArchivedNotifications([
+    notification,
+    ...getLocalArchivedNotifications(),
+  ]);
+}
+
+export async function deleteNotification(id: string) {
+  setLocalNotifications(
+    getLocalNotifications().filter((item) => item.id !== id)
+  );
+  setLocalArchivedNotifications(
+    getLocalArchivedNotifications().filter((item) => item.id !== id)
+  );
+}
+
+export async function getArchivedNotifications() {
+  return getLocalArchivedNotifications();
+}
 
 export async function restoreNotification(id: string) {
-  return apiFetch(`${API}/notifications/restore/${id}/`, {
-    method: "POST",
-  });
-}
+  const archived = getLocalArchivedNotifications();
+  const notification = archived.find((item) => item.id === id);
 
-/* ------------------------------------------
-   GET NOTIFICATION SETTINGS
------------------------------------------- */
+  if (!notification) {
+    return;
+  }
+
+  setLocalArchivedNotifications(
+    archived.filter((item) => item.id !== id)
+  );
+  setLocalNotifications([notification, ...getLocalNotifications()]);
+}
 
 export async function getNotificationSettings() {
-  return apiFetch<NotificationSettingsData>(`${API}/notifications/settings/`, {
-    method: "GET",
-  });
+  return getLocalSettings();
 }
-
-/* ------------------------------------------
-   UPDATE NOTIFICATION SETTINGS
------------------------------------------- */
 
 export async function updateNotificationSettings(
   data: NotificationSettingsData
 ) {
-  return apiFetch(`${API}/notifications/settings/update/`, {
-    method: "PUT",
-    body: JSON.stringify(data),
+  writeJson(NOTIFICATION_SETTINGS_KEY, {
+    ...defaultSettings,
+    ...data,
   });
+
+  await createSettingsNotification();
 }

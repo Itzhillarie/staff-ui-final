@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   CheckCircle,
@@ -18,6 +18,7 @@ import {
   approveIdea,
   rejectIdea,
 } from "@/app/lib/pm-review";
+import { createLocalNotification } from "@/app/lib/notification";
 
 interface Idea {
   id: string;
@@ -31,31 +32,32 @@ interface Idea {
   created_at?: string;
 }
 
+type Priority = "High" | "Medium" | "Low";
+
+type ReviewData = {
+  priority: Priority;
+  due_date: string;
+  review_comment: string;
+};
+
 export default function ProductManagerReviewPage() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
-  const [filteredIdeas, setFilteredIdeas] = useState<Idea[]>([]);
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const [search, setSearch] = useState("");
 
   const [reviewData, setReviewData] = useState<
-    Record<
-      string,
-      {
-        priority: string;
-        due_date: string;
-        review_comment: string;
-      }
-    >
+    Record<string, ReviewData>
   >({});
 
   async function loadIdeas() {
     try {
       setLoading(true);
 
-      const data = await getPMReviewIdeas();
+      const data = (await getPMReviewIdeas()) as
+        | Idea[]
+        | { results?: Idea[] };
 
       const allIdeas = Array.isArray(data)
         ? data
@@ -67,16 +69,8 @@ export default function ProductManagerReviewPage() {
       );
 
       setIdeas(pmIdeas);
-      setFilteredIdeas(pmIdeas);
 
-      const reviewState: Record<
-        string,
-        {
-          priority: string;
-          due_date: string;
-          review_comment: string;
-        }
-      > = {};
+      const reviewState: Record<string, ReviewData> = {};
 
       pmIdeas.forEach((idea: Idea) => {
         reviewState[idea.id] = {
@@ -96,39 +90,40 @@ export default function ProductManagerReviewPage() {
   }
 
   useEffect(() => {
-    loadIdeas();
+    const timeoutId = window.setTimeout(() => {
+      void loadIdeas();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
-  useEffect(() => {
+  const filteredIdeas = useMemo(() => {
     if (!search.trim()) {
-      setFilteredIdeas(ideas);
-      return;
+      return ideas;
     }
 
     const keyword = search.toLowerCase();
 
-    setFilteredIdeas(
-      ideas.filter(
-        (idea) =>
-          idea.title.toLowerCase().includes(keyword) ||
-          idea.description
-            .toLowerCase()
-            .includes(keyword) ||
-          idea.creator.toLowerCase().includes(keyword)
-      )
+    return ideas.filter(
+      (idea) =>
+        idea.title.toLowerCase().includes(keyword) ||
+        idea.description
+          .toLowerCase()
+          .includes(keyword) ||
+        idea.creator.toLowerCase().includes(keyword)
     );
   }, [search, ideas]);
 
   function updateField(
     id: string,
-    field: "priority" | "due_date" | "review_comment",
+    field: keyof ReviewData,
     value: string
   ) {
     setReviewData((prev) => ({
       ...prev,
       [id]: {
         ...prev[id],
-        [field]: value,
+        [field]: field === "priority" ? (value as Priority) : value,
       },
     }));
   }
@@ -137,13 +132,22 @@ export default function ProductManagerReviewPage() {
     try {
       setSaving(true);
 
+      const idea = ideas.find((item) => item.id === id);
+
       await approveIdea(id, reviewData[id]);
+
+      await createLocalNotification({
+        title: "Idea approved",
+        message: `"${idea?.title ?? "An idea"}" was approved for implementation.`,
+        type: "pm_review",
+        category: "pm_reviews",
+      });
 
       await loadIdeas();
 
       alert("Idea approved successfully.");
-    } catch (err: any) {
-      alert(err?.body?.error || "Approval failed.");
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, "Approval failed."));
     } finally {
       setSaving(false);
     }
@@ -153,16 +157,25 @@ export default function ProductManagerReviewPage() {
     try {
       setSaving(true);
 
+      const idea = ideas.find((item) => item.id === id);
+
       await rejectIdea(
         id,
         reviewData[id].review_comment
       );
 
+      await createLocalNotification({
+        title: "Idea rejected",
+        message: `"${idea?.title ?? "An idea"}" was rejected by Product Manager review.`,
+        type: "pm_review",
+        category: "pm_reviews",
+      });
+
       await loadIdeas();
 
       alert("Idea rejected successfully.");
-    } catch (err: any) {
-      alert(err?.body?.error || "Rejection failed.");
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, "Rejection failed."));
     } finally {
       setSaving(false);
     }
@@ -406,4 +419,9 @@ export default function ProductManagerReviewPage() {
     </div>
   );
 }
-        
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error && error.message
+    ? error.message
+    : fallback;
+}

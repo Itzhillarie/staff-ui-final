@@ -27,17 +27,12 @@ export default function ArchivedNotificationsPage() {
 
       const data = await getArchivedNotifications();
 
-      setNotifications(
-        Array.isArray(data)
-          ? data
-          : data.results || []
-      );
-    } catch (error: any) {
+      setNotifications(data);
+    } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          :
-          "Failed to load archived notifications."
+          : "Failed to load archived notifications."
       );
     } finally {
       setLoading(false);

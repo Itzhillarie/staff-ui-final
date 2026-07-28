@@ -18,6 +18,7 @@ import {
   deleteIdea,
   submitIdea,
 } from "@/app/lib/ideas";
+import { createLocalNotification } from "@/app/lib/notification";
 
 import { toast } from "@/app/utils/toast";
 
@@ -132,6 +133,13 @@ export default function SubmitIdeaPage() {
       } else {
         await createIdea(form);
 
+        await createLocalNotification({
+          title: "Idea created",
+          message: `"${form.title}" was created as a draft idea.`,
+          type: "idea",
+          category: "idea_updates",
+        });
+
         toast.success(
           "Draft created successfully."
         );
@@ -189,7 +197,16 @@ export default function SubmitIdeaPage() {
     if (!confirmed) return;
 
     try {
+      const idea = ideas.find((item) => item.id === id);
+
       await submitIdea(id);
+
+      await createLocalNotification({
+        title: "Idea submitted",
+        message: `"${idea?.title ?? "An idea"}" was submitted for peer review.`,
+        type: "idea",
+        category: "idea_updates",
+      });
 
       toast.success(
         "Idea submitted successfully."

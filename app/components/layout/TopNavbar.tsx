@@ -1,8 +1,11 @@
 "use client";
 
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/app/store/authstore";
 import { logout } from "@/app/lib/logout";
+import { getNotifications } from "@/app/lib/notification";
 import { useDashboardTheme } from "@/app/providers/DashboardThemeProvider";
 
 import {
@@ -20,6 +23,29 @@ export default function TopNavbar() {
 
   const user = useAuthStore((state) => state.user);
   const { theme, toggleTheme } = useDashboardTheme();
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+
+  useEffect(() => {
+    async function loadUnreadNotifications() {
+      const notifications = await getNotifications();
+      setUnreadNotifications(
+        notifications.filter((notification) => !notification.is_read).length
+      );
+    }
+
+    void loadUnreadNotifications();
+
+    window.addEventListener(
+      "innovport-notifications-changed",
+      loadUnreadNotifications
+    );
+
+    return () =>
+      window.removeEventListener(
+        "innovport-notifications-changed",
+        loadUnreadNotifications
+      );
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -61,9 +87,18 @@ export default function TopNavbar() {
           )}
         </button>
 
-        <Bell
-          className="cursor-pointer text-slate-600 transition hover:text-blue-600 dark:text-slate-400 dark:hover:text-cyan-300"
-        />
+        <Link
+          href="/dashboard/notifications"
+          className="relative rounded-xl p-2 transition hover:bg-slate-100 dark:hover:bg-slate-900"
+          aria-label="Open notifications"
+        >
+          <Bell className="text-slate-600 transition hover:text-blue-600 dark:text-slate-400 dark:hover:text-cyan-300" />
+          {unreadNotifications > 0 && (
+            <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-red-600 px-1.5 py-0.5 text-center text-xs font-bold leading-none text-white">
+              {unreadNotifications > 99 ? "99+" : unreadNotifications}
+            </span>
+          )}
+        </Link>
 
         <MessageCircle
           className="cursor-pointer text-slate-600 transition hover:text-blue-600 dark:text-slate-400 dark:hover:text-cyan-300"
