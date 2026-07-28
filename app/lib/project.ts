@@ -80,7 +80,10 @@ export async function deletePhase(phaseId: string) {
 ========================================== */
 
 export async function getTasks() {
-  return [];
+  return apiFetch(`${API}/projects/tasks/list/`, {
+    method: "GET",
+    headers: authHeaders(),
+  });
 }
 
 export async function getTask(id: string) {
