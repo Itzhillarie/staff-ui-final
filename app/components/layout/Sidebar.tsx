@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { logout } from "@/app/lib/logout";
+import { useAuthStore } from "@/app/store/authstore";
+import { canAccessEverywhere, canAccessPMReview, canViewUsers } from "@/app/lib/access";
 
 import {
   LayoutDashboard,
@@ -64,11 +66,17 @@ const links = [
     href: "/dashboard/settings",
     icon: Settings,
   },
+  {
+    name: "Users",
+    href: "/dashboard/users",
+    icon: Users,
+  },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const role = useAuthStore((state) => state.user?.role);
 
   async function handleLogout() {
     await logout();
@@ -99,7 +107,23 @@ export default function Sidebar() {
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <nav className="space-y-2">
 
-          {links.map((item) => {
+          {links
+            .filter((item) => {
+              if (item.href === "/dashboard/product-manager-review") {
+                return canAccessPMReview(role);
+              }
+
+              if (item.href === "/dashboard/settings") {
+                return canAccessEverywhere(role);
+              }
+
+              if (item.href === "/dashboard/users") {
+                return canViewUsers(role);
+              }
+
+              return true;
+            })
+            .map((item) => {
             const Icon = item.icon;
 
             return (

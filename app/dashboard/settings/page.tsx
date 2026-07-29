@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Bell,
   Building2,
@@ -13,8 +14,11 @@ import {
   Settings,
   ShieldCheck,
   SlidersHorizontal,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
+import { canAccessEverywhere, useAuthHydrated } from "@/app/lib/access";
+import { useAuthStore } from "@/app/store/authstore";
 
 const roles = [
   "Employee",
@@ -73,8 +77,17 @@ type ToggleKey = Exclude<
 >;
 
 export default function SettingsPage() {
+  const router = useRouter();
+  const currentUser = useAuthStore((state) => state.user);
+  const authHydrated = useAuthHydrated();
   const [activeSection, setActiveSection] = useState("permissions");
   const [settings, setSettings] = useState(settingsDefaults);
+
+  useEffect(() => {
+    if (authHydrated && !canAccessEverywhere(currentUser?.role)) {
+      router.replace("/dashboard");
+    }
+  }, [authHydrated, currentUser?.role, router]);
 
   const enabledCount = useMemo(
     () =>
@@ -84,6 +97,10 @@ export default function SettingsPage() {
       ).length,
     [settings]
   );
+
+  if (!authHydrated || !canAccessEverywhere(currentUser?.role)) {
+    return null;
+  }
 
   function toggleSetting(key: ToggleKey) {
     setSettings((current) => ({
@@ -435,6 +452,13 @@ function AccessPanel() {
         ["Role changes", "Administrator approval required"],
         ["Audit logging", "Enabled"],
       ]}
+      links={[
+        {
+          href: "/dashboard/users",
+          label: "Open user list",
+          icon: Users,
+        },
+      ]}
     />
   );
 }
@@ -476,11 +500,17 @@ function ConfigPanel({
   title,
   description,
   rows,
+  links = [],
 }: {
   icon: React.ElementType;
   title: string;
   description: string;
   rows: Array<[string, string]>;
+  links?: Array<{
+    href: string;
+    label: string;
+    icon: React.ElementType;
+  }>;
 }) {
   return (
     <section className="rounded-2xl border border-cyan-200 bg-white shadow-sm">
@@ -497,13 +527,29 @@ function ConfigPanel({
         ))}
       </div>
       <div className="border-t border-slate-100 p-6">
-        <Link
-          href="/dashboard/settings/audit-logs"
-          className="inline-flex items-center gap-2 rounded-xl border border-cyan-500 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-        >
-          <ClipboardList className="h-4 w-4" />
-          View audit logs
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          {links.map((link) => {
+            const LinkIcon = link.icon;
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="inline-flex items-center gap-2 rounded-xl border border-cyan-500 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                <LinkIcon className="h-4 w-4" />
+                {link.label}
+              </Link>
+            );
+          })}
+          <Link
+            href="/dashboard/settings/audit-logs"
+            className="inline-flex items-center gap-2 rounded-xl border border-cyan-500 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          >
+            <ClipboardList className="h-4 w-4" />
+            View audit logs
+          </Link>
+        </div>
       </div>
     </section>
   );
