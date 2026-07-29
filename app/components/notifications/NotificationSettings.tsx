@@ -82,7 +82,7 @@ export default function NotificationSettings({
   ] as const;
 
   return (
-    <div className="rounded-2xl border border-cyan-200 bg-white shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
 
       <div className="border-b border-slate-200 p-6">
 
@@ -121,8 +121,8 @@ export default function NotificationSettings({
               onClick={() => toggle(option.key)}
               className={`relative h-7 w-14 rounded-full transition ${
                 form[option.key]
-                  ? "bg-cyan-600"
-                  : "bg-cyan-300"
+                  ? "bg-indigo-600"
+                  : "bg-slate-300"
               }`}
             >
 
@@ -147,7 +147,7 @@ export default function NotificationSettings({
         <button
           onClick={() => onSave(form)}
           disabled={loading}
-          className="flex items-center gap-2 rounded-xl bg-cyan-600 px-6 py-3 font-semibold text-white transition hover:bg-cyan-700 disabled:opacity-60"
+          className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-60"
         >
           <Save className="h-5 w-5" />
 
