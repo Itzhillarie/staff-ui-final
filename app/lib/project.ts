@@ -21,6 +21,7 @@ type ProjectTask = {
 type ProjectPhase = {
   id: string;
   phase_name?: string;
+  description?: string;
   tasks?: ProjectTask[];
 };
 
@@ -86,6 +87,7 @@ export async function createPhase(
     headers: authHeaders(),
     body: JSON.stringify({
       ...data,
+      name: data.phase_name,
       Description: data.description,
     }),
   });

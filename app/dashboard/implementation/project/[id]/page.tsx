@@ -1,8 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 import {
+  ArrowLeft,
+  ArrowRight,
   Calendar,
   CheckCircle2,
   Circle,
@@ -14,7 +17,21 @@ import {
   X,
 } from "lucide-react";
 
-import { completeTask, createPhase, createTask, getProject } from "@/app/lib/project";
+import {
+  completeTask,
+  createPhase,
+  createTask,
+  getProject,
+  getProjects,
+} from "@/app/lib/project";
+import {
+  canAccessEverywhere,
+  hasOwnershipFields,
+  isEmployee,
+  isOwnedByUser,
+  useAuthHydrated,
+} from "@/app/lib/access";
+import { useAuthStore } from "@/app/store/authstore";
 import { toast } from "sonner";
 
 interface Task {
@@ -49,6 +66,16 @@ interface Project {
   start_date?: string;
   end_date?: string | null;
   phases?: Phase[];
+  creator?: string | { username?: string; name?: string; id?: string | number };
+  created_by?: string | { username?: string; name?: string; id?: string | number };
+  created_by_name?: string;
+  created_by_username?: string;
+  owner?: string | { username?: string; name?: string; id?: string | number };
+  owner_name?: string;
+  owner_username?: string;
+  author?: string | { username?: string; name?: string; id?: string | number };
+  user?: string | { username?: string; name?: string; id?: string | number };
+  idea_creator?: string;
 }
 
 interface TaskForm {
@@ -124,11 +151,70 @@ function priorityClass(priority?: string) {
   }
 }
 
+function normalizeProjectList(data: unknown): Project[] {
+  if (Array.isArray(data)) {
+    return data as Project[];
+  }
+
+  if (data && typeof data === "object" && "results" in data) {
+    const results = (data as { results?: unknown }).results;
+    return Array.isArray(results) ? (results as Project[]) : [];
+  }
+
+  return [];
+}
+
+function createdPhaseFromResponse(data: unknown): Phase | null {
+  if (!data || typeof data !== "object") {
+    return null;
+  }
+
+  const record = data as Partial<Phase> & {
+    phase?: Phase;
+    data?: Phase;
+    name?: string;
+  };
+  const candidate = record.phase ?? record.data ?? record;
+
+  const id = candidate.id;
+
+  if (!id) {
+    return null;
+  }
+
+  return {
+    ...candidate,
+    id,
+    phase_name:
+      candidate.phase_name ??
+      (candidate as { name?: string }).name ??
+      "Untitled phase",
+    tasks: candidate.tasks ?? [],
+  };
+}
+
+function createdTaskFromResponse(data: unknown): Task | null {
+  if (!data || typeof data !== "object") {
+    return null;
+  }
+
+  const record = data as Partial<Task> & { task?: Task; data?: Task };
+  const candidate = record.task ?? record.data ?? record;
+
+  return candidate.id && candidate.title ? (candidate as Task) : null;
+}
+
 export default function ProjectDetailsPage() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const projectId = params.id;
+  const currentUser = useAuthStore((state) => state.user);
+  const authHydrated = useAuthHydrated();
+  const currentRole = currentUser?.role;
+  const currentUsername = currentUser?.username;
 
   const [project, setProject] = useState<Project | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingPhase, setSavingPhase] = useState(false);
   const [savingTaskId, setSavingTaskId] = useState<string | null>(null);
@@ -140,10 +226,23 @@ export default function ProjectDetailsPage() {
   const [taskForms, setTaskForms] = useState<Record<string, TaskForm>>({});
 
   const loadProject = useCallback(async () => {
+    if (!authHydrated) {
+      return;
+    }
+
     try {
       setLoading(true);
 
       const data = (await getProject(projectId)) as Project;
+
+      if (
+        isEmployee(currentRole) &&
+        hasOwnershipFields(data) &&
+        !isOwnedByUser(data, currentUsername)
+      ) {
+        router.replace("/dashboard/implementation");
+        return;
+      }
 
       setProject(data);
     } catch (err) {
@@ -152,12 +251,48 @@ export default function ProjectDetailsPage() {
     } finally {
       setLoading(false);
     }
-  }, [projectId]);
+  }, [authHydrated, currentRole, currentUsername, projectId, router]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadProject();
   }, [loadProject]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadProjectNavigation() {
+      if (!authHydrated) {
+        return;
+      }
+
+      try {
+        const data = await getProjects();
+        const allProjects = normalizeProjectList(data);
+        const visibleProjects = isEmployee(currentRole)
+          ? allProjects.filter(
+              (item) =>
+                !hasOwnershipFields(item) ||
+                isOwnedByUser(item, currentUsername)
+            )
+          : allProjects;
+
+        if (active) {
+          setProjects(visibleProjects);
+        }
+      } catch {
+        if (active) {
+          setProjects([]);
+        }
+      }
+    }
+
+    void loadProjectNavigation();
+
+    return () => {
+      active = false;
+    };
+  }, [authHydrated, currentRole, currentUsername]);
 
   const projectProgress = useMemo(
     () => (project ? calculateProjectProgress(project) : 0),
@@ -172,11 +307,23 @@ export default function ProjectDetailsPage() {
 
     try {
       setSavingPhase(true);
-      await createPhase(projectId, {
+      const createdPhase = createdPhaseFromResponse(
+        await createPhase(projectId, {
         phase_name: phaseForm.phase_name.trim(),
         description: phaseForm.description.trim(),
-      });
+        })
+      );
       toast.success("Phase created.");
+      if (createdPhase) {
+        setProject((current) =>
+          current
+            ? {
+                ...current,
+                phases: [...(current.phases ?? []), createdPhase],
+              }
+            : current
+        );
+      }
       setShowPhase(false);
       setPhaseForm({ phase_name: "", description: "" });
       await loadProject();
@@ -221,14 +368,33 @@ export default function ProjectDetailsPage() {
 
     try {
       setSavingTaskId(phaseId);
-      await createTask(phaseId, {
+      const createdTask = createdTaskFromResponse(
+        await createTask(phaseId, {
         title: form.title.trim(),
         description: form.description.trim(),
         assigned_to: form.assigned_to.trim(),
         priority: form.priority,
         due_date: form.due_date,
-      });
+        })
+      );
       toast.success("Task created.");
+      if (createdTask) {
+        setProject((current) =>
+          current
+            ? {
+                ...current,
+                phases: (current.phases ?? []).map((phase) =>
+                  phase.id === phaseId
+                    ? {
+                        ...phase,
+                        tasks: [...(phase.tasks ?? []), createdTask],
+                      }
+                    : phase
+                ),
+              }
+            : current
+        );
+      }
       setTaskForms((current) => ({
         ...current,
         [phaseId]: { ...emptyTaskForm },
@@ -273,6 +439,13 @@ export default function ProjectDetailsPage() {
 
   const projectName = project.project_name ?? project.name ?? project.title ?? "Project";
   const phases = project.phases ?? [];
+  const currentIndex = projects.findIndex((item) => item.id === project.id);
+  const previousProject = currentIndex > 0 ? projects[currentIndex - 1] : null;
+  const nextProject =
+    currentIndex >= 0 && currentIndex < projects.length - 1
+      ? projects[currentIndex + 1]
+      : null;
+  const canManageImplementation = canAccessEverywhere(currentRole);
 
   return (
     <div className="space-y-8">
@@ -293,13 +466,49 @@ export default function ProjectDetailsPage() {
             )}
           </div>
 
-          <button
-            onClick={() => setShowPhase(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700"
-          >
-            <Plus size={18} />
-            Add Phase
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href={
+                previousProject
+                  ? `/dashboard/implementation/project/${previousProject.id}`
+                  : "#"
+              }
+              aria-disabled={!previousProject}
+              className={`inline-flex items-center gap-2 rounded-lg border px-4 py-3 text-sm font-semibold ${
+                previousProject
+                  ? "border-slate-300 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                  : "pointer-events-none border-slate-200 text-slate-300 dark:border-slate-800 dark:text-slate-700"
+              }`}
+            >
+              <ArrowLeft size={18} />
+              Prev
+            </Link>
+            <Link
+              href={
+                nextProject
+                  ? `/dashboard/implementation/project/${nextProject.id}`
+                  : "#"
+              }
+              aria-disabled={!nextProject}
+              className={`inline-flex items-center gap-2 rounded-lg border px-4 py-3 text-sm font-semibold ${
+                nextProject
+                  ? "border-slate-300 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                  : "pointer-events-none border-slate-200 text-slate-300 dark:border-slate-800 dark:text-slate-700"
+              }`}
+            >
+              Next
+              <ArrowRight size={18} />
+            </Link>
+            {canManageImplementation && (
+              <button
+                onClick={() => setShowPhase(true)}
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                <Plus size={18} />
+                Add Phase
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="mt-8 grid gap-5 md:grid-cols-3">
@@ -337,7 +546,7 @@ export default function ProjectDetailsPage() {
         </div>
       </div>
 
-      {showPhase && (
+      {showPhase && canManageImplementation && (
         <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
@@ -422,13 +631,15 @@ export default function ProjectDetailsPage() {
                   </p>
                 </div>
 
-                <button
-                  onClick={() => openTaskForm(phase.id)}
-                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-                >
-                  <Plus size={16} />
-                  Add Task
-                </button>
+                {canManageImplementation && (
+                  <button
+                    onClick={() => openTaskForm(phase.id)}
+                    className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                  >
+                    <Plus size={16} />
+                    Add Task
+                  </button>
+                )}
               </div>
 
               <div className="p-6">
@@ -449,7 +660,7 @@ export default function ProjectDetailsPage() {
                   </div>
                 </div>
 
-                {taskForm?.show && (
+                {taskForm?.show && canManageImplementation && (
                   <div className="mb-8 rounded-lg border border-slate-200 p-5 dark:border-slate-800">
                     <div className="grid gap-4 lg:grid-cols-2">
                       <input

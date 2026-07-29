@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { toast } from "@/app/utils/toast";
 
 import {
   CheckCircle,
@@ -20,6 +19,8 @@ import {
   rejectIdea,
 } from "@/app/lib/pm-review";
 import { createLocalNotification } from "@/app/lib/notification";
+import { canAccessPMReview, useAuthHydrated } from "@/app/lib/access";
+import { useAuthStore } from "@/app/store/authstore";
 
 interface Idea {
   id: string;
@@ -42,6 +43,9 @@ type ReviewData = {
 };
 
 export default function ProductManagerReviewPage() {
+  const router = useRouter();
+  const role = useAuthStore((state) => state.user?.role);
+  const authHydrated = useAuthHydrated();
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -91,12 +95,17 @@ export default function ProductManagerReviewPage() {
   }
 
   useEffect(() => {
+    if (authHydrated && !canAccessPMReview(role)) {
+      router.replace("/dashboard/implementation");
+      return;
+    }
+
     const timeoutId = window.setTimeout(() => {
       void loadIdeas();
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
-  }, []);
+  }, [authHydrated, role, router]);
 
   const filteredIdeas = useMemo(() => {
     if (!search.trim()) {
@@ -114,6 +123,10 @@ export default function ProductManagerReviewPage() {
         idea.creator.toLowerCase().includes(keyword)
     );
   }, [search, ideas]);
+
+  if (!authHydrated || !canAccessPMReview(role)) {
+    return null;
+  }
 
   function updateField(
     id: string,

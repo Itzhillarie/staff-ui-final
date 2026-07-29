@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   Calendar,
@@ -12,6 +12,14 @@ import {
 } from "lucide-react";
 
 import { getProjects } from "@/app/lib/project";
+import {
+  canAccessEverywhere,
+  hasOwnershipFields,
+  isEmployee,
+  isOwnedByUser,
+  useAuthHydrated,
+} from "@/app/lib/access";
+import { useAuthStore } from "@/app/store/authstore";
 import { toast } from "sonner";
 
 interface Task {
@@ -38,6 +46,16 @@ interface Project {
   start_date?: string;
   end_date?: string | null;
   phases?: Phase[];
+  creator?: string | { username?: string; name?: string; id?: string | number };
+  created_by?: string | { username?: string; name?: string; id?: string | number };
+  created_by_name?: string;
+  created_by_username?: string;
+  owner?: string | { username?: string; name?: string; id?: string | number };
+  owner_name?: string;
+  owner_username?: string;
+  author?: string | { username?: string; name?: string; id?: string | number };
+  user?: string | { username?: string; name?: string; id?: string | number };
+  idea_creator?: string;
 }
 
 function normalizeList(data: unknown): Project[] {
@@ -91,26 +109,44 @@ function formatDate(value?: string | null) {
 }
 
 export default function ImplementationPage() {
+  const currentUser = useAuthStore((state) => state.user);
+  const authHydrated = useAuthHydrated();
+  const currentRole = currentUser?.role;
+  const currentUsername = currentUser?.username;
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  async function loadProjects() {
+  const loadProjects = useCallback(async () => {
+    if (!authHydrated) {
+      return;
+    }
+
     try {
       setLoading(true);
       const data = await getProjects();
-      setProjects(normalizeList(data));
+      const allProjects = normalizeList(data);
+
+      setProjects(
+        isEmployee(currentRole)
+          ? allProjects.filter(
+              (project) =>
+                !hasOwnershipFields(project) ||
+                isOwnedByUser(project, currentUsername)
+            )
+          : allProjects
+      );
     } catch {
       toast.error("Unable to load implementation projects.");
     } finally {
       setLoading(false);
     }
-  }
+  }, [authHydrated, currentRole, currentUsername]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadProjects();
-  }, []);
+  }, [loadProjects]);
 
   const filteredProjects = useMemo(() => {
     const keyword = search.trim().toLowerCase();
@@ -168,8 +204,9 @@ export default function ImplementationPage() {
             Implementation Projects
           </h1>
           <p className="mt-2 text-slate-500 dark:text-slate-400">
-            Approved ideas become projects where Product Managers define phases,
-            tasks, owners, due dates and priorities.
+            {canAccessEverywhere(currentRole)
+              ? "Approved ideas become projects where Product Managers define phases, tasks, owners, due dates and priorities."
+              : "Track implementation projects created from your approved ideas."}
           </p>
         </div>
 
