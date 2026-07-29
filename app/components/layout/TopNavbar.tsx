@@ -53,7 +53,7 @@ export default function TopNavbar() {
   };
 
   return (
-    <header className="flex h-20 items-center justify-between border-b border-slate-200 bg-white px-8 transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950">
+    <header className="flex h-20 items-center justify-between border-b border-slate-200 bg-white px-8 transition-colors duration-300 dark:border-slate-800 dark:bg-cyan-950">
 
       {/* Search */}
       <div className="relative w-105">
@@ -65,7 +65,7 @@ export default function TopNavbar() {
         <input
           type="text"
           placeholder="Search ideas..."
-          className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-cyan-300/40"
+          className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-cyan-500 dark:border-slate-800 dark:bg-cyan-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-cyan-300/40"
         />
       </div>
 
@@ -78,7 +78,7 @@ export default function TopNavbar() {
           onClick={toggleTheme}
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
           title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 dark:border-slate-800 dark:bg-slate-900 dark:text-cyan-200 dark:hover:border-cyan-300/40 dark:hover:bg-cyan-300/10"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white-500 text-slate-600 transition hover:border-blue-200 hover:bg-cyan-600 hover:text-cyan-600 dark:border-cyan-800 dark:bg-slate-900 dark:text-cyan-200 dark:hover:border-cyan-300/40 dark:hover:bg-cyan-300/10"
         >
           {theme === "dark" ? (
             <Sun size={19} />
@@ -89,29 +89,29 @@ export default function TopNavbar() {
 
         <Link
           href="/dashboard/notifications"
-          className="relative rounded-xl p-2 transition hover:bg-slate-100 dark:hover:bg-slate-900"
+          className="relative rounded-xl p-2 transition hover:bg-cyan-100 dark:hover:bg-cyan-900"
           aria-label="Open notifications"
         >
-          <Bell className="text-slate-600 transition hover:text-blue-600 dark:text-slate-400 dark:hover:text-cyan-300" />
+          <Bell className="text-slate-600 transition hover:text-cyan-600 dark:text-slate-400 dark:hover:text-cyan-300" />
           {unreadNotifications > 0 && (
-            <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-red-600 px-1.5 py-0.5 text-center text-xs font-bold leading-none text-white">
+            <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-blue-700 px-1.5 py-0.5 text-center text-xs font-bold leading-none text-white">
               {unreadNotifications > 99 ? "99+" : unreadNotifications}
             </span>
           )}
         </Link>
 
         <MessageCircle
-          className="cursor-pointer text-slate-600 transition hover:text-blue-600 dark:text-slate-400 dark:hover:text-cyan-300"
+          className="cursor-pointer text-slate-600 transition hover:text-cyan-600 dark:text-slate-400 dark:hover:text-cyan-300"
         />
 
 
         {/* Logged in User */}
-        <div className="flex items-center gap-3 border-l border-slate-200 pl-6 dark:border-slate-800">
+        <div className="flex items-center gap-3 border-l border-cyan-600 pl-6 dark:border-cyan-600">
 
           <div className="relative">
             <UserCircle2
               size={44}
-              className="text-blue-600 dark:text-cyan-300"
+              className="text-cyan-600 dark:text-cyan-300"
             />
 
             {/* Online indicator */}
@@ -137,7 +137,7 @@ export default function TopNavbar() {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-white transition hover:bg-red-700"
+          className="flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-2 text-white transition hover:bg-cyan-700"
         >
           <LogOut size={18} />
           Logout
