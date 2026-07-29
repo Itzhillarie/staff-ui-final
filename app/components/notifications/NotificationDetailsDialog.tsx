@@ -17,7 +17,7 @@ export default function NotificationDetailsDialog({
   if (!open || !notification) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-cyan/50 p-4 backdrop-blur-sm">
 
       <div className="w-full max-w-2xl rounded-2xl bg-white shadow-2xl">
 
@@ -37,7 +37,7 @@ export default function NotificationDetailsDialog({
 
           <button
             onClick={onClose}
-            className="rounded-xl p-2 transition hover:bg-slate-100"
+            className="rounded-xl p-2 transition hover:bg-cyan-100"
           >
             <X className="h-6 w-6 text-slate-600" />
           </button>
@@ -52,7 +52,7 @@ export default function NotificationDetailsDialog({
               Title
             </label>
 
-            <div className="rounded-xl bg-slate-50 p-4 text-slate-800">
+            <div className="rounded-xl bg-slate-cyan p-4 text-slate-800">
               {notification.title}
             </div>
 
@@ -64,7 +64,7 @@ export default function NotificationDetailsDialog({
               Message
             </label>
 
-            <div className="min-h-35 rounded-xl bg-slate-50 p-4 leading-7 text-slate-700">
+            <div className="min-h-35 rounded-xl bg-cyan-50 p-4 leading-7 text-slate-700">
               {notification.message}
             </div>
 
@@ -78,7 +78,7 @@ export default function NotificationDetailsDialog({
                 Type
               </label>
 
-              <div className="rounded-xl bg-indigo-50 px-4 py-3 font-medium capitalize text-indigo-700">
+              <div className="rounded-xl bg-cyan-50 px-4 py-3 font-medium capitalize text-blue-300">
                 {notification.type.replace("_", " ")}
               </div>
 
@@ -108,7 +108,7 @@ export default function NotificationDetailsDialog({
                 Date
               </label>
 
-              <div className="flex items-center gap-2 rounded-xl bg-slate-50 px-4 py-3 text-slate-700">
+              <div className="flex items-center gap-2 rounded-xl bg-cyan-50 px-4 py-3 text-slate-700">
                 <Clock className="h-4 w-4" />
                 {new Date(notification.created_at).toLocaleString()}
               </div>
@@ -123,7 +123,7 @@ export default function NotificationDetailsDialog({
 
           <button
             onClick={onClose}
-            className="rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white transition hover:bg-indigo-700"
+            className="rounded-xl bg-cyan-600 px-6 py-3 font-semibold text-white transition hover:bg-cyan-700"
           >
             Close
           </button>

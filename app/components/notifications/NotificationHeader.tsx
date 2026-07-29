@@ -12,7 +12,7 @@ export default function NotificationHeader({
   unread,
 }: NotificationHeaderProps) {
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-indigo-700 via-purple-700 to-pink-700 p-8 text-white shadow-2xl">
+    <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-cyan-700 via-cyan-700 to-cyan-700 p-8 text-white shadow-2xl">
 
       <div className="absolute -right-12 -top-12 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
 
@@ -54,7 +54,7 @@ export default function NotificationHeader({
 
           <div className="rounded-2xl bg-white/10 p-5 text-center backdrop-blur-sm">
 
-            <p className="text-sm text-indigo-100">
+            <p className="text-sm text-cyan-100">
               Unread
             </p>
 
