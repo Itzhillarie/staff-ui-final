@@ -94,7 +94,7 @@ export default function Sidebar() {
           </div>
           <div>
             <h1 className="text-xl font-black text-slate-950 dark:text-white">
-              spinmob
+              snipper
             </h1>
             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
               Innovation Hub
@@ -146,10 +146,10 @@ export default function Sidebar() {
       </div>
 
       {/* Fixed Logout */}
-      <div className="shrink-0 border-t border-cyan-200 bg-slate p-4 transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950">
+      <div className="shrink-0 border-t border-cyan-200 bg-white p-4 transition-colors duration-300 dark:border-cyan-800 dark:bg-white-500">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center justify-center gap-3 rounded-xl bg-red-600 px-4 py-3 font-medium text-slate transition hover:bg-red-600"
+          className="flex w-full items-center justify-center gap-3 rounded-xl bg-cyan-600 px-4 py-3 font-medium text-white transition hover:bg-cyan-600"
         >
           <LogOut size={2} />
           Logout
