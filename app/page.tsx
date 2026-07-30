@@ -85,7 +85,7 @@ export default function Home() {
     <main className="min-h-screen overflow-hidden bg-[#05121d] text-white">
       <section className="relative min-h-screen">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(34,211,238,0.18),transparent_28%),radial-gradient(circle_at_82%_18%,rgba(59,130,246,0.18),transparent_30%),linear-gradient(135deg,#05121d_0%,#082033_46%,#07111d_100%)]" />
-        <div className="home-grid-scan absolute inset-0 bg-[linear-gradient(rgba(125,211,252,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,0.055)_1px,transparent_1px)] bg-size-[40px_52px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
+        <div className="home-grid-scan absolute inset-0 bg-[linear-gradient(rgba(125,211,252,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,0.055)_1px,transparent_1px)] bg-size-[40px_52px] mask-[linear-gradient(to_bottom,black,transparent_82%)]" />
         <div className="home-orb-drift absolute left-1/2 top-0 h-[4000px] w-[400] -translate-x-1/2 rounded-full border border-cyan-300/10 bg-cyan-300/5 blur-3xl" />
 
         <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-10">
@@ -176,9 +176,9 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="home-rise-in home-rise-delay relative [perspective:1200px]">
+            <div className="home-rise-in home-rise-delay relative perspective-distant">
               <div className="absolute -inset-8 rounded-[2rem] bg-cyan-400/10 blur-3xl" />
-              <div className="home-console-float relative [transform:rotateX(8deg)_rotateY(-10deg)]">
+              <div className="home-console-float relative transform-[rotateX(8deg)_rotateY(-10deg)]">
                 <div className="home-console-shell overflow-hidden rounded-[2rem] border border-cyan-200/15 bg-slate-950/70 p-4 shadow-2xl shadow-cyan-950/40 backdrop-blur-xl">
                   <div className="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
@@ -196,14 +196,14 @@ export default function Home() {
                   </div>
 
                   <div className="grid gap-4 pt-4 lg:grid-cols-[1.08fr_0.92fr]">
-                    <div className="home-graph-panel relative min-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-[#081525] p-5">
-                      <div className="home-graph-field absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(34,211,238,0.18),transparent_34%),linear-gradient(rgba(125,211,252,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,0.06)_1px,transparent_1px)] bg-[size:auto,34px_34px,34px_34px]" />
-                      <div className="relative flex h-full min-h-[380px] items-center justify-center">
+                    <div className="home-graph-panel relative min-h-105 overflow-hidden rounded-2xl border border-white/10 bg-[#081525] p-5">
+                      <div className="home-graph-field absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(34,211,238,0.18),transparent_34%),linear-gradient(rgba(125,211,252,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,0.06)_1px,transparent_1px)] " />
+                      <div className="relative flex h-full min-h-95 items-center justify-center">
                         <div className="home-orbit-ring absolute h-72 w-72 rounded-full border border-cyan-200/20" />
                         <div className="home-orbit-ring home-orbit-ring-reverse absolute h-52 w-52 rounded-full border border-indigo-300/20" />
                         <div className="home-orbit-ring absolute h-32 w-32 rounded-full border border-emerald-300/20" />
 
-                        <div className="home-core-node relative grid h-28 w-28 place-items-center rounded-3xl border border-cyan-200/30 bg-cyan-300/15 shadow-2xl shadow-cyan-500/20 [transform:rotateX(58deg)_rotateZ(45deg)]">
+                        <div className="home-core-node relative grid h-28 w-28 place-items-center rounded-3xl border border-cyan-200/30 bg-cyan-300/15 shadow-2xl shadow-cyan-500/20 transform-[rotateX(58deg)_rotateZ(45deg)]">
                           <Network className="h-10 w-10 -rotate-45 text-cyan-100" />
                         </div>
 
@@ -232,8 +232,8 @@ export default function Home() {
                           );
                         })}
 
-                        <div className="home-flow-line absolute left-1/2 top-1/2 h-px w-64 -translate-x-1/2 -translate-y-1/2 rotate-[24deg] bg-linear-to-r from-transparent via-cyan-200/55 to-transparent" />
-                        <div className="home-flow-line home-flow-line-alt absolute left-1/2 top-1/2 h-px w-60 -translate-x-1/2 -translate-y-1/2 -rotate-[34deg] bg-linear-to-r from-transparent via-indigo-200/55 to-transparent" />
+                        <div className="home-flow-line absolute left-1/2 top-1/2 h-px w-64 -translate-x-1/2 -translate-y-1/2 rotate-24 bg-linear-to-r from-transparent via-cyan-200/55 to-transparent" />
+                        <div className="home-flow-line home-flow-line-alt absolute left-1/2 top-1/2 h-px w-60 -translate-x-1/2 -translate-y-1/2 rotate-[-34deg] bg-linear-to-r from-transparent via-indigo-200/55 to-transparent" />
                         <div className="absolute bottom-5 left-5 right-5 flex items-end gap-2">
                           {[38, 68, 52, 90, 76, 112, 84, 124, 96, 138].map(
                             (height, index) => (
