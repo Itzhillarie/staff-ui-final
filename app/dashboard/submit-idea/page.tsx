@@ -227,7 +227,7 @@ export default function SubmitIdeaPage() {
 
       {/* Header */}
 
-      <div className="rounded-3xl bg-linear-to-r from-cyan-700 via--700 to-light-blue-700 p-10 text-white shadow-xl">
+<div className="rounded-3xl bg-linear-to-r from-cyan-500 via--650 to-cyan-500 p-10 text-slate shadow-xl">
 
         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
 
@@ -255,7 +255,7 @@ export default function SubmitIdeaPage() {
               resetForm();
               setShowModal(true);
             }}
-            className="flex items-center gap-2 rounded-2xl bg-white px-6 py-4 font-semibold text-green-700 transition hover:scale-105"
+            className="flex items-center gap-2 rounded-2xl bg-white px-6 py-4 font-semibold text-blue-700 transition hover:scale-105"
           >
             <Plus size={22} />
             Create Idea
@@ -285,7 +285,7 @@ export default function SubmitIdeaPage() {
 
               <button
                 onClick={resetForm}
-                className="rounded-xl border p-2 hover:bg-slate-100"
+                className="rounded-xl border p-2 hover:bg-green-100"
               >
                 <X />
               </button>
@@ -340,7 +340,7 @@ export default function SubmitIdeaPage() {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="rounded-xl bg-cyan-600 px-8 py-3 font-semibold text-white hover:bg-cyan-700 disabled:opacity-60"
+                  className="rounded-xl bg-cyan-600 px-8 py-3 font-semibold text-white hover:bg-green-100 disabled:opacity-60"
                 >
                   {saving ? (
                     <span className="flex items-center gap-2">

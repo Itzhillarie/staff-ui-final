@@ -22,6 +22,7 @@ export default function TopNavbar() {
   const router = useRouter();
 
   const user = useAuthStore((state) => state.user);
+  console.log(JSON.stringify(user))
   const { theme, toggleTheme } = useDashboardTheme();
   const [unreadNotifications, setUnreadNotifications] = useState(0);
 
