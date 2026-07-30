@@ -151,21 +151,21 @@ export default function NotificationsPage() {
         <button
           onClick={handleReadAll}
           disabled={unread === 0}
-          className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-cyan px-5 py-3 font-semibold text-slate-700 transition hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <CheckCheck size={18} />
           Mark all read
         </button>
         <Link
           href="/dashboard/notifications/archive"
-          className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 transition hover:bg-slate-50"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-cyan px-5 py-3 font-semibold text-slate-700 transition hover:bg-cyan-50"
         >
           <Archive size={18} />
           Archive
         </Link>
         <Link
           href="/dashboard/notifications/settings"
-          className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700"
+          className="inline-flex items-center gap-2 rounded-xl bg-cyan-600 px-5 py-3 font-semibold text-white transition hover:bg-cyan-700"
         >
           <Settings size={18} />
           Settings
