@@ -11,6 +11,7 @@ export default function Signin() {
   alt="Innovation Team"
   fill
   priority
+
    sizes="(max-width: 1024px) 100vw, 50vw"
   className="object-cover"
 />
