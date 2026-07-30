@@ -1,4 +1,5 @@
 import Sidebar from "../components/layout/Sidebar";
+import DashboardModulePager from "../components/layout/DashboardModulePager";
 import TopNavbar from "../components/layout/TopNavbar";
 import { ensureActiveServerSession } from "../lib/session";
 import { DashboardThemeProvider } from "../providers/DashboardThemeProvider";
@@ -25,6 +26,7 @@ export default async function DashboardLayout({
           {/* Page Content */}
           <main className="flex-1 overflow-auto p-8 transition-colors duration-300">
             {children}
+            <DashboardModulePager />
           </main>
 
         </div>
