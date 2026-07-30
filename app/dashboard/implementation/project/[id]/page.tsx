@@ -50,12 +50,18 @@ interface Phase {
   id: string;
   phase_name: string;
   description?: string;
+  Description?: string;
+  name?: string;
+  title?: string;
   progress?: number;
   tasks?: Task[];
 }
 
 interface Project {
   id: string;
+  pk?: string;
+  uuid?: string;
+  project_id?: string;
   project_name?: string;
   name?: string;
   title?: string;
@@ -140,6 +146,26 @@ function formatDate(value?: string | null) {
   return new Date(value).toLocaleDateString();
 }
 
+function isUuid(value?: string | null) {
+  return Boolean(
+    value?.match(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    )
+  );
+}
+
+function getBackendProjectId(project: Project | null, fallbackId: string) {
+  const candidates = [
+    project?.id,
+    project?.project_id,
+    project?.uuid,
+    project?.pk,
+    fallbackId,
+  ];
+
+  return candidates.find(isUuid) ?? fallbackId;
+}
+
 function priorityClass(priority?: string) {
   switch (priority) {
     case "High":
@@ -188,7 +214,10 @@ function createdPhaseFromResponse(data: unknown): Phase | null {
     phase_name:
       candidate.phase_name ??
       (candidate as { name?: string }).name ??
+      (candidate as { title?: string }).title ??
       "Untitled phase",
+    description:
+      candidate.description ?? (candidate as { Description?: string }).Description,
     tasks: candidate.tasks ?? [],
   };
 }
@@ -307,8 +336,9 @@ export default function ProjectDetailsPage() {
 
     try {
       setSavingPhase(true);
+      const backendProjectId = getBackendProjectId(project, projectId);
       const createdPhase = createdPhaseFromResponse(
-        await createPhase(projectId, {
+        await createPhase(backendProjectId, {
         phase_name: phaseForm.phase_name.trim(),
         description: phaseForm.description.trim(),
         })
@@ -326,7 +356,9 @@ export default function ProjectDetailsPage() {
       }
       setShowPhase(false);
       setPhaseForm({ phase_name: "", description: "" });
-      await loadProject();
+      if (!createdPhase) {
+        await loadProject();
+      }
     } catch {
       toast.error("Unable to create phase.");
     } finally {

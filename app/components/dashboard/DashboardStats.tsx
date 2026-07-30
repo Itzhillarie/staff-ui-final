@@ -109,6 +109,7 @@ export default function DashboardStats({
         subtitle={`${stats.users.total_users} Total Users`}
         icon={<Award size={30} />}
         color="bg-cyan-600"
+        href="/dashboard/users"
       />
 
 
