@@ -22,6 +22,9 @@ type ProjectPhase = {
   id: string;
   phase_name?: string;
   description?: string;
+  Description?: string;
+  name?: string;
+  title?: string;
   tasks?: ProjectTask[];
 };
 
@@ -31,10 +34,36 @@ type ProjectSummary = {
   name?: string;
   title?: string;
   phases?: ProjectPhase[];
+  project_phases?: ProjectPhase[];
+  implementation_phases?: ProjectPhase[];
+  Phases?: ProjectPhase[];
 };
 
 function listFromResponse<T>(data: T[] | { results?: T[] }) {
   return Array.isArray(data) ? data : data.results ?? [];
+}
+
+function normalizePhase(phase: ProjectPhase): ProjectPhase {
+  return {
+    ...phase,
+    phase_name: phase.phase_name ?? phase.name ?? phase.title ?? "Untitled phase",
+    description: phase.description ?? phase.Description,
+    tasks: phase.tasks ?? [],
+  };
+}
+
+function normalizeProject<T extends ProjectSummary>(project: T): T {
+  const phases =
+    project.phases ??
+    project.project_phases ??
+    project.implementation_phases ??
+    project.Phases ??
+    [];
+
+  return {
+    ...project,
+    phases: phases.map(normalizePhase),
+  };
 }
 
 function authHeaders() {
@@ -58,17 +87,31 @@ function authHeaders() {
 ========================================== */
 
 export async function getProjects() {
-  return apiFetch(`${API}/projects/list/`, {
+  const data = await apiFetch<ProjectSummary[] | { results?: ProjectSummary[] }>(
+    `${API}/projects/list/`,
+    {
     method: "GET",
     headers: authHeaders(),
-  });
+    }
+  );
+
+  if (Array.isArray(data)) {
+    return data.map(normalizeProject);
+  }
+
+  return {
+    ...data,
+    results: data.results?.map(normalizeProject) ?? [],
+  };
 }
 
 export async function getProject(id: string) {
-  return apiFetch(`${API}/projects/detail/${id}/`, {
+  const data = await apiFetch<ProjectSummary>(`${API}/projects/detail/${id}/`, {
     method: "GET",
     headers: authHeaders(),
   });
+
+  return normalizeProject(data);
 }
 
 /* ==========================================
@@ -86,8 +129,7 @@ export async function createPhase(
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify({
-      ...data,
-      name: data.phase_name,
+      phase_name: data.phase_name,
       Description: data.description,
     }),
   });
@@ -104,7 +146,7 @@ export async function updatePhase(
     method: "PUT",
     headers: authHeaders(),
     body: JSON.stringify({
-      ...data,
+      phase_name: data.phase_name,
       Description: data.description,
     }),
   });

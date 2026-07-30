@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { toast } from "@/app/utils/toast";
+
 import {
   CheckCircle,
   XCircle,
@@ -12,6 +12,7 @@ import {
   ThumbsUp,
   MessageCircle,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   getPMReviewIdeas,
