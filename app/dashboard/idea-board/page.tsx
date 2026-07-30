@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { toast } from "@/app/utils/toast";
 import {
   Plus,
   Pencil,
@@ -61,7 +62,7 @@ export default function IdeaBoardPage() {
       );
     } catch (error) {
       console.error(error);
-      alert("Unable to load ideas.");
+     toast.error("Unable to load ideas.");
     } finally {
       setLoading(false);
     }
@@ -77,8 +78,9 @@ export default function IdeaBoardPage() {
     try {
       await deleteIdea(id);
       loadIdeas();
+      toast.success("Idea deleted successfully.");
     } catch (err: any) {
-      alert(err?.body?.error || "Delete failed");
+      toast.error(err?.message || "Delete failed");
     }
   }
 
@@ -99,10 +101,11 @@ export default function IdeaBoardPage() {
         title,
         description,
       });
+      toast.success("Idea updated successfully.");
 
       loadIdeas();
     } catch (err: any) {
-      alert(err?.body?.error || "Update failed");
+      toast.error(err?.message || "Update failed");
     }
   }
 

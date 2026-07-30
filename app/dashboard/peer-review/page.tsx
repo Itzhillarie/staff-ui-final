@@ -10,7 +10,7 @@ import {
   User,
   Loader2,
 } from "lucide-react";
-
+import { toast } from "@/app/utils/toast";
 import {
   getIdeas,
   likeIdea,
@@ -57,7 +57,7 @@ export default function PeerReviewPage() {
       );
     } catch (err) {
       console.error(err);
-      alert("Unable to load ideas.");
+      toast.error("Unable to load ideas.");
     } finally {
       setLoading(false);
     }
@@ -83,10 +83,11 @@ export default function PeerReviewPage() {
         type: "peer_review",
         category: "peer_reviews",
       });
+      toast.success("Idea liked successfully.");
 
       await loadIdeas();
     } catch (err: unknown) {
-      alert(getErrorMessage(err, "Unable to like idea."));
+      toast.error(getErrorMessage(err, "Unable to like idea."));
     }
   }
 
@@ -102,10 +103,10 @@ export default function PeerReviewPage() {
         type: "peer_review",
         category: "peer_reviews",
       });
-
+     toast.success("Idea disliked successfully.");
       await loadIdeas();
     } catch (err: unknown) {
-      alert(getErrorMessage(err, "Unable to dislike idea."));
+      toast.error(getErrorMessage(err, "Unable to dislike idea."));
     }
   }
 
@@ -113,7 +114,7 @@ export default function PeerReviewPage() {
     if (!selectedIdea) return;
 
     if (!comment.trim()) {
-      alert("Comment cannot be empty.");
+      toast.warning("Comment cannot be empty.");
       return;
     }
 
@@ -128,14 +129,16 @@ export default function PeerReviewPage() {
         type: "peer_review",
         category: "peer_reviews",
       });
+     toast.success("Comment submitted successfully.");
 
+      
       setComment("");
       setSelectedIdea(null);
       setShowComment(false);
 
       await loadIdeas();
     } catch (err: unknown) {
-      alert(getErrorMessage(err, "Unable to add comment."));
+      toast.error(getErrorMessage(err, "Unable to add comment."));
     }
   }
 

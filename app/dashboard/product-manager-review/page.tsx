@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 
 import {
   CheckCircle,
@@ -89,7 +88,7 @@ export default function ProductManagerReviewPage() {
       setReviewData(reviewState);
     } catch (err) {
       console.error(err);
-      alert("Unable to load Product Manager ideas.");
+      toast.error("Unable to load Product Manager ideas.");
     } finally {
       setLoading(false);
     }
@@ -160,9 +159,9 @@ export default function ProductManagerReviewPage() {
 
       await loadIdeas();
 
-      alert("Idea approved successfully.");
+      toast.success("Idea approved successfully.");
     } catch (err: unknown) {
-      alert(getErrorMessage(err, "Approval failed."));
+      toast.error(getErrorMessage(err, "Approval failed."));
     } finally {
       setSaving(false);
     }
@@ -188,9 +187,9 @@ export default function ProductManagerReviewPage() {
 
       await loadIdeas();
 
-      alert("Idea rejected successfully.");
+      toast.success("Idea rejected successfully.");
     } catch (err: unknown) {
-      alert(getErrorMessage(err, "Rejection failed."));
+      toast.error(getErrorMessage(err, "Rejection failed."));
     } finally {
       setSaving(false);
     }
