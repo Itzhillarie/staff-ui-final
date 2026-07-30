@@ -77,6 +77,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const role = useAuthStore((state) => state.user?.role);
+  
 
   async function handleLogout() {
     await logout();

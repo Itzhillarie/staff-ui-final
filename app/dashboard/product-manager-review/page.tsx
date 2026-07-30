@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+
 
 import {
   CheckCircle,
@@ -23,6 +23,7 @@ import {
 import { createLocalNotification } from "@/app/lib/notification";
 import { canAccessPMReview, useAuthHydrated } from "@/app/lib/access";
 import { useAuthStore } from "@/app/store/authstore";
+import { useRouter } from "next/navigation";
 
 interface Idea {
   id: string;
@@ -57,6 +58,7 @@ export default function ProductManagerReviewPage() {
   const [reviewData, setReviewData] = useState<
     Record<string, ReviewData>
   >({});
+  
 
   async function loadIdeas() {
     try {
@@ -196,6 +198,7 @@ export default function ProductManagerReviewPage() {
       setSaving(false);
     }
   }
+ 
 
   return (
     <div className="space-y-8 p-8">
@@ -423,6 +426,7 @@ export default function ProductManagerReviewPage() {
                 </button>
 
               </div>
+                
 
             </div>
 
@@ -431,10 +435,27 @@ export default function ProductManagerReviewPage() {
         </div>
 
       )}
+      <div className="mt-8 flex items-center justify-between border-t pt-6">
+  <button
+    onClick={() => router.push("/dashboard/peer-review")}
+    className="rounded-xl bg-cyan-600 px-5 py-2 text-white hover:bg-cyan-700"
+  >
+    ← Previous
+  </button>
+
+  <button
+    onClick={() => router.push("/dashboard/implementation")}
+    className="rounded-xl bg-cyan-600 px-5 py-2 text-white hover:bg-cyan-700"
+  >
+    Next →
+  </button>
+</div>     
 
     </div>
   );
 }
+
+
 
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error && error.message

@@ -6,6 +6,7 @@ import { persist } from "zustand/middleware";
 interface User {
   username: string;
   role: string;
+  permission: string;
 }
 
 interface AuthState {

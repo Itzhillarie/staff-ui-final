@@ -849,6 +849,21 @@ export default function ProjectDetailsPage() {
           );
         })
       )}
+      <div className="mt-8 flex items-center justify-between border-t pt-6">
+  <button
+    onClick={() => router.push("/dashboard/implementation")}
+    className="rounded-xl bg-cyan-600 px-5 py-2 text-white hover:bg-cyan-700"
+  >
+    ← Previous
+  </button>
+
+  <button
+    onClick={() => router.push("/dashboard/notifications")}
+    className="rounded-xl bg-cyan-600 px-5 py-2 text-white hover:bg-cyan-700"
+  >
+    Next →
+  </button>
+</div>
     </div>
   );
 }

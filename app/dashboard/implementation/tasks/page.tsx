@@ -10,6 +10,7 @@ import {
   Search,
   User,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { completeTask, getTasks } from "@/app/lib/project";
 import { toast } from "sonner";
@@ -134,6 +135,8 @@ export default function TasksPage() {
 
   const completedCount = tasks.filter(isTaskComplete).length;
 
+  const router = useRouter();
+
   return (
     <div className="space-y-8">
       <div>
@@ -192,7 +195,7 @@ export default function TasksPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px]">
+            <table className="w-full min-w-225">
               <thead className="bg-slate-50 text-sm text-slate-600 dark:bg-slate-950 dark:text-slate-300">
                 <tr>
                   <th className="px-6 py-4 text-left">Task</th>
@@ -273,6 +276,21 @@ export default function TasksPage() {
           </div>
         )}
       </div>
+      <div className="mt-8 flex items-center justify-between border-t pt-6">
+  <button
+    onClick={() => router.push("/dashboard/implementation")}
+    className="rounded-xl bg-cyan-600 px-5 py-2 text-white hover:bg-cyan-700"
+  >
+    ← Previous
+  </button>
+
+  <button
+    onClick={() => router.push("/dashboard/notifications")}
+    className="rounded-xl bg-cyan-600 px-5 py-2 text-white hover:bg-cyan-700"
+  >
+    Next →
+  </button>
+</div>
     </div>
   );
 }

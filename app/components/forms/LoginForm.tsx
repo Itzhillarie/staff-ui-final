@@ -101,6 +101,7 @@ export function SigninForm() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("username");
     localStorage.removeItem("role");
+    localStorage.removeItem("permission")
 
     toast.info("Your session expired. Please sign in again.");
   }, [logout, searchParams]);
@@ -118,6 +119,7 @@ export function SigninForm() {
         {
           username: state.username ?? "",
           role: state.role ?? "",
+          permission: state.permission ?? "",
         }
       );
 
