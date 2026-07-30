@@ -83,8 +83,8 @@ export default function NotificationSettingsPage() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="rounded-2xl bg-indigo-100 p-4">
-            <Settings size={32} className="text-indigo-600" />
+          <div className="rounded-2xl bg-cyan-100 p-4">
+            <Settings size={32} className="text-cyan-600" />
           </div>
 
           <div>
@@ -100,17 +100,17 @@ export default function NotificationSettingsPage() {
 
         <Link
           href="/dashboard/notifications"
-          className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 font-medium transition hover:bg-slate-100"
+          className="flex items-center gap-2 rounded-xl border border-slate-300 bg-cyan px-5 py-3 font-medium transition hover:bg-cyan-100"
         >
           <ArrowLeft size={18} />
           Back to Notifications
         </Link>
       </div>
 
-      <div className="flex items-start gap-4 rounded-2xl border border-blue-200 bg-blue-50 p-6">
+      <div className="flex items-start gap-4 rounded-2xl border border-blue-200 bg-cyan-50 p-6">
         <Bell size={28} className="mt-1 text-blue-600" />
         <div>
-          <h2 className="text-lg font-semibold text-slate-800">
+          <h2 className="text-lg font-semibold text-slate-300">
             Notification Preferences
           </h2>
           <p className="mt-2 leading-7 text-slate-600">

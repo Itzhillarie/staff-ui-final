@@ -85,8 +85,8 @@ export default function Home() {
     <main className="min-h-screen overflow-hidden bg-[#05121d] text-white">
       <section className="relative min-h-screen">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(34,211,238,0.18),transparent_28%),radial-gradient(circle_at_82%_18%,rgba(59,130,246,0.18),transparent_30%),linear-gradient(135deg,#05121d_0%,#082033_46%,#07111d_100%)]" />
-        <div className="home-grid-scan absolute inset-0 bg-[linear-gradient(rgba(125,211,252,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,0.055)_1px,transparent_1px)] bg-[size:52px_52px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
-        <div className="home-orb-drift absolute left-1/2 top-0 h-[640px] w-[640px] -translate-x-1/2 rounded-full border border-cyan-300/10 bg-cyan-300/5 blur-3xl" />
+        <div className="home-grid-scan absolute inset-0 bg-[linear-gradient(rgba(125,211,252,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,0.055)_1px,transparent_1px)] bg-size-[40px_52px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
+        <div className="home-orb-drift absolute left-1/2 top-0 h-[4000px] w-[400] -translate-x-1/2 rounded-full border border-cyan-300/10 bg-cyan-300/5 blur-3xl" />
 
         <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-10">
           <nav className="flex items-center justify-between">

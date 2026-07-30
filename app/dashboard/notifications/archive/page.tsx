@@ -86,7 +86,7 @@ export default function ArchivedNotificationsPage() {
         unread={0}
       />
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-cyan-200 bg-cyan p-6 shadow-sm">
 
         <div className="mb-6 flex items-center justify-between">
 
