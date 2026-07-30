@@ -7,19 +7,21 @@ export default function Signin() {
       <div className="grid min-h-screen lg:grid-cols-[1.05fr_0.95fr]">
         <section className="relative hidden min-h-screen overflow-hidden bg-cyan-950 px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between">
           <Image
-  src="/images/login-image.jpg"
-  alt="Innovation Team"
-  fill
-  priority
-  className="object-cover"
-/>
+            src="/images/login-image.jpg"
+            alt="Innovation Team"
+            fill
+            priority
 
-{/* Dark overlay */}
-<div className="absolute inset-0 bg-black/45" />
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="object-cover"
+          />
 
-{/* Optional cyan gradient */}
-<div className="absolute inset-0 bg-linear-to-br from-cyan-500/20 via-transparent to-slate-950/60" />
-          
+          {/* Dark overlay */}
+          <div className="absolute inset-0 bg-black/45" />
+
+          {/* Optional cyan gradient */}
+          <div className="absolute inset-0 bg-linear-to-br from-cyan-500/20 via-transparent to-slate-950/60" />
+
 
           <div className="relative z-10 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white text-base font-black text-slate-950">

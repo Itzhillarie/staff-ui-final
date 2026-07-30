@@ -8,6 +8,7 @@ export interface LoginState {
   token?: string;
   username?: string;
   role?: string;
+  permission?: string;
 }
 
 export async function loginUserAction(
@@ -73,6 +74,7 @@ export async function loginUserAction(
       token: data.token,
       username: data.username,
       role: data.role,
+      permission: data.permission
     };
   } catch (error) {
     console.error(error);

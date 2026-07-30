@@ -10,6 +10,7 @@ import {
   Loader2,
   X,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import {
   getIdeas,
@@ -33,6 +34,7 @@ interface Idea {
   dislikes: number;
 }
 
+   
 export default function SubmitIdeaPage() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
 
@@ -44,14 +46,22 @@ export default function SubmitIdeaPage() {
 
   const [showModal, setShowModal] = useState(false);
 
-  const [page] = useState(1);
+  const [page, setPage] = useState(1);
+const [pageSize] = useState(20);
 
-  const [pageSize] = useState(20);
-
+const [pagination, setPagination] = useState({
+  current_page: 1,
+  total_pages: 1,
+  has_next: false,
+  has_previous: false,
+});
   const [form, setForm] = useState({
     title: "",
     description: "",
   });
+  const router = useRouter();
+   
+
 
   /* ------------------------------------------
      LOAD IDEAS
@@ -68,6 +78,12 @@ export default function SubmitIdeaPage() {
       const drafts = (response.results ?? []).filter(
         (idea) => idea.status === "Draft"
       );
+      setPagination({
+      current_page: response.current_page,
+      total_pages: response.total_pages,
+      has_next: response.has_next,
+      has_previous: response.has_previous,
+    });
 
       setIdeas(drafts);
     } catch (error: unknown) {
@@ -221,13 +237,14 @@ export default function SubmitIdeaPage() {
       );
     }
   }
+  
 
   return (
     <div className="space-y-8">
 
       {/* Header */}
 
-      <div className="rounded-3xl bg-linear-to-r from-cyan-700 via--700 to-light-blue-700 p-10 text-white shadow-xl">
+<div className="rounded-3xl bg-linear-to-r from-cyan-500 via--650 to-cyan-500 p-10 text-slate shadow-xl">
 
         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
 
@@ -255,7 +272,7 @@ export default function SubmitIdeaPage() {
               resetForm();
               setShowModal(true);
             }}
-            className="flex items-center gap-2 rounded-2xl bg-white px-6 py-4 font-semibold text-green-700 transition hover:scale-105"
+            className="flex items-center gap-2 rounded-2xl bg-white px-6 py-4 font-semibold text-blue-700 transition hover:scale-105"
           >
             <Plus size={22} />
             Create Idea
@@ -285,7 +302,7 @@ export default function SubmitIdeaPage() {
 
               <button
                 onClick={resetForm}
-                className="rounded-xl border p-2 hover:bg-slate-100"
+                className="rounded-xl border p-2 hover:bg-green-100"
               >
                 <X />
               </button>
@@ -340,7 +357,7 @@ export default function SubmitIdeaPage() {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="rounded-xl bg-cyan-600 px-8 py-3 font-semibold text-white hover:bg-cyan-700 disabled:opacity-60"
+                  className="rounded-xl bg-cyan-600 px-8 py-3 font-semibold text-white hover:bg-green-100 disabled:opacity-60"
                 >
                   {saving ? (
                     <span className="flex items-center gap-2">
@@ -530,12 +547,42 @@ export default function SubmitIdeaPage() {
           </div>
 
         )}
+        <div className="mt-8 flex items-center justify-between border-t pt-6">
+  <button
+    disabled
+    className="rounded-xl bg-slate-300 px-5 py-2 text-white cursor-not-allowed"
+  >
+    ← Previous
+  </button>
+
+  <button
+    onClick={() => router.push("/dashboard/idea-board")}
+    className="rounded-xl bg-cyan-600 px-5 py-2 text-white hover:bg-cyan-700"
+  >
+    Next →
+  </button>
+</div>
 
       </div>
 
     </div>
 
   );
+  <div className="mt-8 flex items-center justify-between border-t pt-6">
+  <button
+    disabled
+    className="rounded-xl bg-slate-300 px-5 py-2 text-white cursor-not-allowed"
+  >
+    ← Previous
+  </button>
+
+  <button
+    onClick={() => router.push("/dashboard/idea-board")}
+    className="rounded-xl bg-cyan-600 px-5 py-2 text-white hover:bg-cyan-700"
+  >
+    Next →
+  </button>
+</div>
 }
 
 function getErrorMessage(error: unknown, fallback: string) {
