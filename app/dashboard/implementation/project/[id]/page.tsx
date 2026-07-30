@@ -233,6 +233,37 @@ function createdTaskFromResponse(data: unknown): Task | null {
   return candidate.id && candidate.title ? (candidate as Task) : null;
 }
 
+function normalizePhaseName(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function phaseNameCount(project: Project | null, phaseName: string) {
+  const normalizedName = normalizePhaseName(phaseName);
+
+  return (
+    project?.phases?.filter(
+      (phase) => normalizePhaseName(phase.phase_name ?? "") === normalizedName
+    ).length ?? 0
+  );
+}
+
+function hasPersistedPhase(
+  project: Project | null,
+  phase: Phase | null,
+  phaseName: string,
+  previousNameCount: number
+) {
+  if (!project) {
+    return false;
+  }
+
+  if (phase?.id && project.phases?.some((item) => item.id === phase.id)) {
+    return true;
+  }
+
+  return phaseNameCount(project, phaseName) > previousNameCount;
+}
+
 export default function ProjectDetailsPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -256,7 +287,7 @@ export default function ProjectDetailsPage() {
 
   const loadProject = useCallback(async () => {
     if (!authHydrated) {
-      return;
+      return null;
     }
 
     try {
@@ -270,13 +301,15 @@ export default function ProjectDetailsPage() {
         !isOwnedByUser(data, currentUsername)
       ) {
         router.replace("/dashboard/implementation");
-        return;
+        return null;
       }
 
       setProject(data);
+      return data;
     } catch (err) {
       console.error(err);
       toast.error("Unable to load project.");
+      return null;
     } finally {
       setLoading(false);
     }
@@ -337,29 +370,33 @@ export default function ProjectDetailsPage() {
     try {
       setSavingPhase(true);
       const backendProjectId = getBackendProjectId(project, projectId);
+      const phaseName = phaseForm.phase_name.trim();
+      const description = phaseForm.description.trim();
+      const previousNameCount = phaseNameCount(project, phaseName);
       const createdPhase = createdPhaseFromResponse(
         await createPhase(backendProjectId, {
-        phase_name: phaseForm.phase_name.trim(),
-        description: phaseForm.description.trim(),
+          phase_name: phaseName,
+          description,
         })
       );
-      toast.success("Phase created.");
-      if (createdPhase) {
-        setProject((current) =>
-          current
-            ? {
-                ...current,
-                phases: [...(current.phases ?? []), createdPhase],
-              }
-            : current
-        );
+      const reloadedProject = await loadProject();
+
+      if (
+        !hasPersistedPhase(
+          reloadedProject,
+          createdPhase,
+          phaseName,
+          previousNameCount
+        )
+      ) {
+        throw new Error("Phase was not returned by the project detail endpoint.");
       }
+
+      toast.success("Phase created.");
       setShowPhase(false);
       setPhaseForm({ phase_name: "", description: "" });
-      if (!createdPhase) {
-        await loadProject();
-      }
-    } catch {
+    } catch (error) {
+      console.error(error);
       toast.error("Unable to create phase.");
     } finally {
       setSavingPhase(false);

@@ -30,6 +30,9 @@ type ProjectPhase = {
 
 type ProjectSummary = {
   id: string;
+  pk?: string;
+  uuid?: string;
+  project_id?: string;
   project_name?: string;
   name?: string;
   title?: string;
@@ -41,6 +44,30 @@ type ProjectSummary = {
 
 function listFromResponse<T>(data: T[] | { results?: T[] }) {
   return Array.isArray(data) ? data : data.results ?? [];
+}
+
+function phaseListFromResponse(data: unknown): ProjectPhase[] {
+  if (Array.isArray(data)) {
+    return data as ProjectPhase[];
+  }
+
+  if (!data || typeof data !== "object") {
+    return [];
+  }
+
+  const record = data as {
+    results?: unknown;
+    phases?: unknown;
+    data?: unknown;
+  };
+
+  for (const value of [record.results, record.phases, record.data]) {
+    if (Array.isArray(value)) {
+      return value as ProjectPhase[];
+    }
+  }
+
+  return [];
 }
 
 function normalizePhase(phase: ProjectPhase): ProjectPhase {
@@ -64,6 +91,26 @@ function normalizeProject<T extends ProjectSummary>(project: T): T {
     ...project,
     phases: phases.map(normalizePhase),
   };
+}
+
+function isUuid(value?: string | null) {
+  return Boolean(
+    value?.match(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    )
+  );
+}
+
+function getProjectPhaseId(project: ProjectSummary, fallbackId: string) {
+  const candidates = [
+    project.id,
+    project.project_id,
+    project.uuid,
+    project.pk,
+    fallbackId,
+  ];
+
+  return candidates.find(isUuid) ?? fallbackId;
 }
 
 function authHeaders() {
@@ -111,7 +158,19 @@ export async function getProject(id: string) {
     headers: authHeaders(),
   });
 
-  return normalizeProject(data);
+  const project = normalizeProject(data);
+  const projectPhaseId = getProjectPhaseId(project, id);
+
+  try {
+    const phases = await getProjectPhases(projectPhaseId);
+
+    return {
+      ...project,
+      phases,
+    };
+  } catch {
+    return project;
+  }
 }
 
 /* ==========================================
@@ -130,9 +189,20 @@ export async function createPhase(
     headers: authHeaders(),
     body: JSON.stringify({
       phase_name: data.phase_name,
+      name: data.phase_name,
+      description: data.description,
       Description: data.description,
     }),
   });
+}
+
+async function getProjectPhases(projectId: string) {
+  const data = await apiFetch(`${API}/projects/projects/${projectId}/phases/`, {
+    method: "GET",
+    headers: authHeaders(),
+  });
+
+  return phaseListFromResponse(data).map(normalizePhase);
 }
 
 export async function updatePhase(
