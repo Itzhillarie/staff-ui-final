@@ -61,11 +61,7 @@ const links = [
     href: "/dashboard/notifications",
     icon: Bell,
   },
-  {
-    name: "Settings",
-    href: "/dashboard/settings",
-    icon: Settings,
-  },
+ 
   {
     name: "Users",
     href: "/dashboard/users",
@@ -95,7 +91,7 @@ export default function Sidebar() {
           </div>
           <div>
             <h1 className="text-xl font-black text-slate-950 dark:text-white">
-              inno
+              
             </h1>
             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
               Innovation Hub

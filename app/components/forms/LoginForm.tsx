@@ -35,7 +35,7 @@ const initialState = {
 };
 
 const styles = {
-  container: "w-full max-w-[440px]",
+  container: "w-full max-w-[480px]",
 
   eyebrow:
     "mb-6 inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 shadow-sm lg:hidden",

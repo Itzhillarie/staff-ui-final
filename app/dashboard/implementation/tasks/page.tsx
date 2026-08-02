@@ -285,7 +285,7 @@ export default function TasksPage() {
   </button>
 
   <button
-    onClick={() => router.push("/dashboard/notifications")}
+    onClick={() => router.push("/projects/implementation/")}
     className="rounded-xl bg-cyan-600 px-5 py-2 text-white hover:bg-cyan-700"
   >
     Next →
