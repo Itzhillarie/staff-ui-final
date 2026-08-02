@@ -5,7 +5,7 @@ export default function Signin() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#f7f9fc] text-cyan-950">
       <div className="grid min-h-screen lg:grid-cols-[1.05fr_0.95fr]">
-        <section className="relative hidden min-h-screen overflow-hidden bg-cyan-950 px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between">
+        <section className="relative hidden min-h-screen overflow-hidden bg-cyan-950 px-48 py-20 text-white lg:flex lg:flex-col lg:justify-between">
           <Image
             src="/images/login-image.jpg"
             alt="Innovation Team"
@@ -35,10 +35,12 @@ export default function Signin() {
             </div>
           </div>
 
-          <div className="relative z-10 max-w-xl pb-8">
+          <div className="relative z-10 max-w-xl items-center justify-center pb-8">
+             <div className="max-w-2xl px-8 text-center">
             <p className="mb-5 text-sm font-medium uppercase tracking-[0.18em] text-teal-200">
               Team workspace
             </p>
+            </div>
             <h1 className="text-5xl font-semibold leading-[1.05]">
               Turn everyday ideas into visible progress.
             </h1>

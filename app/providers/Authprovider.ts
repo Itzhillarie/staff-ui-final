@@ -25,6 +25,7 @@ export default function AuthProvider({
       localStorage.removeItem("authToken");
       localStorage.removeItem("username");
       localStorage.removeItem("role");
+      localStorage.removeItem("permission");
 
       return;
     }

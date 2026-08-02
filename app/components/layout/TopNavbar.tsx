@@ -138,7 +138,7 @@ export default function TopNavbar() {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-2 text-white transition hover:bg-cyan-700"
+          className="flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-2 text-white transition hover:bg-red-400"
         >
           <LogOut size={18} />
           Logout

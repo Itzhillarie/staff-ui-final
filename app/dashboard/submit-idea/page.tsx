@@ -11,7 +11,6 @@ import {
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-
 import {
   getIdeas,
   createIdea,
@@ -516,7 +515,7 @@ const [pagination, setPagination] = useState({
 
                       setShowModal(true);
                     }}
-                    className="flex items-center gap-2 rounded-xl bg-cyan-500 px-4 py-3 text-white transition hover:bg-cyan-600"
+                    className="flex items-center gap-2 rounded-xl bg-cyan-500 px-4 py-3 text-white transition hover:bg-blue-400"
                   >
                     <Pencil size={18} />
                     Edit
@@ -524,7 +523,7 @@ const [pagination, setPagination] = useState({
 
                   <button
                     onClick={() => handleDelete(idea.id)}
-                    className="flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-3 text-white transition hover:bg-cyan-700"
+                    className="flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-3 text-white transition hover:bg-red-400"
                   >
                     <Trash2 size={18} />
                     Delete
@@ -532,7 +531,7 @@ const [pagination, setPagination] = useState({
 
                   <button
                     onClick={() => handleSubmit(idea.id)}
-                    className="flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-3 text-white transition hover:bg-cyan-700"
+                    className="flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-3 text-white transition hover:bg-green-400"
                   >
                     <Send size={18} />
                     Submit
@@ -547,42 +546,13 @@ const [pagination, setPagination] = useState({
           </div>
 
         )}
-        <div className="mt-8 flex items-center justify-between border-t pt-6">
-  <button
-    disabled
-    className="rounded-xl bg-slate-300 px-5 py-2 text-white cursor-not-allowed"
-  >
-    ← Previous
-  </button>
-
-  <button
-    onClick={() => router.push("/dashboard/idea-board")}
-    className="rounded-xl bg-cyan-600 px-5 py-2 text-white hover:bg-cyan-700"
-  >
-    Next →
-  </button>
-</div>
-
+    
       </div>
 
     </div>
 
   );
-  <div className="mt-8 flex items-center justify-between border-t pt-6">
-  <button
-    disabled
-    className="rounded-xl bg-slate-300 px-5 py-2 text-white cursor-not-allowed"
-  >
-    ← Previous
-  </button>
-
-  <button
-    onClick={() => router.push("/dashboard/idea-board")}
-    className="rounded-xl bg-cyan-600 px-5 py-2 text-white hover:bg-cyan-700"
-  >
-    Next →
-  </button>
-</div>
+  
 }
 
 function getErrorMessage(error: unknown, fallback: string) {
