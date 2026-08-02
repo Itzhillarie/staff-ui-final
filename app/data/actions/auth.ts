@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 export interface LoginState {
   success: boolean;
@@ -26,9 +26,14 @@ export async function loginUserAction(
   }
 
   try {
-    const apiUrl =
-      process.env.API_SERVER_URL ??
-      process.env.NEXT_PUBLIC_API_URL;
+    const apiUrl = await getServerApiUrl();
+
+    if (!apiUrl) {
+      return {
+        success: false,
+        message: "API server URL is not configured.",
+      };
+    }
 
     const response = await fetch(
       `${apiUrl}/users/login/`,
@@ -46,7 +51,7 @@ export async function loginUserAction(
       }
     );
 
-    const data = await response.json();
+    const data = await parseApiResponse(response);
 
     if (!response.ok) {
       return {
@@ -82,6 +87,58 @@ export async function loginUserAction(
     return {
       success: false,
       message: "Unable to connect to the server.",
+    };
+  }
+}
+
+async function getServerApiUrl() {
+  const configuredUrl =
+    process.env.API_SERVER_URL?.trim() ||
+    process.env.NEXT_PUBLIC_API_URL?.trim();
+
+  if (!configuredUrl) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(configuredUrl)) {
+    return configuredUrl.replace(/\/+$/, "");
+  }
+
+  const requestHeaders = await headers();
+  const host =
+    requestHeaders.get("x-forwarded-host") ??
+    requestHeaders.get("host");
+
+  if (!host) {
+    return null;
+  }
+
+  const protocol =
+    requestHeaders.get("x-forwarded-proto") ??
+    (host.startsWith("localhost") ? "http" : "https");
+
+  return new URL(
+    configuredUrl,
+    `${protocol}://${host}`
+  )
+    .toString()
+    .replace(/\/+$/, "");
+}
+
+async function parseApiResponse(response: Response) {
+  const text = await response.text();
+
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {
+      message: response.ok
+        ? "Unexpected empty response from server."
+        : `Server returned ${response.status} ${response.statusText}.`,
     };
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "@/app/utils/toast";
 import { useRouter } from "next/navigation";
@@ -44,7 +44,7 @@ export default function IdeaBoardPage() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadIdeas = async () => {
+  const loadIdeas = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -63,25 +63,35 @@ export default function IdeaBoardPage() {
       );
     } catch (error) {
       console.error(error);
-     toast.error("Unable to load ideas.");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Unable to load ideas."
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadIdeas();
-  }, []);
+    const timeoutId = window.setTimeout(() => {
+      void loadIdeas();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [loadIdeas]);
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this idea?")) return;
 
     try {
       await deleteIdea(id);
-      loadIdeas();
+      void loadIdeas();
       toast.success("Idea deleted successfully.");
-    } catch (err: any) {
-      toast.error(err?.message || "Delete failed");
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, "Delete failed"));
     }
   }
 
@@ -104,9 +114,9 @@ export default function IdeaBoardPage() {
       });
       toast.success("Idea updated successfully.");
 
-      loadIdeas();
-    } catch (err: any) {
-      toast.error(err?.message || "Update failed");
+      void loadIdeas();
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, "Update failed"));
     }
   }
   const router = useRouter();
@@ -314,4 +324,13 @@ export default function IdeaBoardPage() {
     </div>
     
   );
+}
+
+function getErrorMessage(
+  error: unknown,
+  fallback: string
+) {
+  return error instanceof Error && error.message
+    ? error.message
+    : fallback;
 }

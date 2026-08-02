@@ -58,6 +58,7 @@ async function proxyBackendRequest(
   const headers = new Headers();
   const contentType = request.headers.get("content-type");
   const authorization = request.headers.get("authorization");
+  const token = request.cookies.get("jwt")?.value;
 
   headers.set("ngrok-skip-browser-warning", "1");
 
@@ -67,21 +68,38 @@ async function proxyBackendRequest(
 
   if (authorization) {
     headers.set("authorization", authorization);
+  } else if (token) {
+    headers.set("authorization", `Bearer ${token}`);
   }
 
-  const hasBody = !["GET", "HEAD"].includes(request.method);
-  const response = await fetch(upstreamUrl, {
-    method: request.method,
-    headers,
-    body: hasBody ? await request.text() : undefined,
-    cache: "no-store",
-  });
+  try {
+    const hasBody = !["GET", "HEAD"].includes(request.method);
+    const response = await fetch(upstreamUrl, {
+      method: request.method,
+      headers,
+      body: hasBody ? await request.text() : undefined,
+      cache: "no-store",
+    });
 
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: filterResponseHeaders(response.headers),
-  });
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: filterResponseHeaders(response.headers),
+    });
+  } catch (error) {
+    console.error("Unable to reach backend API.", error);
+
+    return Response.json(
+      {
+        error: "Unable to reach backend API.",
+        detail:
+          error instanceof Error
+            ? error.message
+            : "Unknown backend proxy error.",
+      },
+      { status: 502 }
+    );
+  }
 }
 
 function filterResponseHeaders(headers: Headers) {
